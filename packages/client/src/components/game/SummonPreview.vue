@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Unit } from '@game/sdk/src/card/unit';
 import { AnimatedSprite } from 'pixi.js';
+import { match } from 'ts-pattern';
 
 const { camera, assets, ui, fx } = useGame();
 
@@ -28,25 +29,38 @@ const boardDimensions = useGameSelector(session => ({
 
 const isDisplayed = computed(() => {
   if (!textures) return false;
-  if (
-    !ui.hoveredCell.value ||
-    ui.targetingMode.value !== TARGETING_MODES.SUMMON ||
-    !ui.selectedCard.value
-  ) {
-    return false;
-  }
-  return (
-    ui.selectedCard.value instanceof Unit &&
-    ui.selectedCard.value.canSummonAt(ui.hoveredCell.value.position)
-  );
+
+  return match(ui.targetingMode.value)
+    .with(TARGETING_MODES.NONE, TARGETING_MODES.BASIC, () => false)
+    .with(TARGETING_MODES.SUMMON, () => {
+      if (!ui.hoveredCell.value || !ui.selectedCard.value) {
+        return false;
+      }
+      return (
+        ui.selectedCard.value instanceof Unit &&
+        ui.selectedCard.value.canSummonAt(ui.hoveredCell.value.position)
+      );
+    })
+    .with(TARGETING_MODES.FOLLOWUP, () => {
+      return ui.selectedCard.value instanceof Unit;
+    })
+    .exhaustive();
+});
+
+const position = computed(() => {
+  return match(ui.targetingMode.value)
+    .with(TARGETING_MODES.NONE, TARGETING_MODES.BASIC, () => null)
+    .with(TARGETING_MODES.SUMMON, () => ui.hoveredCell.value!.position)
+    .with(TARGETING_MODES.FOLLOWUP, () => ui.summonTarget.value)
+    .exhaustive();
 });
 </script>
 
 <template>
   <IsoPositioner
-    v-if="isDisplayed"
+    v-if="isDisplayed && position"
     :animated="false"
-    v-bind="ui.hoveredCell.value!.position"
+    v-bind="position"
     :z-index-offset="3"
     :angle="camera.angle.value"
     :height="boardDimensions.height"

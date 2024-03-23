@@ -30,6 +30,7 @@ export type GameUiContext = {
   selectedCard: ComputedRef<Nullable<AnyCard>>;
   selectedCardIndex: Ref<Nullable<number>>;
   followupTargets: Ref<Point3D[]>;
+  summonTarget: Ref<Nullable<Point3D>>;
   selectCardAtIndex(index: number): void;
   unselectCard(): void;
 
@@ -46,6 +47,7 @@ export const useGameUiProvider = (session: GameSession) => {
   const selectedCardIndex = ref<Nullable<number>>(null);
   const selectedEntityId = ref<Nullable<EntityId>>(null);
   const followupTargets = ref<Point3D[]>([]);
+  const summonTarget = ref<Nullable<Point3D>>();
 
   const targetingMode = ref<TargetingMode>(TARGETING_MODES.NONE);
 
@@ -56,6 +58,7 @@ export const useGameUiProvider = (session: GameSession) => {
 
   const api: GameUiContext = {
     targetingMode,
+    summonTarget,
     followupTargets,
     selectedCardIndex,
     switchTargetingMode(mode) {

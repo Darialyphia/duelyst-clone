@@ -3,4 +3,5 @@
 <template>
   <TeamInfos />
   <ActionBar />
+  <SummonFollowupUi />
 </template>

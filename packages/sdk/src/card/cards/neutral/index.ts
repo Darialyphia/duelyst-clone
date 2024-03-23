@@ -24,6 +24,7 @@ export const neutral: CardBlueprint[] = [
             keywords: [],
             handler(session, attachedTo) {
               const [point] = attachedTo.card.summonFollowupTargets;
+              console.log(attachedTo.card.summonFollowupTargets);
               const entity = session.entitySystem.getEntityAt(point);
               if (entity) {
                 entity.heal(2, attachedTo.card);

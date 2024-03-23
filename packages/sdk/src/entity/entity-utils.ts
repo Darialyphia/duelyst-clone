@@ -2,7 +2,7 @@ import { type Nullable, isDefined } from '@game/shared';
 import { GameSession } from '../game-session';
 import { type Point3D } from '../types';
 import { Entity, type EntityId } from './entity';
-import { isAxisAligned, isWithinRange } from '../utils/targeting';
+import { isAxisAligned, isWithinCells, isWithinRange } from '../utils/targeting';
 
 export const getEntityIfOwnerMatches = (
   ctx: GameSession,
@@ -46,7 +46,7 @@ export const isEmpty = (session: GameSession, point: Point3D) => {
 };
 
 export const hasNearbyUnit = (session: GameSession, origin: Point3D, point: Point3D) => {
-  return !isEmpty(session, point) && isWithinRange(origin, point, 1);
+  return !isEmpty(session, point) && isWithinCells(origin, point, 1);
 };
 
 export const pointsToEntities = (session: GameSession, points: Point3D[]): Entity[] =>

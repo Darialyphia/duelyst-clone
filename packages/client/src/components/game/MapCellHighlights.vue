@@ -32,16 +32,46 @@ const matchMovement = (cellToTest: Cell) => {
 };
 
 const matchAttack = (cell: Cell) => {
-  return false;
-  // if (state.value.phase === 'deploy') return false;
-  // return match(ui.targetingMode.value)
-  //   .with(TARGETING_MODES.BASIC, TARGETING_MODES.SKILL, () => false)
-  //   .with(TARGETING_MODES.NONE, () => {
-  //     if (!ui.hoveredEntity.value) return false;
-  //     if (ui.hoveredEntity.value.isAlly(state.value.activeEntity.id)) return false;
-  //     return pathfinding.canAttackAt(ui.hoveredEntity.value, cell);
-  //   })
-  //   .exhaustive();
+  if (phase.value !== 'battle') return false;
+  return match(ui.targetingMode.value)
+    .with(
+      TARGETING_MODES.BASIC,
+      TARGETING_MODES.SUMMON,
+      TARGETING_MODES.FOLLOWUP,
+      () => false
+    )
+    .with(TARGETING_MODES.NONE, () => {
+      if (!ui.hoveredEntity.value) return false;
+      if (ui.hoveredEntity.value.player.equals(activePlayer.value)) return false;
+
+      return pathfinding.canAttackAt(ui.hoveredEntity.value, cell);
+    })
+    .exhaustive();
+};
+
+const matchFollowup = (cell: Cell) => {
+  if (phase.value !== 'battle') return false;
+  return match(ui.targetingMode.value)
+    .with(
+      TARGETING_MODES.BASIC,
+      TARGETING_MODES.SUMMON,
+      TARGETING_MODES.NONE,
+      () => false
+    )
+    .with(TARGETING_MODES.FOLLOWUP, () => {
+      if (!ui.selectedCard.value) return false;
+      if (!(ui.selectedCard.value instanceof Unit)) return false;
+
+      return (
+        ui.selectedCard.value.blueprint.summonedFollowup?.isTargetable(
+          session,
+          cell,
+          ui.summonTarget.value!,
+          ui.selectedCard.value
+        ) ?? false
+      );
+    })
+    .exhaustive();
 };
 
 const matchSummon = (cell: Cell) => {
@@ -55,6 +85,7 @@ const matchSummon = (cell: Cell) => {
 const isMovementDisplayed = computed(() => !fx.isPlaying.value && matchMovement(cell));
 const isAttackDisplayed = computed(() => !fx.isPlaying.value && matchAttack(cell));
 const isSummonDisplayed = computed(() => !fx.isPlaying.value && matchSummon(cell));
+const isFollowupDisplayed = computed(() => !fx.isPlaying.value && matchFollowup(cell));
 
 const movementBitmask = computed(() => {
   return getBitMask(session, cell, camera.angle.value, neighbor => {
@@ -80,6 +111,14 @@ const summonBitmask = computed(() => {
   });
 });
 
+const followupBitmask = computed(() => {
+  return getBitMask(session, cell, camera.angle.value, neighbor => {
+    if (!neighbor) return false;
+
+    return matchFollowup(neighbor);
+  });
+});
+
 const movementTexture = computed(() => {
   if (!isDefined(movementBitmask.value)) return;
 
@@ -96,6 +135,12 @@ const summonTexture = computed(() => {
   if (!isDefined(summonBitmask.value)) return;
 
   return getTextureIndexFromBitMask(summonBitmask.value, summonTileset.value);
+});
+
+const followupTexture = computed(() => {
+  if (!isDefined(followupBitmask.value)) return;
+
+  return getTextureIndexFromBitMask(followupBitmask.value, summonTileset.value);
 });
 
 const { autoDestroyRef } = useAutoDestroy();
@@ -147,6 +192,22 @@ const { autoDestroyRef } = useAutoDestroy();
       event-mode="none"
     >
       <sprite :texture="summonTexture" :anchor="0.5" />
+    </container>
+  </PTransition>
+
+  <PTransition
+    appear
+    :duration="{ enter: 300, leave: 300 }"
+    :before-enter="{ alpha: 0 }"
+    :enter="{ alpha: 1 }"
+    :leave="{ alpha: 0 }"
+  >
+    <container
+      v-if="followupTexture && isFollowupDisplayed"
+      :ref="container => autoDestroyRef(container)"
+      event-mode="none"
+    >
+      <sprite :texture="followupTexture" :anchor="0.5" />
     </container>
   </PTransition>
 </template>

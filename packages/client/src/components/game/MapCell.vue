@@ -122,6 +122,7 @@ const filters = computed(() => {
                   ui.selectedCard.value.canSummonAt(cell.position)
                 ) {
                   if (ui.selectedCard.value.blueprint.summonedFollowup) {
+                    ui.summonTarget.value = cell.position;
                     ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);
                   } else {
                     dispatch('playCard', {
@@ -131,6 +132,19 @@ const filters = computed(() => {
                     });
                     ui.unselectCard();
                   }
+                }
+              })
+              .with(TARGETING_MODES.FOLLOWUP, () => {
+                if (
+                  ui.selectedCard.value instanceof Unit &&
+                  ui.selectedCard.value.blueprint.summonedFollowup?.isTargetable(
+                    session,
+                    cell,
+                    ui.summonTarget.value!,
+                    ui.selectedCard.value
+                  )
+                ) {
+                  ui.followupTargets.value.push(cell.position);
                 }
               })
               .with(TARGETING_MODES.NONE, () => {

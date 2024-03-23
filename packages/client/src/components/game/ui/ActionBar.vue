@@ -71,7 +71,7 @@ const hand = useGameSelector(session => session.playerSystem.activePlayer.hand);
   }
 
   &.selected > .icon {
-    transform: translateY(-65%) scale(2);
+    transform: translateY(-70%) scale(2);
   }
 }
 </style>

@@ -48,13 +48,12 @@ export class Unit extends Card<UnitCtx> {
   }
 
   async onPlay(ctx: UnitCtx) {
+    this.summonFollowupTargets = ctx.targets;
     this.entity = this.session.entitySystem.addEntity({
       cardIndex: this.index,
       playerId: this.playerId,
       position: ctx.position
     });
-
-    this.summonFollowupTargets = ctx.targets;
   }
 
   get attack(): number {
