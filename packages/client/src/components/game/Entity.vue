@@ -19,7 +19,6 @@ const setTextures = () => {
   if (!entity.value) return;
   const sheet = assets.getSpritesheet(entity.value.card.blueprint.spriteId);
   textures.value = createSpritesheetFrameObject(animationName.value, sheet);
-  console.log(`[${entityId}] textures updated for ${animationName.value}`);
 };
 setTextures();
 
@@ -31,10 +30,6 @@ watch(animationName, (newAnimation, oldAnimation) => {
     nextTick(() => {
       if (!sprite.value) return;
       sprite.value.gotoAndPlay(0);
-      console.log(`[${entityId}] start playing animation ${newAnimation}`);
-      setTimeout(() => {
-        console.log(`[${entityId}] is playing : ${sprite.value?.playing}`);
-      });
     });
   };
 
@@ -46,7 +41,6 @@ watch(animationName, (newAnimation, oldAnimation) => {
       updateAnimation();
     };
   };
-  console.log(`[${entityId}] update animation from ${oldAnimation} to ${newAnimation}`);
   if (newAnimation === 'breathing' && oldAnimation === 'idle') {
     updateAnimationDelayed();
   } else {
@@ -105,43 +99,6 @@ const boardDimensions = useGameSelector(session => ({
   width: session.boardSystem.width,
   height: session.boardSystem.height
 }));
-
-const attackStyle = new TextStyle({
-  fontSize: 30,
-  align: 'center',
-  fill:
-    entity.value.attack < entity.value.card.blueprint.attack
-      ? 'red'
-      : entity.value.attack > entity.value.card.blueprint.attack
-        ? 0x12c943
-        : 'white'
-});
-
-const hpStyle = new TextStyle({
-  fontSize: 30,
-  align: 'center',
-  fill:
-    entity.value.hp < entity.value.card.blueprint.maxHp
-      ? 'red'
-      : entity.value.hp > entity.value.card.blueprint.maxHp
-        ? 0x12c943
-        : 'white'
-});
-
-watchEffect(() => {
-  attackStyle.fill =
-    entity.value.attack < entity.value.card.blueprint.attack
-      ? 'red'
-      : entity.value.attack > entity.value.card.blueprint.attack
-        ? 0x12c943
-        : 'white';
-  hpStyle.fill =
-    entity.value.hp < entity.value.card.blueprint.maxHp
-      ? 'red'
-      : entity.value.hp > entity.value.card.blueprint.maxHp
-        ? 0x12c943
-        : 'white';
-});
 </script>
 
 <template>
@@ -179,47 +136,14 @@ watchEffect(() => {
         "
         :textures="textures"
         :filters="filters"
-        :anchor="0.5"
+        :anchor-x="0.5"
+        :anchor-y="1"
+        :y="CELL_HEIGHT * 0.9"
         :scale-x="scaleX"
         :playing="true"
       />
 
-      <container :y="CELL_HEIGHT * 0.7">
-        <graphics
-          @render="
-            g => {
-              g.clear();
-              g.beginFill('black');
-              g.lineStyle({ color: 'yellow', width: 1 });
-              g.drawCircle(-CELL_WIDTH * 0.25, 0, 7);
-            }
-          "
-        >
-          <pixi-text
-            :style="attackStyle"
-            :scale="0.25"
-            :x="-CELL_WIDTH * 0.4 + 14"
-            :anchor="0.5"
-          >
-            {{ entity.attack }}
-          </pixi-text>
-        </graphics>
-
-        <graphics
-          @render="
-            g => {
-              g.clear();
-              g.beginFill('black');
-              g.lineStyle({ color: 'red', width: 1 });
-              g.drawCircle(22, 0, 7);
-            }
-          "
-        >
-          <pixi-text :style="hpStyle" :scale="0.25" :x="22" :anchor="0.5">
-            {{ entity.hp }}
-          </pixi-text>
-        </graphics>
-      </container>
+      <EntityStats :entity-id="entityId" />
     </container>
   </IsoPositioner>
 </template>

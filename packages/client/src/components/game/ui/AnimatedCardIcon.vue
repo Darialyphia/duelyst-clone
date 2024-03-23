@@ -37,6 +37,8 @@ const style = computed(() => {
 
 <style scoped lang="postcss">
 div {
+  pointer-events: none;
+
   width: calc(1px * var(--width));
   height: calc(1px * var(--height));
 

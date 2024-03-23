@@ -32,15 +32,15 @@ const state: SerializedGameState = {
       cards: [
         { blueprintId: 'sajj' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' }
+        { blueprintId: 'bloodtear_alchemist' }
       ],
       isPlayer1: true,
       graveyard: [],
@@ -52,15 +52,15 @@ const state: SerializedGameState = {
       cards: [
         { blueprintId: 'sajj' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
+        { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'healing_mystic' }
+        { blueprintId: 'bloodtear_alchemist' }
       ],
       isPlayer1: false,
       graveyard: [],

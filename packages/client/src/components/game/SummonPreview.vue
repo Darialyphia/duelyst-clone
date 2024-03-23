@@ -74,9 +74,11 @@ const position = computed(() => {
     <animated-sprite
       :alpha="0.5"
       :textures="textures"
-      :anchor="0.5"
       :scale-x="scaleX"
       :playing="true"
+      :anchor-x="0.5"
+      :anchor-y="1"
+      :y="CELL_HEIGHT * 0.9"
     />
   </IsoPositioner>
 </template>

@@ -50,16 +50,16 @@ const hand = useGameSelector(session => session.playerSystem.activePlayer.hand);
   background: transparent;
   /* background: var(--bg); */
   background-size: cover;
-  border: none;
 
   transition: transform 0.2s;
 
   > .icon {
     position: absolute;
     z-index: 1;
-    top: 0;
+    bottom: 0;
     left: 0;
-    transform: translateY(-50%) scale(2);
+    transform-origin: bottom center;
+    transform: scale(2);
 
     transition:
       transform 0.3s ease-out,
@@ -71,7 +71,7 @@ const hand = useGameSelector(session => session.playerSystem.activePlayer.hand);
   }
 
   &.selected > .icon {
-    transform: translateY(-70%) scale(2);
+    transform: scale(2) translateY(-20px);
   }
 }
 </style>
