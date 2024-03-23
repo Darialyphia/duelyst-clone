@@ -17,17 +17,20 @@ const scaleY = app.value.view.height / SKY_SIZE.y;
     :width="screen.width"
     :height="screen.height"
     :scale="scaleY"
+    event-mode="static"
   />
   <tiling-sprite
     :texture="sky2"
     :width="screen.width"
     :height="screen.height"
     :scale="scaleY"
+    event-mode="static"
   />
   <tiling-sprite
     :texture="sky4"
     :width="screen.width"
     :height="screen.height"
     :scale="scaleY"
+    event-mode="static"
   />
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useStage } from 'vue3-pixi';
+
 // watchEffect(() => {
 //   if (gameObjectsLayer.value) {
 //     gameObjectsLayer.value.group.enableSort = true;
@@ -24,6 +26,7 @@ const entities = useGameSelector(session => session.entitySystem.getList());
   </Camera>
 
   <Tint />
+  <FollowupOverlay />
   <Layer :ref="(layer: any) => ui.registerLayer(layer, 'ui')" />
   <Fps />
 </template>

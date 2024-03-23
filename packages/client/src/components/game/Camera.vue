@@ -4,11 +4,12 @@ import { type Viewport } from 'pixi-viewport';
 import { CELL_HEIGHT, CELL_WIDTH } from '@/utils/constants';
 import { pointToIndex } from '@game/shared';
 import { Container } from 'pixi.js';
+import type { FederatedPointerEvent } from 'pixi.js';
 
 const app = useApplication();
 const screenViewport = shallowRef<Viewport>();
 
-const { fx } = useGame();
+const { fx, ui } = useGame();
 
 const { camera } = useGame();
 
@@ -103,18 +104,15 @@ until(screenViewport)
     :events="app.renderer.events"
     :disable-on-context-menu="true"
     :sortable-children="true"
-  >
-    <graphics
-      :alpha="0"
-      @render="
-        g => {
-          g.clear();
-          g.beginFill('red');
-          g.drawRect(0, 0, worldSize.width, worldSize.height);
-          g.endFill();
+    @pointerup="
+      (e: FederatedPointerEvent) => {
+        if (e.target === screenViewport) {
+          ui.unselectCard();
+          ui.unselectEntity();
         }
-      "
-    />
+      }
+    "
+  >
     <container
       v-bind="containerOffset"
       :ref="

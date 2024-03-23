@@ -184,7 +184,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   canMove(distance: number) {
     return this.interceptors.canMove.getValue(
-      distance <= this.reach && this.movementsTaken < 1 && this.attacksTaken > 0,
+      distance <= this.reach && this.movementsTaken < 1 && this.attacksTaken === 0,
       this
     );
   }

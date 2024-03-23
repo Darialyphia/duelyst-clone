@@ -109,6 +109,7 @@ export const useGameUiProvider = (session: GameSession) => {
     },
     unselectCard() {
       selectedCardIndex.value = null;
+      followupTargets.value = [];
       api.switchTargetingMode(TARGETING_MODES.NONE);
     }
   };

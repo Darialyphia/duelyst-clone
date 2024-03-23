@@ -121,12 +121,16 @@ const filters = computed(() => {
                   ui.selectedCard.value instanceof Unit &&
                   ui.selectedCard.value.canSummonAt(cell.position)
                 ) {
-                  dispatch('playCard', {
-                    cardIndex: ui.selectedCardIndex.value!,
-                    position: cell.position,
-                    targets: []
-                  });
-                  ui.unselectCard();
+                  if (ui.selectedCard.value.blueprint.summonedFollowup) {
+                    ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);
+                  } else {
+                    dispatch('playCard', {
+                      cardIndex: ui.selectedCardIndex.value!,
+                      position: cell.position,
+                      targets: []
+                    });
+                    ui.unselectCard();
+                  }
                 }
               })
               .with(TARGETING_MODES.NONE, () => {
