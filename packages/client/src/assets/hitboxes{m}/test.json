@@ -1,0 +1,39 @@
+{
+  "generator_info": "PixiJS polygon exporter. Visit https://github.com/eXponenta for more!",
+  "tag": "pixi_polygon_points",
+  "format": {
+    "reshaped": true,
+    "flat": true,
+    "body": false,
+    "normalized": false
+  },
+  "shapes": [
+    {
+      "label": "",
+      "id": 0,
+      "type": "POLYGON",
+      "source": {
+        "width": 128,
+        "height": 128
+      },
+      "points": [
+        [49, 41, 55, 50, 57, 42],
+        [57, 31, 58, 84, 72, 84, 80, 55, 79, 35, 68, 27],
+        [42, 78, 58, 84, 50, 61, 42, 59],
+        [89, 77, 87, 64, 80, 55, 72, 84],
+        [89, 47, 86, 39, 79, 35, 80, 55],
+        [59, 26, 68, 27, 71, 25, 61, 23],
+        [31, 58, 51, 56, 55, 50, 40, 53],
+        [71, 25, 68, 27, 79, 35],
+        [51, 56, 50, 61, 58, 84, 55, 50],
+        [55, 50, 58, 84, 57, 42]
+      ],
+      "bounds": {
+        "x": 31,
+        "y": 31,
+        "width": 58,
+        "height": 58
+      }
+    }
+  ]
+}
