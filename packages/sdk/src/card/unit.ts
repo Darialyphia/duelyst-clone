@@ -1,8 +1,9 @@
 import { CARDS, type CardBlueprint } from './card-lookup';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { Card } from './card';
-import type { Point3D } from '@game/shared';
+import type { Nullable, Point3D } from '@game/shared';
 import { config } from '../config';
+import type { Entity } from '../entity/entity';
 
 export type UnitInterceptor = Unit['interceptors'];
 
@@ -13,6 +14,9 @@ type UnitBlueprint = CardBlueprint & {
 type UnitCtx = { position: Point3D; targets: Point3D[] };
 
 export class Unit extends Card<UnitCtx> {
+  entity: Nullable<Entity> = null;
+  summonFollowupTargets: Point3D[] = [];
+
   get blueprint(): UnitBlueprint {
     return CARDS[this.blueprintId] as UnitBlueprint;
   }
@@ -44,13 +48,13 @@ export class Unit extends Card<UnitCtx> {
   }
 
   async onPlay(ctx: UnitCtx) {
-    this.session.entitySystem.addEntity({
+    this.entity = this.session.entitySystem.addEntity({
       cardIndex: this.index,
       playerId: this.playerId,
       position: ctx.position
     });
 
-    // TODO: handle opening gambits
+    this.summonFollowupTargets = ctx.targets;
   }
 
   get attack(): number {

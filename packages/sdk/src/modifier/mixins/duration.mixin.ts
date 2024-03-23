@@ -1,16 +1,17 @@
 import type { Entity } from '../../entity/entity';
+import { PLAYER_EVENTS } from '../../player/player';
 import type { Keyword } from '../../utils/keywords';
 import type { Modifier, ModifierMixin } from '../modifier';
 
 export const modifierDurationMixin = ({
   duration,
-  tickOn,
+  tickOn = 'end',
   onApplied,
   onRemoved,
   keywords
 }: {
   duration: number;
-  tickOn: 'turn-start' | 'turn-end';
+  tickOn?: 'start' | 'end';
   onApplied: Modifier['onApplied'];
   onRemoved: Modifier['onRemoved'];
   keywords: Keyword[];
@@ -19,19 +20,21 @@ export const modifierDurationMixin = ({
 
   return {
     keywords,
-    onApplied(session, attachedTo) {
+    onApplied(session, attachedTo, modifier) {
+      const eventName =
+        tickOn === 'end' ? PLAYER_EVENTS.TURN_END : PLAYER_EVENTS.TURN_START;
       const listener = () => {
         _duration--;
         if (_duration === 0) {
-          attachedTo.off('turn-ended', listener);
-          attachedTo.removeModifier('swiftness');
+          attachedTo.player.off(eventName, listener);
+          attachedTo.removeModifier(modifier.id);
         }
       };
-      attachedTo.on('turn-ended', listener);
-      return onApplied(session, attachedTo);
+      attachedTo.player.on(eventName, listener);
+      return onApplied(session, attachedTo, modifier);
     },
-    onRemoved(session, attachedTo) {
-      return onRemoved(session, attachedTo);
+    onRemoved(session, attachedTo, modifier) {
+      return onRemoved(session, attachedTo, modifier);
     },
     onReapply() {
       _duration = duration;

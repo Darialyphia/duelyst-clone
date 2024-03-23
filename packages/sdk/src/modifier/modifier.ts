@@ -1,25 +1,28 @@
 import type { MaybePromise } from '@game/shared';
-import type { CharacterBlueprint } from '../entity/character-blueprint';
 import type { Entity } from '../entity/entity';
 import type { GameSession } from '../game-session';
 import type { Keyword } from '../utils/keywords';
-
-export type ModifierDescriptionContext = Pick<
-  CharacterBlueprint,
-  'attack' | 'initiative' | 'maxHp' | 'maxAp' | 'spellPower' | 'speed'
->;
 
 export type ModifierId = string;
 
 type ModifierBase = {
   id: ModifierId;
-  name: string;
-  iconId: string;
   keywords: Keyword[];
-  description: string;
-  onApplied(session: GameSession, attachedTo: Entity): MaybePromise<void>;
-  onRemoved(session: GameSession, attachedTo: Entity): MaybePromise<void>;
+  onApplied(
+    session: GameSession,
+    attachedTo: Entity,
+    modifier: Modifier
+  ): MaybePromise<void>;
+  onRemoved(
+    session: GameSession,
+    attachedTo: Entity,
+    modifier: Modifier
+  ): MaybePromise<void>;
 };
+
+type VisibilityMixin =
+  | { visible: true; name: string; description: string }
+  | { visible: false; name?: never; description?: never };
 
 type StackableMixin =
   | {
@@ -29,10 +32,14 @@ type StackableMixin =
   | {
       stackable: false;
       stacks?: never;
-      onReapply(session: GameSession, attachedTo: Entity): MaybePromise<void>;
+      onReapply(
+        session: GameSession,
+        attachedTo: Entity,
+        modifier: Modifier
+      ): MaybePromise<void>;
     };
 
-export type Modifier = ModifierBase & StackableMixin;
+export type Modifier = ModifierBase & StackableMixin & VisibilityMixin;
 
 export type ModifierMixin = Partial<
   Pick<
@@ -41,7 +48,7 @@ export type ModifierMixin = Partial<
   >
 >;
 
-type ModifierBuilderOptions = Pick<Modifier, 'id' | 'description' | 'iconId' | 'name'> &
+type ModifierBuilderOptions = Pick<Modifier, 'id' | 'visible' | 'description' | 'name'> &
   Omit<StackableMixin, 'onReapply'> & { mixins: ModifierMixin[] };
 
 export const createModifier = ({
@@ -53,17 +60,17 @@ export const createModifier = ({
     keywords: [...new Set(mixins.map(m => m.keywords).flat())],
     async onApplied(session, attachedTo) {
       for (const mixin of mixins) {
-        mixin.onApplied?.(session, attachedTo);
+        mixin.onApplied?.(session, attachedTo, this);
       }
     },
     async onRemoved(session, attachedTo) {
       for (const mixin of mixins) {
-        mixin.onRemoved?.(session, attachedTo);
+        mixin.onRemoved?.(session, attachedTo, this);
       }
     },
     async onReapply(session, attachedTo) {
       for (const mixin of mixins) {
-        mixin.onReapply?.(session, attachedTo);
+        mixin.onReapply?.(session, attachedTo, this);
       }
     }
   } as Modifier;

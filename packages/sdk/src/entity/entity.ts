@@ -7,9 +7,10 @@ import { Interceptable, ReactiveValue, type inferInterceptor } from '../utils/he
 import { isAlly, isEnemy } from './entity-utils';
 import { isWithinCells } from '../utils/targeting';
 import type { Modifier, ModifierId } from '../modifier/modifier';
-import type { Unit } from '../card/unit';
+import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
+import type { AnyCard } from '../card/card';
 
 export type EntityId = number;
 
@@ -36,6 +37,9 @@ export const ENTITY_EVENTS = {
   BEFORE_TAKE_DAMAGE: 'before_take_damage',
   AFTER_TAKE_DAMAGE: 'after_take_damage',
 
+  BEFORE_HEAL: 'before_heal',
+  AFTER_HEAL: 'after_heal',
+
   BEFORE_ATTACK: 'before_attack',
   AFTER_ATTACK: 'after_attack'
 } as const;
@@ -49,7 +53,7 @@ type DealDamageEvent = {
 };
 type TakeDamageEvent = {
   entity: Entity;
-  source: Nullable<Entity>;
+  source: AnyCard;
   amount: number;
 };
 type AttackEvent = {
@@ -69,6 +73,9 @@ export type EntityEventMap = {
 
   [ENTITY_EVENTS.BEFORE_TAKE_DAMAGE]: [event: TakeDamageEvent];
   [ENTITY_EVENTS.AFTER_TAKE_DAMAGE]: [event: TakeDamageEvent];
+
+  [ENTITY_EVENTS.BEFORE_HEAL]: [event: TakeDamageEvent];
+  [ENTITY_EVENTS.AFTER_HEAL]: [event: TakeDamageEvent];
 
   [ENTITY_EVENTS.BEFORE_ATTACK]: [event: AttackEvent];
   [ENTITY_EVENTS.AFTER_ATTACK]: [event: AttackEvent];
@@ -107,7 +114,8 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     canAttack: new Interceptable<boolean, { entity: Entity; target: Entity }>(),
     canRetaliate: new Interceptable<boolean, { entity: Entity; source: Entity }>(),
     canBeAttackTarget: new Interceptable<boolean, { entity: Entity; source: Entity }>(),
-    damageTaken: new Interceptable<number, { entity: Entity; amount: number }>()
+    damageTaken: new Interceptable<number, { entity: Entity; amount: number }>(),
+    healReceived: new Interceptable<number, { entity: Entity; amount: number }>()
   };
 
   constructor(
@@ -121,7 +129,11 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.playerId = options.playerId;
     this.movementsTaken = options?.movementsTaken ?? 0;
     this.attacksTaken = options?.attacksTaken ?? 0;
+
     this.currentHp.lazySetInitialValue(options.hp ?? this.maxHp);
+    this.card.blueprint.modifiers.forEach(modifier => {
+      this.addModifier(modifier);
+    });
 
     this.emit('created', this);
   }
@@ -172,7 +184,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   canMove(distance: number) {
     return this.interceptors.canMove.getValue(
-      distance <= this.reach && this.movementsTaken < 1,
+      distance <= this.reach && this.movementsTaken < 1 && this.attacksTaken > 0,
       this
     );
   }
@@ -256,6 +268,13 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     });
   }
 
+  getHealReceived(amount: number) {
+    return this.interceptors.healReceived.getValue(amount, {
+      entity: this,
+      amount
+    });
+  }
+
   async dealDamage(power: number, target: Entity) {
     const payload = {
       entity: this,
@@ -267,12 +286,12 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     await this.session.fxSystem.playAnimation(this.id, 'attack', {
       framePercentage: 0.75
     });
-    await target.takeDamage(power, this);
+    await target.takeDamage(power, this.card);
 
     this.emit(ENTITY_EVENTS.AFTER_DEAL_DAMAGE, payload);
   }
 
-  async takeDamage(power: number, source: Nullable<Entity>) {
+  async takeDamage(power: number, source: AnyCard) {
     const amount = this.getTakenDamage(power);
     const payload = {
       entity: this,
@@ -280,8 +299,9 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       source
     };
     this.emit(ENTITY_EVENTS.BEFORE_TAKE_DAMAGE, payload);
+    const entity = source instanceof Unit ? source.entity : null;
     this.session.fxSystem.displayDamageIndicator(
-      source?.id ?? this.player.opponent.general.id,
+      entity?.id ?? this.player.opponent.general.id,
       this.id,
       amount
     );
@@ -301,6 +321,20 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.emit(ENTITY_EVENTS.AFTER_ATTACK, { entity: this, target });
   }
 
+  async heal(baseAmount: number, source: AnyCard) {
+    const amount = this.getTakenDamage(baseAmount);
+    const payload = {
+      entity: this,
+      amount,
+      source
+    };
+    this.emit(ENTITY_EVENTS.BEFORE_HEAL, payload);
+
+    this.hp += amount;
+
+    this.emit(ENTITY_EVENTS.AFTER_HEAL, payload);
+  }
+
   getModifier(id: ModifierId) {
     return this.modifiers.find(m => m.id === id);
   }
@@ -311,12 +345,12 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       if (existing.stackable) {
         existing.stacks++;
       } else {
-        return existing.onReapply(this.session, this);
+        return existing.onReapply(this.session, this, existing);
       }
     }
 
     this.modifiers.push(modifier);
-    return modifier.onApplied(this.session, this);
+    return modifier.onApplied(this.session, this, modifier);
   }
 
   removeModifier(modifierId: ModifierId, ignoreStacks = false) {
@@ -324,7 +358,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       if (mod.id !== modifierId) return;
 
       if (mod.stackable && mod.stacks > 1 && !ignoreStacks) return;
-      mod.onRemoved(this.session, this);
+      mod.onRemoved(this.session, this, mod);
     });
 
     this.modifiers = this.modifiers.filter(mod => {

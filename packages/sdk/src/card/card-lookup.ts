@@ -1,5 +1,5 @@
 import { keyBy } from 'lodash-es';
-import type { CardBlueprintId } from './card';
+import type { Card, CardBlueprintId } from './card';
 import type { Point3D, Prettify } from '@game/shared';
 import type { Modifier } from '../modifier/modifier';
 import type { GameSession } from '../game-session';
@@ -12,6 +12,7 @@ import { magmar } from './cards/magmar';
 import { vanar } from './cards/vanar';
 import { neutral } from './cards/neutral';
 import type { CardKind } from './card-utils';
+import type { Unit } from './unit';
 
 type CardBlueprintBase = {
   id: CardBlueprintId;
@@ -25,6 +26,16 @@ type CardBlueprintUnit = {
   attack: number;
   maxHp: number;
   modifiers: Modifier[];
+  summonedFollowup?: {
+    minTargetCount: number;
+    maxTargetCount: number;
+    isTargetable(
+      session: GameSession,
+      point: Point3D,
+      summonedPoint: Point3D,
+      card: Unit
+    ): boolean;
+  };
 };
 
 type CardBlueprintSpell = {
