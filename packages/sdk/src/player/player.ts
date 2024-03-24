@@ -12,7 +12,7 @@ import { Deck } from '../card/deck';
 import { type AnyCard, type SerializedCard } from '../card/card';
 import EventEmitter from 'eventemitter3';
 import { config } from '../config';
-import { Interceptable } from '../utils/helpers';
+import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { CARD_KINDS } from '../card/card-utils';
 import { createCard } from '../card/card-factory';
 import type { Unit } from '../card/unit';
@@ -228,5 +228,24 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     }
 
     return card;
+  }
+
+  addInterceptor<T extends keyof PlayerInterceptor>(
+    key: T,
+    interceptor: inferInterceptor<PlayerInterceptor[T]>,
+    priority?: number
+  ) {
+    this.interceptors[key].add(interceptor as any, priority);
+  }
+
+  removeInterceptor<T extends keyof PlayerInterceptor>(
+    key: T,
+    interceptor: inferInterceptor<PlayerInterceptor[T]>
+  ) {
+    this.interceptors[key].remove(interceptor as any);
+  }
+
+  giveMana(amount: number) {
+    this.currentMana = Math.min(this.currentMana + amount, config.MAX_MANA);
   }
 }

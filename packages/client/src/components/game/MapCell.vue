@@ -1,17 +1,25 @@
 <script setup lang="ts">
-import { type Cell, Unit } from '@game/sdk';
+import { Unit } from '@game/sdk';
+import type { CellId } from '@game/sdk/src/board/cell';
 import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 import type { FederatedPointerEvent, Filter } from 'pixi.js';
 import { match } from 'ts-pattern';
 import { Hitbox } from '~/utils/hitbox';
 
-const { cell } = defineProps<{ cell: Cell }>();
+const { cellId } = defineProps<{ cellId: CellId }>();
 
 const { assets, camera, ui, dispatch, pathfinding, fx, session } = useGame();
+const cell = useGameSelector(session => session.boardSystem.getCellAt(cellId)!);
 
 const textures = computed(() => {
-  const sheet = assets.getSpritesheet(cell.spriteId);
+  const sheet = assets.getSpritesheet(cell.value.spriteId);
   return sheet.animations[0];
+});
+
+const tileTexture = computed(() => {
+  if (!cell.value.tile) return null;
+  const sheet = assets.getSpritesheet(cell.value.tile.blueprint.spriteId);
+  return createSpritesheetFrameObject('idle', sheet);
 });
 
 const boardDimensions = useGameSelector(session => ({
@@ -20,7 +28,7 @@ const boardDimensions = useGameSelector(session => ({
 }));
 const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
 
-const isHovered = computed(() => ui.hoveredCell.value?.equals(cell));
+const isHovered = computed(() => ui.hoveredCell.value?.equals(cell.value));
 
 const shape = assets.getHitbox('tile');
 const hitArea = Hitbox.from(shape.shapes[0].points, shape.shapes[0].source, 0.5);
@@ -31,10 +39,10 @@ const isMovePathHighlighted = computed(() => {
   if (!ui.hoveredCell.value) return false;
   if (ui.targetingMode.value !== TARGETING_MODES.BASIC) return false;
 
-  const entityOnCell = session.entitySystem.getEntityAt(cell);
+  const entityOnCell = session.entitySystem.getEntityAt(cell.value);
   if (!ui.selectedEntity.value) return false;
 
-  const canMoveTo = pathfinding.canMoveTo(ui.selectedEntity.value, cell);
+  const canMoveTo = pathfinding.canMoveTo(ui.selectedEntity.value, cell.value);
   if (!canMoveTo) return false;
 
   const path = pathfinding.getPath(
@@ -45,7 +53,7 @@ const isMovePathHighlighted = computed(() => {
 
   if (!path) return false;
 
-  const isInPath = path.some(vec => vec.equals(cell.position));
+  const isInPath = path.some(vec => vec.equals(cell.value.position));
 
   return isInPath || entityOnCell?.equals(ui.selectedEntity.value);
 });
@@ -56,7 +64,7 @@ const filters = computed(() => {
   if (isMovePathHighlighted.value) result.push(pathFilter);
   if (
     ui.selectedEntity.value &&
-    ui.hoveredCell.value?.equals(cell) &&
+    ui.hoveredCell.value?.equals(cell.value) &&
     ui.hoveredEntity.value?.isEnemy(ui.selectedEntity.value.id) &&
     ui.selectedEntity.value.canAttack(ui.hoveredEntity.value) &&
     ui.targetingMode.value === TARGETING_MODES.BASIC
@@ -154,6 +162,13 @@ const filters = computed(() => {
               });
           }
         "
+      />
+      <animated-sprite
+        v-if="tileTexture"
+        event-mode="none"
+        :textures="tileTexture"
+        :anchor="0.5"
+        :y="-CELL_HEIGHT * 0.45"
       />
 
       <MapCellHighlights :cell="cell" />

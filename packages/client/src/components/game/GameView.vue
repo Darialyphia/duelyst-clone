@@ -18,7 +18,7 @@ const entities = useGameSelector(session => session.entitySystem.getList());
   <Camera>
     <Layer :ref="(layer: any) => ui.registerLayer(layer, 'scene')">
       <Underground />
-      <MapCell v-for="cell in cells" :key="cell.id" :cell="cell" />
+      <MapCell v-for="cell in cells" :key="cell.id" :cell-id="cell.id" />
 
       <Entity v-for="entity in entities" :key="entity.id" :entity-id="entity.id" />
       <SummonPreview />

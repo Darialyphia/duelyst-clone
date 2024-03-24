@@ -1,4 +1,10 @@
-import { isDefined, Vec3, type Nullable, type Point3D } from '@game/shared';
+import {
+  isDefined,
+  Vec3,
+  type AnyObject,
+  type Nullable,
+  type Point3D
+} from '@game/shared';
 import type { GameSession } from '../game-session';
 import { TILES, type TileblueprintId } from './tile-lookup';
 import type { Entity } from '../entity/entity';
@@ -12,6 +18,8 @@ export class Tile {
   position: Vec3;
   blueprintId: TileblueprintId;
   private occupant: Nullable<Entity> = null;
+
+  meta: AnyObject = {};
 
   constructor(
     private session: GameSession,
@@ -36,9 +44,9 @@ export class Tile {
     this.occupant = this.session.entitySystem.getEntityAt(this.position);
 
     if (!previous && this.occupant) {
-      this.blueprint.onEnter(this.session, this.occupant);
+      this.blueprint.onEnter(this.session, this.occupant, this);
     } else if (previous && !this.occupant) {
-      this.blueprint.onLeave(this.session, previous);
+      this.blueprint.onLeave(this.session, previous, this);
     }
   }
 }

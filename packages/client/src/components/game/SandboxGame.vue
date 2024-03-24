@@ -18,7 +18,11 @@ const state: SerializedGameState = {
           y,
           z: 0
         },
-        spriteId: 'ground'
+        spriteId: 'ground',
+        tileBlueprintId:
+          (x === 4 && y === 0) || (x === 4 && y === 4) || (x === 5 && y == 2)
+            ? 'mana-tile'
+            : null
       }))
     ).flat(),
     player1StartPosition: { x: 0, y: 2, z: 0 },
