@@ -50,13 +50,14 @@ type GameEventsBase = {
   'game:action': [GameAction<any>];
   'game:ready': [];
 };
-type GameEventMap = Prettify<
+export type GameEventMap = Prettify<
   GameEventsBase &
     GlobalEntityEvents &
     GlobalPlayerEvents &
     GlobalDeckEvents &
     GlobalCardEvents
 >;
+export type GameEvent = keyof GameEventMap;
 
 export const GAME_PHASES = {
   MULLIGAN: 'mulligan',
@@ -130,6 +131,7 @@ export class GameSession extends EventEmitter<GameEventMap> {
       });
     });
   }
+
   private async setup() {
     if (this.isReady) return;
     this.isReady = true;

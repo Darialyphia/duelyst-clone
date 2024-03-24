@@ -1,3 +1,5 @@
+import type { Values } from '@game/shared';
+
 export type Keyword = {
   name: string;
   description: string;
@@ -16,4 +18,6 @@ export const KEYWORDS = {
     name: 'Opening Gambit',
     description: 'Triggers an effect when summoned from your action bar.'
   }
-} satisfies Record<string, Keyword>;
+} as const satisfies Record<string, Keyword>;
+
+export type KeywordName = Values<typeof KEYWORDS>['name'];

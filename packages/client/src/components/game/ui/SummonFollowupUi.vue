@@ -24,6 +24,7 @@ const commit = () => {
 };
 
 watchEffect(() => {
+  if (ui.targetingMode.value !== TARGETING_MODES.FOLLOWUP) return;
   const card = ui.selectedCard.value;
   if (!card) return false;
   if (!(card instanceof Unit)) return false;

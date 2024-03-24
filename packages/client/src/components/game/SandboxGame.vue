@@ -33,12 +33,13 @@ const state: SerializedGameState = {
         { blueprintId: 'sajj' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' }
       ],
@@ -53,12 +54,13 @@ const state: SerializedGameState = {
         { blueprintId: 'sajj' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
-        { blueprintId: 'healing_mystic' },
-        { blueprintId: 'bloodtear_alchemist' },
+        { blueprintId: 'araki_headhunter' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' }
       ],
@@ -70,7 +72,7 @@ const state: SerializedGameState = {
 };
 
 const fx = useFXProvider();
-const session = GameSession.createClientSession(state, 'seed', fx.ctx);
+const session = GameSession.createClientSession(state, 'Hello DO', fx.ctx);
 
 const dispatch = (
   type: Parameters<(typeof session)['dispatch']>[0]['type'],
@@ -96,7 +98,7 @@ const dispatch = (
     @end-turn="dispatch('endTurn', $event)"
     @use-skill="dispatch('useSkill', $event)"
     @play-card="dispatch('playCard', $event)"
-    @replace="dispatch('replace', $event)"
+    @replace-card="dispatch('replaceCard', $event)"
     @mulligan="dispatch('mulligan', $event)"
   />
 </template>

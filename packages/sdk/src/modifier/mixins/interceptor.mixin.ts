@@ -13,7 +13,7 @@ export const interceptorMixin = <T extends keyof EntityInterceptor>({
   key: T;
   keywords: Keyword[];
   duration: number;
-  tickOn: Parameters<typeof modifierDurationMixin>[0]['tickOn'];
+  tickOn?: Parameters<typeof modifierDurationMixin>[0]['tickOn'];
   interceptor: inferInterceptor<EntityInterceptor[T]>;
 }) => {
   return modifierDurationMixin({

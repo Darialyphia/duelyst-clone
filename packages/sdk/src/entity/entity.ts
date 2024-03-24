@@ -11,6 +11,7 @@ import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
 import type { AnyCard } from '../card/card';
+import type { KeywordName } from '../utils/keywords';
 
 export type EntityId = number;
 
@@ -98,7 +99,9 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   private attacksTaken: number;
 
   private currentHp = new ReactiveValue(0, hp => {
-    if (hp <= 0) {
+    const intercepted = this.interceptors.maxHp.getValue(hp, this);
+
+    if (intercepted <= 0) {
       this.session.actionSystem.schedule(async () => {
         await this.session.fxSystem.playAnimation(this.id, 'death');
         this.destroy();
@@ -163,7 +166,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   get hp() {
-    return this.currentHp.value;
+    return this.interceptors.maxHp.getValue(this.currentHp.value, this);
   }
 
   private set hp(val: number) {
@@ -344,6 +347,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     if (existing) {
       if (existing.stackable) {
         existing.stacks++;
+        return;
       } else {
         return existing.onReapply(this.session, this, existing);
       }
@@ -380,5 +384,11 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   get isGeneral() {
     return this.card.blueprint.kind == CARD_KINDS.GENERAL;
+  }
+
+  hasKeyword(name: KeywordName) {
+    return this.modifiers.some(mod =>
+      mod.keywords.some(keyword => keyword.name === name)
+    );
   }
 }

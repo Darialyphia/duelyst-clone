@@ -86,6 +86,8 @@ export class EntitySystem {
     const entity = new Entity(this.session, { ...rawEntity, id });
     this.entityMap.set(id, entity);
     this.setupListeners(entity);
+    // we have to emit the event manually because it was emitted before we could setup the listeners
+    this.session.emit('entity:created', entity);
     return entity;
   }
 

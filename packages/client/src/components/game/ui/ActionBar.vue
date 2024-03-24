@@ -2,11 +2,23 @@
 const { dispatch, ui } = useGame();
 
 const hand = useGameSelector(session => session.playerSystem.activePlayer.hand);
+
+const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
 </script>
 
 <template>
   <div class="action-bar">
-    <UiFancyButton :style="{ '--hue': '230DEG', '--hue2': '210DEG' }">
+    <UiFancyButton
+      :style="{ '--hue': '230DEG', '--hue2': '210DEG' }"
+      :disabled="!activePlayer.canReplace() || !ui.selectedCardIndex.value"
+      @click="
+        () => {
+          dispatch('replaceCard', {
+            cardIndex: ui.selectedCardIndex.value!
+          });
+        }
+      "
+    >
       Replace
     </UiFancyButton>
     <button

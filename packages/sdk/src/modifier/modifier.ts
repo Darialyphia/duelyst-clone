@@ -1,4 +1,4 @@
-import type { MaybePromise } from '@game/shared';
+import type { MaybePromise, Prettify } from '@game/shared';
 import type { Entity } from '../entity/entity';
 import type { GameSession } from '../game-session';
 import type { Keyword } from '../utils/keywords';
@@ -39,7 +39,7 @@ type StackableMixin =
       ): MaybePromise<void>;
     };
 
-export type Modifier = ModifierBase & StackableMixin & VisibilityMixin;
+export type Modifier = Prettify<ModifierBase & StackableMixin & VisibilityMixin>;
 
 export type ModifierMixin = Partial<
   Pick<

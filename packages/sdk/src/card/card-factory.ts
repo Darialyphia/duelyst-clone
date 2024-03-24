@@ -15,7 +15,6 @@ export const createCard = (
   playerId: PlayerId
 ) => {
   const blueprint = CARDS[card.blueprintId];
-
   return match(blueprint.kind)
     .with(
       CARD_KINDS.GENERAL,
