@@ -53,7 +53,6 @@ export const useAssetsProvider = () => {
       // Assets.loadBundle('units'),
       Assets.loadBundle('tilesets'),
       Assets.loadBundle('interactables'),
-      Assets.loadBundle('fx'),
       Assets.loadBundle('hitboxes'),
       Assets.loadBundle('modifiers')
     ]);

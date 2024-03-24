@@ -21,26 +21,33 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     >
       Replace
     </UiFancyButton>
-    <button
-      v-for="(card, index) in hand"
-      :key="`${card?.blueprintId}:${index}`"
-      class="card-button"
-      :class="[
-        card && ui.selectedCard.value === card && 'selected',
-        card && card?.blueprint.kind.toLowerCase()
-      ]"
-      :disabled="!card || card.manaCost > activePlayer.currentMana"
-      :data-cost="card && card.manaCost"
-      @click="ui.selectCardAtIndex(index)"
+    <TransitionGroup
+      tag="div"
+      class="flex gap-9 iems-center"
+      mode="out-in"
+      :duration="700"
     >
-      <AnimatedCardIcon
-        v-if="card"
-        :sprite-id="card.blueprint.spriteId"
-        :kind="card.blueprint.kind"
-        :is-active="ui.selectedCardIndex.value === index"
-        class="icon"
-      />
-    </button>
+      <button
+        v-for="(card, index) in hand"
+        :key="`${card?.blueprintId}:${index}`"
+        class="card-button"
+        :class="[
+          card && ui.selectedCard.value === card && 'selected',
+          card && card?.blueprint.kind.toLowerCase()
+        ]"
+        :disabled="!card || card.manaCost > activePlayer.currentMana"
+        :data-cost="card && card.manaCost"
+        @click="ui.selectCardAtIndex(index)"
+      >
+        <AnimatedCardIcon
+          v-if="card"
+          :sprite-id="card.blueprint.spriteId"
+          :kind="card.blueprint.kind"
+          :is-active="ui.selectedCardIndex.value === index"
+          class="icon"
+        />
+      </button>
+    </TransitionGroup>
     <UiFancyButton
       :style="{ '--hue': '10DEG', '--hue2': '20DEG', 'min-width': '13ch' }"
       @click="dispatch('endTurn')"
@@ -53,7 +60,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
 <style scoped lang="postcss">
 .action-bar {
   position: absolute;
-  bottom: var(--size-3);
+  bottom: var(--size-5);
   left: 50%;
   transform: translateX(-50%);
 
@@ -74,7 +81,6 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
   border: none;
 
   transition: transform 0.2s;
-
   &::after {
     content: '';
 
@@ -83,8 +89,33 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     transform: translateY(20%) scaleY(0.35) rotateZ(45deg);
 
     opacity: 0.8s;
-    background: radial-gradient(circle at center, black 20%, transparent 80%);
     border: solid var(--border-size-3) var(--gray-5);
+
+    transition: border-color 0.5s;
+  }
+
+  &:not(:empty)::after {
+    background: radial-gradient(circle at center, black 20%, transparent 80%);
+  }
+
+  &:is(.v-enter-active, .v-leave-active) {
+    transition: all 0.7s ease;
+  }
+
+  &.v-leave-active {
+    position: absolute;
+  }
+
+  &:is(.v-enter-from, .v-leave-to) {
+    opacity: 0;
+  }
+
+  &.v-enter-from {
+    transform: translateY(-25px) scale(0);
+  }
+
+  &.v-leave-to {
+    transform: translateX(-25px) scale(0);
   }
 
   &:disabled {
@@ -105,11 +136,10 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
 
     aspect-ratio: 1;
     width: 4ch;
-    padding: var(--size-2);
 
     line-height: 1;
 
-    background: linear-gradient(to bottom, var(--red-7), var(--red-11));
+    background: linear-gradient(to bottom, var(--blue-7), var(--blue-9));
     border: solid var(--border-size-1) currentColor;
     border-radius: var(--radius-1);
     box-shadow: 0 3px 5px 1px hsl(0 0 0 / 0.3);
@@ -128,7 +158,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
       filter 0.3s;
     &:hover,
     .card-button.selected > & {
-      filter: drop-shadow(0 0 3px yellow);
+      filter: drop-shadow(0 0 3px cyan);
     }
   }
 
@@ -137,8 +167,19 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     left: 26px;
     filter: drop-shadow(0 0 1px black);
   }
-  &.selected > .icon {
-    transform: scale(2) translateY(-15px);
+  &.selected {
+    &::after {
+      border-color: var(--blue-2);
+    }
+
+    > .icon {
+      transform: scale(2) translateY(-15px);
+    }
   }
+}
+
+button:not(.card-button) {
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
 }
 </style>

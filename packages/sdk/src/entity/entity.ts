@@ -331,14 +331,14 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
           key: 'canAttack',
           duration: 1,
           tickOn: 'end',
-          interceptor: () => false,
+          interceptor: () => () => false,
           keywords: [KEYWORDS.EXHAUSTED]
         }),
         modifierInterceptorMixin({
           key: 'canMove',
           duration: 1,
           tickOn: 'end',
-          interceptor: () => false,
+          interceptor: () => () => false,
           keywords: [KEYWORDS.EXHAUSTED]
         })
       ]

@@ -27,7 +27,7 @@ const tag = computed(() => {
 <template>
   <component
     :is="tag"
-    class="ui-button"
+    class="ui-fancy-button"
     :class="{
       'is-inline': isInline,
       'is-cta': isCta,

@@ -125,8 +125,7 @@ export const neutral: CardBlueprint[] = [
                     key: 'attack',
                     duration: Infinity,
                     keywords: [],
-                    interceptor: atk => {
-                      const modifier = attachedTo.getModifier(id)!;
+                    interceptor: modifier => atk => {
                       return atk + 2 * modifier.stacks!;
                     }
                   })

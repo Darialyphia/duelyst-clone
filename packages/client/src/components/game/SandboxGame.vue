@@ -63,6 +63,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'scions_first_wish' },
+        { blueprintId: 'scions_first_wish' },
+        { blueprintId: 'scions_first_wish' },
         { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'ephemeral_shroud' },
