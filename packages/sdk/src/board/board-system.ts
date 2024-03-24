@@ -105,11 +105,17 @@ export class BoardSystem {
           Vec3.add(point, { x: maxDistance, y: maxDistance, z: maxDistance })
         ] as [Vec3, Vec3])
       : undefined;
-
-    return new Pathfinder(this.session, boundaries).getDistanceMap(point);
+    const entity = this.session.entitySystem.getEntityAt(point);
+    if (!entity) {
+      throw new Error('Cannot get distancemap from an empty cell.');
+    }
+    return new Pathfinder(this.session, entity, boundaries).getDistanceMap(point);
   }
 
   getPathTo(entity: Entity, point: Point3D, maxDistance?: number) {
+    const entityAtPoint = this.session.entitySystem.getEntityAt(point);
+    if (entityAtPoint && entity.isEnemy(entityAtPoint.id)) return null;
+
     const boundaries = maxDistance
       ? ([
           Vec3.sub(point, { x: maxDistance, y: maxDistance, z: maxDistance }),
@@ -117,7 +123,7 @@ export class BoardSystem {
         ] as [Vec3, Vec3])
       : undefined;
 
-    const path = new Pathfinder(this.session, boundaries).findPath(
+    const path = new Pathfinder(this.session, entity, boundaries).findPath(
       entity.position,
       point
     );

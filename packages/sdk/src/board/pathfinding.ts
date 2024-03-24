@@ -10,6 +10,7 @@ import type { Point3D } from '../types';
 import { pointToCellId } from '../utils/helpers';
 import { GameSession } from '../game-session';
 import { isEmpty } from '../entity/entity-utils';
+import type { Entity } from '../entity/entity';
 
 export type DistanceMap = {
   costs: ReturnType<typeof dijkstra>['costs'];
@@ -21,11 +22,13 @@ export class Pathfinder {
 
   constructor(
     private session: GameSession,
+    private entity: Entity,
     private boundaries?: [Point3D, Point3D]
   ) {}
 
-  private makeAdapter(origin: Point3D): GraphAdapter<CellId> {
+  private makeAdapter(origin: Point3D, destination?: Point3D): GraphAdapter<CellId> {
     const originVec = Vec3.fromPoint3D(origin);
+    const destinationVec = destination ? Vec3.fromPoint3D(destination) : null;
 
     return {
       getEdges: node => {
@@ -42,7 +45,12 @@ export class Pathfinder {
             edges
               .filter(isDefined)
               .filter(point => {
-                if (!isEmpty(this.session, point)) return false;
+                if (originVec.equals(point)) return false;
+
+                const entityAtPoint = this.session.entitySystem.getEntityAt(point);
+                if (destinationVec?.equals(point) && entityAtPoint) return false;
+                if (entityAtPoint && this.entity.isEnemy(entityAtPoint.id)) return false;
+
                 if (this.boundaries) {
                   return (
                     originVec.dist(point) <= originVec.dist(this.boundaries[0]) &&
@@ -67,7 +75,7 @@ export class Pathfinder {
 
   findPath(from: Point3D, to: Point3D) {
     return findShortestPath<CellId>(
-      this.makeAdapter(from),
+      this.makeAdapter(from, to),
       pointToCellId(from),
       pointToCellId(to)
     );

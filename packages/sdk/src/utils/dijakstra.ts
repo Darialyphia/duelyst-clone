@@ -75,17 +75,25 @@ export const findShortestPath = <T>(
 ) => {
   const getKey = (node: T) => getNodeKey(node, adapter);
   const { costs, parents } = dijkstra(adapter, startNode, finishNode);
+
   const optimalPath = [finishNode];
   let parent = parents[getKey(finishNode)];
-
   if (!parent) return null;
 
   while (parent) {
     if (parent !== startNode) {
-      optimalPath.push(parent);
+      try {
+        optimalPath.push(parent);
+      } catch (err) {
+        console.log(`Error going from ${getKey(startNode)} to ${getKey(finishNode)}`);
+        console.log({ costs, parents });
+        console.log(optimalPath.slice(0, 100));
+        throw err;
+      }
     }
     parent = parents[getKey(parent)];
   }
+
   optimalPath.reverse();
 
   const results = {
