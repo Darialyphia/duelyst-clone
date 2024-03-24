@@ -34,7 +34,7 @@ const state: SerializedGameState = {
       id: '1',
       name: 'Player 1',
       cards: [
-        { blueprintId: 'sajj' },
+        { blueprintId: 'maehv' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'bloodtear_alchemist' },
         { blueprintId: 'araki_headhunter' },
