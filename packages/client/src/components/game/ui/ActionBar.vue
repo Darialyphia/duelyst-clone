@@ -26,6 +26,8 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
       :key="`${card?.blueprintId}:${index}`"
       class="card-button"
       :class="card && ui.selectedCard.value === card && 'selected'"
+      :disabled="!card || card.manaCost > activePlayer.currentMana"
+      :data-cost="card && card.manaCost"
       @click="ui.selectCardAtIndex(index)"
     >
       <AnimatedCardIcon v-if="card" :sprite-id="card.blueprint.spriteId" class="icon" />
@@ -60,10 +62,49 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
   padding: 0;
 
   background: transparent;
-  /* background: var(--bg); */
-  background-size: cover;
+  border: none;
 
   transition: transform 0.2s;
+
+  &::after {
+    content: '';
+
+    position: absolute;
+    inset: 0;
+    transform: translateY(20%) scaleY(0.35) rotateZ(45deg);
+
+    opacity: 0.8s;
+    background: radial-gradient(circle at center, black 20%, transparent 80%);
+    border: solid var(--border-size-3) var(--gray-5);
+  }
+
+  &:disabled {
+    filter: grayscale(1);
+  }
+
+  &[data-cost]::before {
+    content: attr(data-cost);
+
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: grid;
+    place-content: center;
+
+    aspect-ratio: 1;
+    width: 4ch;
+    padding: var(--size-2);
+
+    line-height: 1;
+
+    background: linear-gradient(to bottom, var(--red-7), var(--red-11));
+    border: solid var(--border-size-1) currentColor;
+    border-radius: var(--radius-1);
+    box-shadow: 0 3px 5px 1px hsl(0 0 0 / 0.3);
+  }
 
   > .icon {
     position: absolute;
@@ -78,7 +119,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
       filter 0.3s;
     &:hover,
     .card-button.selected > & {
-      filter: drop-shadow(0 0 3px cyan);
+      filter: drop-shadow(0 0 3px yellow);
     }
   }
 

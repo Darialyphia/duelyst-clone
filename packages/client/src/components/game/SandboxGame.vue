@@ -72,7 +72,7 @@ const state: SerializedGameState = {
 };
 
 const fx = useFXProvider();
-const session = GameSession.createClientSession(state, 'Hello DO', fx.ctx);
+const session = GameSession.createClientSession(state, 'seed', fx.ctx);
 
 const dispatch = (
   type: Parameters<(typeof session)['dispatch']>[0]['type'],
