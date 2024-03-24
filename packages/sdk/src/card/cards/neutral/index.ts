@@ -1,4 +1,5 @@
 import { hasNearbyUnit, isEmpty, isEnemy } from '../../../entity/entity-utils';
+import { modifierDyingWishMixin } from '../../../modifier/mixins/dying-wish.mixin';
 import { modifierGameEventMixin } from '../../../modifier/mixins/game-event.mixin';
 import { interceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { modifierOpeningGambitMixin } from '../../../modifier/mixins/opening-gambit.mixin';
@@ -131,6 +132,36 @@ export const neutral: CardBlueprint[] = [
               });
 
               attachedTo.addModifier(modifier);
+            }
+          })
+        ]
+      })
+    ]
+  },
+  {
+    id: 'azure_horn_shaman',
+    name: 'Azure Horn Shaman',
+    description: 'Dying Wish: Give +4 Health to friendly minions around it.',
+    spriteId: 'neutral_mercazurehorn',
+    kind: CARD_KINDS.MINION,
+    manaCost: 2,
+    attack: 1,
+    maxHp: 4,
+    modifiers: [
+      createModifier({
+        id: 'azure_horn_shaman',
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierDyingWishMixin({
+            keywords: [],
+            listener(event, { session, attachedTo }) {
+              session.entitySystem
+                .getNearbyEntities(attachedTo.position)
+                .filter(entity => !entity.isGeneral && attachedTo.isAlly(entity.id))
+                .forEach(entity => {
+                  entity.addInterceptor('maxHp', val => val + 4);
+                });
             }
           })
         ]
