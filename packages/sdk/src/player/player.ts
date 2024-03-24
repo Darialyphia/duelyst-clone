@@ -50,7 +50,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   public readonly name: string;
   public readonly isPlayer1: boolean;
   public hasMulliganed: boolean;
-  public maxMana: number;
+  public _maxMana: number;
   public currentMana: number;
   private cardsReplacedThisTurn = 0;
 
@@ -60,7 +60,8 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   readonly cards: AnyCard[];
 
   protected interceptors = {
-    maxReplaces: new Interceptable<number, Player>()
+    maxReplaces: new Interceptable<number, Player>(),
+    maxMana: new Interceptable<number, Player>()
   };
 
   constructor(
@@ -72,7 +73,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     this.name = options.name;
     this.isPlayer1 = options.isPlayer1;
     this.hasMulliganed = options.hasMulliganed ?? false;
-    this.maxMana =
+    this._maxMana =
       options.maxMana ?? this.isPlayer1
         ? config.PLAYER_1_STARTING_MANA
         : config.PLAYER_2_STARTING_MANA;
@@ -99,6 +100,14 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
       null
     );
     this.graveyard = options.graveyard.map(index => this.cards[index]);
+  }
+
+  get maxMana(): number {
+    return this.interceptors.maxMana.getValue(this._maxMana, this);
+  }
+
+  set maxMana(val) {
+    this._maxMana = val;
   }
 
   placeGeneral() {
