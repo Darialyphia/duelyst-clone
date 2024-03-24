@@ -4,6 +4,8 @@ import { modifierGameEventMixin } from '../../../modifier/mixins/game-event.mixi
 import { interceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { modifierOpeningGambitMixin } from '../../../modifier/mixins/opening-gambit.mixin';
 import { createModifier } from '../../../modifier/modifier';
+import { dispelAt } from '../../../modifier/modifier-utils';
+import { isWithinCells } from '../../../utils/targeting';
 import { type CardBlueprint } from '../../card-lookup';
 import { CARD_KINDS } from '../../card-utils';
 
@@ -167,5 +169,39 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ]
+  },
+  {
+    id: 'ephemeral_shroud',
+    name: 'Ephemeral Shroud',
+    description: 'Opening Gambit: Dispel 1 nearby space.',
+    spriteId: 'neutral_monsterdreamoracle',
+    kind: CARD_KINDS.MINION,
+    manaCost: 2,
+    attack: 2,
+    maxHp: 2,
+    modifiers: [
+      createModifier({
+        id: 'ephemeral_shroud',
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierOpeningGambitMixin({
+            keywords: [],
+            handler(session, attachedTo) {
+              const [point] = attachedTo.card.summonFollowupTargets;
+              if (!point) return;
+              dispelAt(session, point);
+            }
+          })
+        ]
+      })
+    ],
+    summonedFollowup: {
+      minTargetCount: 0,
+      maxTargetCount: 1,
+      isTargetable(session, point, summonedPoint) {
+        return isWithinCells(summonedPoint, point, 1);
+      }
+    }
   }
 ];

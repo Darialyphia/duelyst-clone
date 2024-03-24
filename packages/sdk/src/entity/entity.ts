@@ -232,6 +232,10 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.interceptors[key].remove(interceptor as any);
   }
 
+  clearAllInterceptors() {
+    Object.values(this.interceptors).forEach(interceptor => interceptor.clear());
+  }
+
   startTurn() {
     this.movementsTaken = 0;
     this.attacksTaken = 0;

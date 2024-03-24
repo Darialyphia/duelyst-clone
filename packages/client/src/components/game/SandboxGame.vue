@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'ephemeral_shroud' },
+        { blueprintId: 'ephemeral_shroud' },
+        { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' },
@@ -57,6 +60,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'ephemeral_shroud' },
+        { blueprintId: 'ephemeral_shroud' },
+        { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' },

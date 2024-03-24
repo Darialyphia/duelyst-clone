@@ -56,6 +56,10 @@ export class Interceptable<
     this.listeners.splice(idx, 1);
   }
 
+  clear() {
+    this.listeners = [];
+  }
+
   getValue(initialValue: TValue, ctx: Readonly<TContext>) {
     return this.listeners
       .sort((a, b) => a.priority - b.priority)
