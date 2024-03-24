@@ -13,6 +13,7 @@ import { vanar } from './cards/vanar';
 import { neutral } from './cards/neutral';
 import type { CardKind } from './card-utils';
 import type { Unit } from './unit';
+import type { Spell } from './spell';
 
 type CardBlueprintBase = {
   id: CardBlueprintId;
@@ -26,7 +27,7 @@ type CardBlueprintUnit = {
   attack: number;
   maxHp: number;
   modifiers: Modifier[];
-  summonedFollowup?: {
+  followup?: {
     minTargetCount: number;
     maxTargetCount: number;
     isTargetable(
@@ -39,7 +40,23 @@ type CardBlueprintUnit = {
 };
 
 type CardBlueprintSpell = {
-  onPlay(session: GameSession, targets: Point3D[]): Promise<void>;
+  onPlay(
+    session: GameSession,
+    castPoint: Point3D,
+    otherTargets: Point3D[],
+    card: Spell
+  ): Promise<void>;
+  isTargetable(session: GameSession, point: Point3D): boolean;
+  followup?: {
+    minTargetCount: number;
+    maxTargetCount: number;
+    isTargetable(
+      session: GameSession,
+      point: Point3D,
+      castPoint: Point3D,
+      card: Unit
+    ): boolean;
+  };
 };
 
 type CardBlueprintArtifact = {

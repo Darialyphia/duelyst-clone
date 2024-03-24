@@ -1,18 +1,28 @@
 <script setup lang="ts">
-const { spriteId } = defineProps<{ spriteId: string }>();
+import { CARD_KINDS, type CardKind } from '@game/sdk';
+import { match } from 'ts-pattern';
+const { spriteId, kind } = defineProps<{ spriteId: string; kind: CardKind }>();
 const { assets } = useGame();
 
 const sheet = assets.getSpritesheet(spriteId);
 const el = ref<HTMLElement>();
 const isHovered = useElementHover(el);
-
 const animation = computed(() =>
-  isHovered.value ? sheet.animations.idle : sheet.animations.breathing
+  match(kind)
+    .with(CARD_KINDS.MINION, CARD_KINDS.GENERAL, () =>
+      isHovered.value ? sheet.animations.idle : sheet.animations.breathing
+    )
+    .with(CARD_KINDS.SPELL, CARD_KINDS.ARTIFACT, () =>
+      isHovered.value ? sheet.animations.active : sheet.animations.default
+    )
+    .exhaustive()
 );
 const frame = ref(0);
+const frameDuration = HALF_SPEED_SPRITES.includes(sheet.data.meta.image!) ? 160 : 80;
+console.log(sheet.data.meta.image, frameDuration);
 useIntervalFn(() => {
   frame.value = (frame.value + 1) % (animation.value.length - 1);
-}, 80);
+}, frameDuration);
 
 watch(isHovered, () => {
   frame.value = 0;

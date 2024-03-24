@@ -9,8 +9,7 @@ const canSkip = computed(() => {
   if (!(card instanceof Unit)) return false;
 
   return (
-    ui.followupTargets.value.length <=
-    (card.blueprint.summonedFollowup?.minTargetCount ?? 0)
+    ui.followupTargets.value.length <= (card.blueprint.followup?.minTargetCount ?? 0)
   );
 });
 
@@ -29,9 +28,7 @@ watchEffect(() => {
   if (!card) return false;
   if (!(card instanceof Unit)) return false;
 
-  if (
-    ui.followupTargets.value.length === card.blueprint.summonedFollowup!.maxTargetCount
-  ) {
+  if (ui.followupTargets.value.length === card.blueprint.followup!.maxTargetCount) {
     commit();
   }
 });

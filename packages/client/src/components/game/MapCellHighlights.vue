@@ -63,7 +63,7 @@ const matchFollowup = (cell: Cell) => {
       if (!(ui.selectedCard.value instanceof Unit)) return false;
 
       return (
-        ui.selectedCard.value.blueprint.summonedFollowup?.isTargetable(
+        ui.selectedCard.value.blueprint.followup?.isTargetable(
           session,
           cell,
           ui.summonTarget.value!,
@@ -77,9 +77,8 @@ const matchFollowup = (cell: Cell) => {
 const matchSummon = (cell: Cell) => {
   if (ui.targetingMode.value !== TARGETING_MODES.SUMMON) return false;
   if (!ui.selectedCard.value) return false;
-  if (!(ui.selectedCard.value instanceof Unit)) return false;
 
-  return ui.selectedCard.value.canSummonAt(cell.position);
+  return ui.selectedCard.value.canPlayAt(cell.position);
 };
 
 const isMovementDisplayed = computed(() => !fx.isPlaying.value && matchMovement(cell));

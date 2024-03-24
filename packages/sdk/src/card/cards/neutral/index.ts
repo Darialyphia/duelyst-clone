@@ -28,7 +28,7 @@ export const neutral: CardBlueprint[] = [
           modifierOpeningGambitMixin({
             keywords: [],
             handler(session, attachedTo) {
-              const [point] = attachedTo.card.summonFollowupTargets;
+              const [point] = attachedTo.card.followupTargets;
               if (!point) return;
               const entity = session.entitySystem.getEntityAt(point);
               if (entity) {
@@ -39,7 +39,7 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ],
-    summonedFollowup: {
+    followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
       isTargetable(session, point) {
@@ -65,7 +65,7 @@ export const neutral: CardBlueprint[] = [
           modifierOpeningGambitMixin({
             keywords: [],
             handler(session, attachedTo) {
-              const [point] = attachedTo.card.summonFollowupTargets;
+              const [point] = attachedTo.card.followupTargets;
               if (!point) return;
 
               const entity = session.entitySystem.getEntityAt(point);
@@ -77,7 +77,7 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ],
-    summonedFollowup: {
+    followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
       isTargetable(session, point, summonedPoint, card) {
@@ -188,7 +188,7 @@ export const neutral: CardBlueprint[] = [
           modifierOpeningGambitMixin({
             keywords: [],
             handler(session, attachedTo) {
-              const [point] = attachedTo.card.summonFollowupTargets;
+              const [point] = attachedTo.card.followupTargets;
               if (!point) return;
               dispelAt(session, point);
             }
@@ -196,7 +196,7 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ],
-    summonedFollowup: {
+    followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
       isTargetable(session, point, summonedPoint) {

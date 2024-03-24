@@ -30,7 +30,12 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
       :data-cost="card && card.manaCost"
       @click="ui.selectCardAtIndex(index)"
     >
-      <AnimatedCardIcon v-if="card" :sprite-id="card.blueprint.spriteId" class="icon" />
+      <AnimatedCardIcon
+        v-if="card"
+        :sprite-id="card.blueprint.spriteId"
+        :kind="card.blueprint.kind"
+        class="icon"
+      />
     </button>
     <UiFancyButton
       :style="{ '--hue': '10DEG', '--hue2': '20DEG', 'min-width': '13ch' }"

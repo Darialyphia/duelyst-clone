@@ -51,8 +51,8 @@ export class PlayCardAction extends GameAction<typeof schema> {
         }
       })
       .with(P.instanceOf(Spell), async card => {
-        if (isDefined(targets)) {
-          return card.play(this.payload as any);
+        if (isDefined(targets) && isDefined(position)) {
+          return card.play({ position, targets });
         }
       })
       .with(P.instanceOf(Artifact), async card => {

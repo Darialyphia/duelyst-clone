@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'void_pulse' },
+        { blueprintId: 'void_pulse' },
+        { blueprintId: 'void_pulse' },
         { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'ephemeral_shroud' },
         { blueprintId: 'ephemeral_shroud' },

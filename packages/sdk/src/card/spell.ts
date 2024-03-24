@@ -1,7 +1,6 @@
 import { CARDS, type CardBlueprint } from './card-lookup';
 import { Card } from './card';
 import type { Point3D } from '@game/shared';
-import type { Cell } from '../board/cell';
 
 export type SpellInterceptor = Spell['interceptors'];
 
@@ -9,9 +8,11 @@ type SpellBlueprint = CardBlueprint & {
   kind: 'SPELL';
 };
 
-type SpellCtx = { targets: Point3D[] };
+type SpellCtx = { position: Point3D; targets: Point3D[] };
 
 export class Spell extends Card<SpellCtx> {
+  followupTargets: Point3D[] = [];
+
   get blueprint(): SpellBlueprint {
     return CARDS[this.blueprintId] as SpellBlueprint;
   }
@@ -20,7 +21,12 @@ export class Spell extends Card<SpellCtx> {
     return this.blueprint.kind;
   }
 
+  canPlayAt(point: Point3D) {
+    return this.blueprint.isTargetable(this.session, point);
+  }
+
   async onPlay(ctx: SpellCtx) {
-    this.blueprint.onPlay(this.session, ctx.targets);
+    this.followupTargets = ctx.targets;
+    this.blueprint.onPlay(this.session, ctx.position, ctx.targets, this);
   }
 }

@@ -1,7 +1,7 @@
 import type { GameSession } from '../game-session';
 import { CARDS } from './card-lookup';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
-import type { AnyObject, Serializable, Values } from '@game/shared';
+import type { AnyObject, Point3D, Serializable, Values } from '@game/shared';
 
 import type { CardIndex, PlayerId } from '../player/player';
 import EventEmitter from 'eventemitter3';
@@ -76,6 +76,7 @@ export abstract class Card<TCtx extends AnyObject>
     return this.interceptors.manaCost.getValue(this.blueprint.manaCost, this);
   }
 
+  abstract canPlayAt(point: Point3D): boolean;
   abstract onPlay(ctx: TCtx): Promise<void>;
 
   async play(ctx: TCtx) {

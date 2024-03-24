@@ -25,6 +25,7 @@ const prefixByAssetType = {
   tilesets: "",
   skills: "",
   units: "",
+  icons: "",
   tiles: "",
   ui: "",
   interactables: "",

@@ -90,7 +90,9 @@ onMounted(async () => {
             .flat()
             .map(card => card.blueprint.spriteId)
         )
-      ].map(spriteId => game.assets.loadSpritesheet(spriteId))
+      ].map(spriteId => {
+        return game.assets.loadSpritesheet(spriteId);
+      })
     );
 
     ready.value = true;

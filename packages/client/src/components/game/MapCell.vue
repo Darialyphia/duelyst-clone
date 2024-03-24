@@ -129,7 +129,7 @@ const filters = computed(() => {
                   ui.selectedCard.value instanceof Unit &&
                   ui.selectedCard.value.canSummonAt(cell.position)
                 ) {
-                  if (ui.selectedCard.value.blueprint.summonedFollowup) {
+                  if (ui.selectedCard.value.blueprint.followup) {
                     ui.summonTarget.value = cell.position;
                     ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);
                   } else {
@@ -145,7 +145,7 @@ const filters = computed(() => {
               .with(TARGETING_MODES.FOLLOWUP, () => {
                 if (
                   ui.selectedCard.value instanceof Unit &&
-                  ui.selectedCard.value.blueprint.summonedFollowup?.isTargetable(
+                  ui.selectedCard.value.blueprint.followup?.isTargetable(
                     session,
                     cell,
                     ui.summonTarget.value!,

@@ -22,6 +22,17 @@ export type AssetsContext = {
 
 export const ASSETS_INJECTION_KEY = Symbol('assets') as InjectionKey<AssetsContext>;
 
+const splitBundle = (manifest: AssetsManifest, name: string) => {
+  const bundle = manifest.bundles.find(b => b.name === name)!;
+  manifest.bundles.splice(manifest.bundles.indexOf(bundle), 1);
+  (bundle.assets as UnresolvedAsset[]).forEach(asset => {
+    manifest.bundles.push({
+      name: asset.alias?.[0] ?? '',
+      assets: [asset]
+    });
+  });
+};
+
 export const useAssetsProvider = () => {
   const loaded = ref(false);
   const load = async () => {
@@ -29,16 +40,10 @@ export const useAssetsProvider = () => {
 
     Assets.cache.reset();
     const manifest = await $fetch<AssetsManifest>('/assets/assets-manifest.json');
-    // transform the manifest to add one bundle pr unit, as loading everything at once is way too expensive
 
-    const unitsBundle = manifest.bundles.find(b => b.name === 'units')!;
-    manifest.bundles.splice(manifest.bundles.indexOf(unitsBundle), 1);
-    (unitsBundle.assets as UnresolvedAsset[]).forEach(asset => {
-      manifest.bundles.push({
-        name: asset.alias?.[0] ?? '',
-        assets: [asset]
-      });
-    });
+    // transform the manifest to add separate bundles for units and icons, as loading everything at once is way too expensive
+    splitBundle(manifest, 'units');
+    splitBundle(manifest, 'icons');
 
     Assets.init({ manifest });
 
@@ -55,15 +60,15 @@ export const useAssetsProvider = () => {
     loaded.value = true;
   };
 
-  const unitsBundlesLoaded = new Set<string>();
+  const bundlesLoaded = new Set<string>();
   const api: AssetsContext = {
     loaded,
     load,
     async loadSpritesheet(key) {
       // avoids pixi warning messages when wetry to load a bundle multiple times
-      if (!unitsBundlesLoaded.has(key)) {
+      if (!bundlesLoaded.has(key)) {
         await Assets.loadBundle(key);
-        unitsBundlesLoaded.add(key);
+        bundlesLoaded.add(key);
       }
       return Assets.get<SpritesheetWithAnimations>(key);
     },

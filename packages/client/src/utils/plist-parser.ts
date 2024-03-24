@@ -33,16 +33,18 @@ const parsePlistValue = (str: string) => {
   return JSON.parse(str.replaceAll('{', '[').replaceAll('}', ']'));
 };
 
-const parsePlist = (raw: string): ISpritesheetData => {
+const parsePlist = (url: string, raw: string): ISpritesheetData => {
   const json = plist.parse(raw) as PlistSchema;
+  const urlParts = url.split('/');
+  const filename = urlParts.at(-1)!.replace('.plist', '');
 
   const parsedSize = parsePlistValue(json.metadata.size) as [number, number];
 
   const animations: Record<string, string[]> = {};
 
   Object.keys(json.frames).forEach(key => {
-    const parts = key.split('_');
-    const name = parts.at(-2)!;
+    const parts = key.replace(`${filename}_`, '').split('_');
+    const name = parts.at(-2) ?? 'default'; // spells and artifacts dont have an animation name for their "default" state
     if (!animations[name]) {
       animations[name] = [];
     }
@@ -98,7 +100,7 @@ export const plistParser = {
     const response = await fetch(url);
     const raw = await response.text();
 
-    return parsePlist(raw);
+    return parsePlist(url, raw);
   },
 
   async testParse(asset: any, options: any): Promise<boolean> {

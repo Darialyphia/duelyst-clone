@@ -15,7 +15,7 @@ type UnitCtx = { position: Point3D; targets: Point3D[] };
 
 export class Unit extends Card<UnitCtx> {
   entity: Nullable<Entity> = null;
-  summonFollowupTargets: Point3D[] = [];
+  followupTargets: Point3D[] = [];
 
   get blueprint(): UnitBlueprint {
     return CARDS[this.blueprintId] as UnitBlueprint;
@@ -48,7 +48,7 @@ export class Unit extends Card<UnitCtx> {
   }
 
   async onPlay(ctx: UnitCtx) {
-    this.summonFollowupTargets = ctx.targets;
+    this.followupTargets = ctx.targets;
     this.entity = this.session.entitySystem.addEntity({
       cardIndex: this.index,
       playerId: this.playerId,
@@ -65,7 +65,7 @@ export class Unit extends Card<UnitCtx> {
     return this.interceptors.maxHp.getValue(this.blueprint.maxHp, this);
   }
 
-  canSummonAt(point: Point3D) {
+  canPlayAt(point: Point3D) {
     const isOccupied = !!this.session.entitySystem.getEntityAt(point);
     if (isOccupied) return false;
     const nearby = this.session.boardSystem.getNeighbors(point);
