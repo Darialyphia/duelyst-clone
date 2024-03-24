@@ -6,9 +6,13 @@ import { Unit } from '../card/unit';
 import { Spell } from '../card/spell';
 import { Artifact } from '../card/artifact';
 import { isDefined } from '@game/shared';
+import { config } from '../config';
 
 const schema = defaultActionSchema.extend({
-  cardIndex: z.number(),
+  cardIndex: z
+    .number()
+    .nonnegative()
+    .max(config.MAX_HAND_SIZE - 1),
   position: z
     .object({
       x: z.number(),

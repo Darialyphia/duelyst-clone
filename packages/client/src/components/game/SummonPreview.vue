@@ -38,7 +38,7 @@ const isDisplayed = computed(() => {
       }
       return (
         ui.selectedCard.value instanceof Unit &&
-        ui.selectedCard.value.canSummonAt(ui.hoveredCell.value.position)
+        ui.selectedCard.value.canPlayAt(ui.hoveredCell.value.position)
       );
     })
     .with(TARGETING_MODES.FOLLOWUP, () => {

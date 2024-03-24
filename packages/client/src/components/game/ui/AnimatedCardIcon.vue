@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { CARD_KINDS, type CardKind } from '@game/sdk';
 import { match } from 'ts-pattern';
-const { spriteId, kind } = defineProps<{ spriteId: string; kind: CardKind }>();
+const { spriteId, kind, isActive } = defineProps<{
+  spriteId: string;
+  kind: CardKind;
+  isActive?: boolean;
+}>();
 const { assets } = useGame();
 
 const sheet = assets.getSpritesheet(spriteId);
@@ -10,10 +14,10 @@ const isHovered = useElementHover(el);
 const animationName = computed(() =>
   match(kind)
     .with(CARD_KINDS.MINION, CARD_KINDS.GENERAL, () =>
-      isHovered.value ? 'idle' : 'breathing'
+      isHovered.value || isActive ? 'idle' : 'breathing'
     )
     .with(CARD_KINDS.SPELL, CARD_KINDS.ARTIFACT, () =>
-      isHovered.value ? 'active' : 'default'
+      isHovered.value || isActive ? 'active' : 'default'
     )
     .exhaustive()
 );
@@ -27,7 +31,7 @@ useIntervalFn(() => {
   frame.value = (frame.value + 1) % (animation.value.length - 1);
 }, frameDuration);
 
-watch(isHovered, () => {
+watch([isHovered, () => isActive], () => {
   frame.value = 0;
 });
 

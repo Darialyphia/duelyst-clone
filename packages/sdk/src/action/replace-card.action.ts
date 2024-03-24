@@ -6,7 +6,7 @@ import { config } from '../config';
 const schema = defaultActionSchema.extend({
   cardIndex: z
     .number()
-    .positive()
+    .nonnegative()
     .max(config.MAX_HAND_SIZE - 1)
 });
 

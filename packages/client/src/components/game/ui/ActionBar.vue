@@ -10,7 +10,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
   <div class="action-bar">
     <UiFancyButton
       :style="{ '--hue': '230DEG', '--hue2': '210DEG' }"
-      :disabled="!activePlayer.canReplace() || !ui.selectedCardIndex.value"
+      :disabled="!activePlayer.canReplace() || !isDefined(ui.selectedCardIndex.value)"
       @click="
         () => {
           dispatch('replaceCard', {
@@ -37,6 +37,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
         v-if="card"
         :sprite-id="card.blueprint.spriteId"
         :kind="card.blueprint.kind"
+        :is-active="ui.selectedCardIndex.value === index"
         class="icon"
       />
     </button>
