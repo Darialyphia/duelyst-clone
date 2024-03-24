@@ -7,19 +7,22 @@ const { assets } = useGame();
 const sheet = assets.getSpritesheet(spriteId);
 const el = ref<HTMLElement>();
 const isHovered = useElementHover(el);
-const animation = computed(() =>
+const animationName = computed(() =>
   match(kind)
     .with(CARD_KINDS.MINION, CARD_KINDS.GENERAL, () =>
-      isHovered.value ? sheet.animations.idle : sheet.animations.breathing
+      isHovered.value ? 'idle' : 'breathing'
     )
     .with(CARD_KINDS.SPELL, CARD_KINDS.ARTIFACT, () =>
-      isHovered.value ? sheet.animations.active : sheet.animations.default
+      isHovered.value ? 'active' : 'default'
     )
     .exhaustive()
 );
+const animation = computed(() => sheet.animations[animationName.value]);
 const frame = ref(0);
-const frameDuration = HALF_SPEED_SPRITES.includes(sheet.data.meta.image!) ? 160 : 80;
-console.log(sheet.data.meta.image, frameDuration);
+const frameDuration = computed(() =>
+  isHalfSpeed(sheet, animationName.value) ? 160 : 80
+);
+
 useIntervalFn(() => {
   frame.value = (frame.value + 1) % (animation.value.length - 1);
 }, frameDuration);
@@ -47,8 +50,6 @@ const style = computed(() => {
 
 <style scoped lang="postcss">
 div {
-  pointer-events: none;
-
   width: calc(1px * var(--width));
   height: calc(1px * var(--height));
 

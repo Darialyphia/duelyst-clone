@@ -106,9 +106,7 @@ export const useGameUiProvider = (session: GameSession) => {
     }),
     selectCardAtIndex(index) {
       selectedCardIndex.value = index;
-      if (api.selectedCard.value instanceof Unit) {
-        api.switchTargetingMode(TARGETING_MODES.SUMMON);
-      }
+      api.switchTargetingMode(TARGETING_MODES.SUMMON);
     },
     unselectCard() {
       selectedCardIndex.value = null;

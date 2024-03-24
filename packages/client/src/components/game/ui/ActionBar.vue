@@ -25,7 +25,10 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
       v-for="(card, index) in hand"
       :key="`${card?.blueprintId}:${index}`"
       class="card-button"
-      :class="card && ui.selectedCard.value === card && 'selected'"
+      :class="[
+        card && ui.selectedCard.value === card && 'selected',
+        card && card?.blueprint.kind.toLowerCase()
+      ]"
       :disabled="!card || card.manaCost > activePlayer.currentMana"
       :data-cost="card && card.manaCost"
       @click="ui.selectCardAtIndex(index)"
@@ -92,7 +95,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
 
     position: absolute;
     z-index: 2;
-    bottom: 0;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
 
@@ -128,8 +131,13 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     }
   }
 
+  &.spell > .icon {
+    bottom: 10px;
+    left: 26px;
+    filter: drop-shadow(0 0 1px black);
+  }
   &.selected > .icon {
-    transform: scale(2) translateY(-20px);
+    transform: scale(2) translateY(-15px);
   }
 }
 </style>

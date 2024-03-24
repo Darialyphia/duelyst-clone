@@ -125,10 +125,7 @@ const filters = computed(() => {
                 }
               })
               .with(TARGETING_MODES.SUMMON, () => {
-                if (
-                  ui.selectedCard.value instanceof Unit &&
-                  ui.selectedCard.value.canSummonAt(cell.position)
-                ) {
+                if (ui.selectedCard.value?.canPlayAt(cell.position)) {
                   if (ui.selectedCard.value.blueprint.followup) {
                     ui.summonTarget.value = cell.position;
                     ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);

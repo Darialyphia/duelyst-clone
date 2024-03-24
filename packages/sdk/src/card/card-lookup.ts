@@ -62,6 +62,16 @@ type CardBlueprintSpell = {
 type CardBlueprintArtifact = {
   onEquiped(session: GameSession, equipedOn: Entity): Promise<void>;
   onRemoved(session: GameSession, equipedOn: Entity): Promise<void>;
+  followup?: {
+    minTargetCount: number;
+    maxTargetCount: number;
+    isTargetable(
+      session: GameSession,
+      point: Point3D,
+      castPoint: Point3D,
+      card: Unit
+    ): boolean;
+  };
 };
 
 export type CardBlueprint = Prettify<
