@@ -1,6 +1,6 @@
 import type { Entity, EntityId, GameSession } from '@game/sdk';
 import type { DistanceMap } from '@game/sdk/src/board/pathfinding';
-import { dist, type Nullable, type Point3D, type Vec3 } from '@game/shared';
+import { type Nullable, type Point3D, type Vec3 } from '@game/shared';
 
 export type PathfindingContext = {
   canMoveTo(entity: Entity, position: Point3D): boolean;
@@ -15,7 +15,7 @@ const PATHFINDING_INJECTION_KEY = Symbol(
 export const usePathfindingProvider = (session: GameSession) => {
   const cache = new Map<EntityId, DistanceMap>();
 
-  session.on('game:action', () => {
+  session.on('*', () => {
     cache.clear();
   });
 

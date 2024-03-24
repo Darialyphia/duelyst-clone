@@ -200,7 +200,7 @@ export const useFXProvider = () => {
           provided.entityPositionsMap.value.set(entity.id, entity.position.serialize());
         });
       };
-      session.on('game:action', updatePositions);
+      session.on('*', updatePositions);
       updatePositions();
     },
     provideUi(ui) {

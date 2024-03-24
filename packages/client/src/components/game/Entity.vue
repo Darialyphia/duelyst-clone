@@ -99,11 +99,13 @@ const boardDimensions = useGameSelector(session => ({
   width: session.boardSystem.width,
   height: session.boardSystem.height
 }));
+
+const isReady = computed(() => entity && fx.entityPositionsMap.value.get(entityId)!);
 </script>
 
 <template>
   <IsoPositioner
-    v-if="entity"
+    v-if="isReady"
     :animated="!fx.isPlaying.value"
     v-bind="fx.entityPositionsMap.value.get(entityId)!"
     :z-index-offset="3"

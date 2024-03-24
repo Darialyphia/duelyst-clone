@@ -2,20 +2,26 @@ import EventEmitter from 'eventemitter3';
 import { EntitySystem } from './entity/entity-system';
 import { BoardSystem, type BoardSystemOptions } from './board/board-system';
 import { PlayerSystem } from './player/player-system';
-import type {
-  EntityEvent,
-  EntityEventMap,
-  EntityId,
-  SerializedEntity
+import {
+  ENTITY_EVENTS,
+  type EntityEvent,
+  type EntityEventMap,
+  type EntityId,
+  type SerializedEntity
 } from './entity/entity';
 import type { GameAction, SerializedAction } from './action/action';
 import type { Nullable, Prettify, Values } from '@game/shared';
-import type { PlayerEvent, PlayerEventMap, SerializedPlayer } from './player/player';
+import {
+  PLAYER_EVENTS,
+  type PlayerEvent,
+  type PlayerEventMap,
+  type SerializedPlayer
+} from './player/player';
 import { ActionSystem } from './action/action-system';
 import { noopFXContext, type FXSystem } from './fx-system';
 import { RNGSystem } from './rng-system';
-import type { DeckEvent, DeckEventMap } from './card/deck';
-import type { CardEvent, CardEventMap } from './card/card';
+import { DECK_EVENTS, type DeckEvent, type DeckEventMap } from './card/deck';
+import { CARD_EVENTS, type CardEvent, type CardEventMap } from './card/card';
 
 export type SerializedGameState = {
   map: BoardSystemOptions;
@@ -40,6 +46,7 @@ type GlobalCardEvents = {
 };
 
 type GameEventsBase = {
+  '*': [string];
   'game:action': [GameAction<any>];
   'game:ready': [];
 };
@@ -109,10 +116,24 @@ export class GameSession extends EventEmitter<GameEventMap> {
     this.setup();
   }
 
+  private setupStarEvents() {
+    [
+      ...Object.values(ENTITY_EVENTS).map(e => `entity:${e}`),
+      ...Object.values(DECK_EVENTS).map(e => `deck:${e}`),
+      ...Object.values(PLAYER_EVENTS).map(e => `player:${e}`),
+      ...Object.values(CARD_EVENTS).map(e => `card:${e}`),
+      'game:action',
+      'game:ready'
+    ].forEach(eventName => {
+      this.on(eventName as any, () => {
+        this.emit('*', eventName);
+      });
+    });
+  }
   private async setup() {
     if (this.isReady) return;
     this.isReady = true;
-
+    this.setupStarEvents();
     this.phase = this.initialState.phase;
 
     this.rngSystem.setup(this.seed);

@@ -7,7 +7,7 @@ const createGameSessionRef =
 
     const el = customRef((track, trigger) => {
       _trigger = trigger;
-      session.on('game:action', trigger);
+      session.on('*', trigger);
       return {
         get() {
           track();
@@ -19,7 +19,7 @@ const createGameSessionRef =
       };
     });
 
-    return [el, () => session.off('game:action', _trigger)] as const;
+    return [el, () => session.off('*', _trigger)] as const;
   };
 
 export const useGameSelector = <T>(getter: (session: GameSession) => T) => {
