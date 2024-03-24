@@ -12,6 +12,7 @@ const loadParserByAssetType = {
   tilesets: TILESET_PARSER,
   skills: SPRITESHEET_PARSER,
   units: PLIST_PARSER,
+  icons: PLIST_PARSER,
   tiles: SPRITESHEET_PARSER,
   ui: SPRITESHEET_PARSER,
   interactables: SPRITESHEET_PARSER,
