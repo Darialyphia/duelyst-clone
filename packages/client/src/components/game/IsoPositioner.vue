@@ -84,12 +84,12 @@ const tweened = ref({ x: containerX.value, y: containerY.value });
 
 watch([containerX, containerY], ([newX, newY]) => {
   gsap.to(tweened.value, {
-    duration: animated ? 1 : 0,
+    duration: animated ? 0.7 : 0,
     x: newX,
     ease: animated ? Power3.easeOut : Power0.easeOut
   });
   gsap.to(tweened.value, {
-    duration: animated ? 1 : 0,
+    duration: animated ? 0.7 : 0,
     y: newY,
     ease: animated ? Power3.easeOut : Power0.easeOut
   });

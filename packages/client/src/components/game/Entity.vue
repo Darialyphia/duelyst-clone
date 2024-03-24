@@ -4,6 +4,7 @@ import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom';
 import type { EntityId } from '@game/sdk';
 import { AnimatedSprite, Container, type Filter, type FrameObject } from 'pixi.js';
 import { TextStyle } from 'pixi.js';
+import { AdjustmentFilter } from '@pixi/filter-adjustment';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
@@ -61,6 +62,7 @@ const hoveredFilters = [
   }),
   new OutlineFilter(2, 0xffffff, 0.2, 0)
 ] as const;
+const exhaustedFilter = new AdjustmentFilter({ saturation: 0 });
 
 const isHovered = computed(() => ui.hoveredEntity.value?.equals(entity.value));
 
@@ -81,6 +83,9 @@ const filters = computed(() => {
   const result: Filter[] = [];
   if (isHovered.value) {
     result.push(...hoveredFilters);
+  }
+  if (entity.value.hasKeyword('Exhausted')) {
+    result.push(exhaustedFilter);
   }
 
   return result;

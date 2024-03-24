@@ -6,12 +6,13 @@ import type { CardIndex, PlayerId } from '../player/player';
 import { Interceptable, ReactiveValue, type inferInterceptor } from '../utils/helpers';
 import { isAlly, isEnemy } from './entity-utils';
 import { isWithinCells } from '../utils/targeting';
-import type { Modifier, ModifierId } from '../modifier/modifier';
+import { createModifier, type Modifier, type ModifierId } from '../modifier/modifier';
 import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
 import type { AnyCard } from '../card/card';
-import type { KeywordName } from '../utils/keywords';
+import { KEYWORDS, type KeywordName } from '../utils/keywords';
+import { modifierInterceptorMixin } from '../modifier/mixins/interceptor.mixin';
 
 export type EntityId = number;
 
@@ -236,7 +237,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     Object.values(this.interceptors).forEach(interceptor => interceptor.clear());
   }
 
-  startTurn() {
+  endTurn() {
     this.movementsTaken = 0;
     this.attacksTaken = 0;
   }
@@ -317,13 +318,46 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.emit(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, payload);
   }
 
+  exhaust() {
+    const modifierId = 'exhausted';
+    const modifier = createModifier({
+      id: modifierId,
+      visible: true,
+      name: KEYWORDS.EXHAUSTED.name,
+      description: KEYWORDS.EXHAUSTED.description,
+      stackable: false,
+      mixins: [
+        modifierInterceptorMixin({
+          key: 'canAttack',
+          duration: 1,
+          tickOn: 'end',
+          interceptor: () => false,
+          keywords: [KEYWORDS.EXHAUSTED]
+        }),
+        modifierInterceptorMixin({
+          key: 'canMove',
+          duration: 1,
+          tickOn: 'end',
+          interceptor: () => false,
+          keywords: [KEYWORDS.EXHAUSTED]
+        })
+      ]
+    });
+    this.addModifier(modifier);
+    const remove = () => {
+      this.removeModifier(modifierId);
+      this.player.off('turn_end', remove);
+    };
+    this.player.on('turn_end', remove);
+  }
+
   async performAttack(target: Entity) {
     this.emit(ENTITY_EVENTS.BEFORE_ATTACK, { entity: this, target });
     await this.dealDamage(this.attack, target);
     if (target.canRetaliate(this)) {
       await target.dealDamage(target.attack, this);
     }
-
+    this.exhaust();
     this.emit(ENTITY_EVENTS.AFTER_ATTACK, { entity: this, target });
   }
 

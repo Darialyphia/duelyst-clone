@@ -54,6 +54,8 @@ export class Unit extends Card<UnitCtx> {
       playerId: this.playerId,
       position: ctx.position
     });
+
+    this.entity.exhaust();
   }
 
   get attack(): number {

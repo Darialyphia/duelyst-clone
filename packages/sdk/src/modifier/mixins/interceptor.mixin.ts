@@ -3,7 +3,7 @@ import type { inferInterceptor } from '../../utils/helpers';
 import type { Keyword } from '../../utils/keywords';
 import { modifierDurationMixin } from './duration.mixin';
 
-export const interceptorMixin = <T extends keyof EntityInterceptor>({
+export const modifierInterceptorMixin = <T extends keyof EntityInterceptor>({
   key,
   duration,
   interceptor,

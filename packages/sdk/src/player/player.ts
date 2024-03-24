@@ -198,6 +198,9 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
 
   endTun() {
     this.draw(config.CARD_DRAW_PER_TURN);
+    this.entities.forEach(entity => {
+      entity.endTurn();
+    });
     this.emit(PLAYER_EVENTS.TURN_END, this);
   }
 
@@ -205,9 +208,6 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     this.cardsReplacedThisTurn = 0;
     this.maxMana = Math.min(this.maxMana + 1, config.MAX_MANA);
     this.currentMana = this.maxMana;
-    this.entities.forEach(entity => {
-      entity.startTurn();
-    });
     this.emit(PLAYER_EVENTS.TURN_START, this);
   }
 

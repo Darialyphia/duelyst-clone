@@ -28,7 +28,7 @@ export const displayDamageIndicator: FxCommand<'displayDamageIndicator'> = (
   const container = new Container();
 
   const textSprite = new Text(String(amount), {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: '700',
     fill: 0xff0000,
     stroke: 'black',

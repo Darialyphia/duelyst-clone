@@ -1,7 +1,7 @@
 import { hasNearbyUnit, isEmpty, isEnemy } from '../../../entity/entity-utils';
 import { modifierDyingWishMixin } from '../../../modifier/mixins/dying-wish.mixin';
 import { modifierGameEventMixin } from '../../../modifier/mixins/game-event.mixin';
-import { interceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
+import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { modifierOpeningGambitMixin } from '../../../modifier/mixins/opening-gambit.mixin';
 import { createModifier } from '../../../modifier/modifier';
 import { dispelAt } from '../../../modifier/modifier-utils';
@@ -121,7 +121,7 @@ export const neutral: CardBlueprint[] = [
                 stackable: true,
                 stacks: 1,
                 mixins: [
-                  interceptorMixin({
+                  modifierInterceptorMixin({
                     key: 'attack',
                     duration: Infinity,
                     keywords: [],
