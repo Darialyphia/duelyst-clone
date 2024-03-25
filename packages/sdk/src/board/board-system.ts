@@ -107,7 +107,7 @@ export class BoardSystem {
       : undefined;
     const entity = this.session.entitySystem.getEntityAt(point);
     if (!entity) {
-      throw new Error('Cannot get distancemap from an empty cell.');
+      return null;
     }
     return new Pathfinder(this.session, entity, boundaries).getDistanceMap(point);
   }

@@ -16,6 +16,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
           dispatch('replaceCard', {
             cardIndex: ui.selectedCardIndex.value!
           });
+          ui.unselectCard();
         }
       "
     >

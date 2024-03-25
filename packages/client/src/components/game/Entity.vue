@@ -1,96 +1,13 @@
 <script setup lang="ts">
-import { OutlineFilter } from '@pixi/filter-outline';
-import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom';
 import type { EntityId } from '@game/sdk';
-import { AnimatedSprite, Container, type Filter, type FrameObject } from 'pixi.js';
+import { randomInt } from '@game/shared';
+import { Container } from 'pixi.js';
 import { PTransition } from 'vue3-pixi';
-import { AdjustmentFilter } from '@pixi/filter-adjustment';
-import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
-const { camera, assets, ui, fx } = useGame();
-
+const { camera, fx } = useGame();
 const entity = useGameSelector(session => session.entitySystem.getEntityById(entityId)!);
-const textures = ref<FrameObject[]>([]);
-
-const animationName = computed(
-  () => fx.entityAnimationsMap.value.get(entityId) ?? 'breathing'
-);
-const setTextures = () => {
-  if (!entity.value) return;
-  const sheet = assets.getSpritesheet(entity.value.card.blueprint.spriteId);
-  textures.value = createSpritesheetFrameObject(animationName.value, sheet);
-};
-setTextures();
-
-const sprite = ref<AnimatedSprite>();
-
-watch(animationName, (newAnimation, oldAnimation) => {
-  const updateAnimation = () => {
-    setTextures();
-    nextTick(() => {
-      if (!sprite.value) return;
-      sprite.value.gotoAndPlay(0);
-    });
-  };
-
-  const updateAnimationDelayed = () => {
-    if (!sprite.value) return;
-    sprite.value.onLoop = sprite.value.onComplete = () => {
-      sprite.value!.onLoop = undefined;
-      sprite.value!.onComplete = undefined;
-      updateAnimation();
-    };
-  };
-  if (newAnimation === 'breathing' && oldAnimation === 'idle') {
-    updateAnimationDelayed();
-  } else {
-    updateAnimation();
-  }
-});
-
-const isSelected = computed(() => ui.selectedEntity.value?.equals(entity.value));
-watchEffect(() => {
-  fx.entityAnimationsMap.value.set(entityId, isSelected.value ? 'idle' : 'breathing');
-});
-
-const hoveredFilters = [
-  new AdvancedBloomFilter({
-    blur: 0,
-    bloomScale: 0.9,
-    threshold: 0.75
-  }),
-  new OutlineFilter(2, 0xffffff, 0.2, 0)
-] as const;
-const exhaustedFilter = new AdjustmentFilter({ saturation: 0 });
-
-const isHovered = computed(() => ui.hoveredEntity.value?.equals(entity.value));
-
-watchEffect(() => {
-  gsap.to(hoveredFilters[0], {
-    duration: 0.2,
-    blur: isHovered.value ? 4 : 0,
-    ease: Power2.easeOut
-  });
-  gsap.to(hoveredFilters[1], {
-    duration: 0.2,
-    alpha: isHovered.value ? 1 : 0,
-    ease: Power2.easeOut
-  });
-});
-
-const filters = computed(() => {
-  const result: Filter[] = [];
-  if (isHovered.value) {
-    result.push(...hoveredFilters);
-  }
-  if (entity.value.hasKeyword('Exhausted')) {
-    result.push(exhaustedFilter);
-  }
-
-  return result;
-});
 
 const scaleX = computed(() => {
   let value = entity.value.player.isPlayer1 ? 1 : -1;
@@ -106,19 +23,16 @@ const boardDimensions = useGameSelector(session => ({
   height: session.boardSystem.height
 }));
 
-const isReady = computed(() => entity && fx.entityPositionsMap.value.get(entityId)!);
-
-const shadowFilters = [new ColorOverlayFilter(0x000000)];
-
 const isEnterAnimationDone = ref(false);
 const onEnter = (container: Container) => {
-  container.y = -100;
+  console.log('enter');
+  container.y = -1 * (randomInt(50) + 50);
   container.alpha = 0;
+
   gsap.to(container, {
     y: 0,
     duration: 1,
     ease: Bounce.easeOut,
-    delay: Math.random() * 0.5,
     onStart() {
       container.alpha = 1;
     },
@@ -127,11 +41,21 @@ const onEnter = (container: Container) => {
     }
   });
 };
+const onShadowEnter = (container: Container) => {
+  container.scale.set(0);
+  container.pivot.set(container.width / 2, container.height / 2);
+  gsap.to(container.scale, {
+    x: 1,
+    y: 1,
+    duration: 1,
+    ease: Bounce.easeOut
+  });
+};
 </script>
 
 <template>
   <IsoPositioner
-    v-if="isReady"
+    v-if="entity && fx.entityPositionsMap.value.get(entityId)"
     :animated="!fx.isPlaying.value"
     v-bind="fx.entityPositionsMap.value.get(entityId)!"
     :z-index-offset="3"
@@ -144,50 +68,30 @@ const onEnter = (container: Container) => {
     }"
     event-mode="none"
   >
-    <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onEnter">
-      <container
-        :ref="
-          (container: any) => {
-            if (container?.parent) {
-              fx.registerEntityRootContainer(entity.id, container.parent);
-            }
+    <container
+      :ref="
+        (container: any) => {
+          if (container?.parent) {
+            fx.registerEntityRootContainer(entity.id, container.parent);
           }
-        "
-      >
-        <animated-sprite
-          v-if="textures?.length"
-          :textures="textures"
-          :z-index="1"
-          :filters="shadowFilters"
-          :scale-y="0.45"
-          :skew-x="-1"
-          :anchor="0.5"
-          :x="10"
-          :y="CELL_HEIGHT * 0.5"
-          loop
-          event-mode="none"
-          playing
-        />
-        <animated-sprite
-          :ref="
-            (el: any) => {
-              if (entity) {
-                fx.registerSprite(entity.id, el);
-              }
-              sprite = el;
-            }
-          "
-          :textures="textures"
-          :filters="filters"
-          :anchor-x="0.5"
-          :anchor-y="1"
-          :y="CELL_HEIGHT * 0.9"
-          :scale-x="scaleX"
-          :playing="true"
-        />
+        }
+      "
+    >
+      <container :scale-x="scaleX">
+        <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onShadowEnter">
+          <container>
+            <EntityShadow :entity-id="entityId" />
+          </container>
+        </PTransition>
 
-        <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" />
+        <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onEnter">
+          <container>
+            <EntitySprite :entity-id="entityId" />
+          </container>
+        </PTransition>
       </container>
-    </PTransition>
+
+      <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" />
+    </container>
   </IsoPositioner>
 </template>
