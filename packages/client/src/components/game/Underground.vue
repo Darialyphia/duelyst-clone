@@ -49,7 +49,7 @@ const textures = computed(() => {
       :key="`${cell.id}:${i}`"
       :animated="!fx.isPlaying.value"
       v-bind="cell.position"
-      :z="-i * UNDERGROUND_SPRITE_SIZE + 2"
+      :z="-i * UNDERGROUND_SPRITE_SIZE + 1.5"
       :angle="camera.angle.value"
       :height="boardDimensions.height"
       :width="boardDimensions.width"

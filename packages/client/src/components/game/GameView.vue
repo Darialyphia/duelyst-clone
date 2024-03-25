@@ -17,7 +17,7 @@ const entities = useGameSelector(session => session.entitySystem.getList());
   <Sky />
   <Camera>
     <Layer :ref="(layer: any) => ui.registerLayer(layer, 'scene')">
-      <Underground />
+      <!-- <Underground /> -->
       <MapCell v-for="cell in cells" :key="cell.id" :cell-id="cell.id" />
 
       <Entity v-for="entity in entities" :key="entity.id" :entity-id="entity.id" />

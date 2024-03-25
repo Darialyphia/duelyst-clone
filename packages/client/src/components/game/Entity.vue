@@ -3,8 +3,9 @@ import { OutlineFilter } from '@pixi/filter-outline';
 import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom';
 import type { EntityId } from '@game/sdk';
 import { AnimatedSprite, Container, type Filter, type FrameObject } from 'pixi.js';
-import { TextStyle } from 'pixi.js';
+import { PTransition } from 'vue3-pixi';
 import { AdjustmentFilter } from '@pixi/filter-adjustment';
+import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
@@ -106,6 +107,26 @@ const boardDimensions = useGameSelector(session => ({
 }));
 
 const isReady = computed(() => entity && fx.entityPositionsMap.value.get(entityId)!);
+
+const shadowFilters = [new ColorOverlayFilter(0x000000)];
+
+const isEnterAnimationDone = ref(false);
+const onEnter = (container: Container) => {
+  container.y = -100;
+  container.alpha = 0;
+  gsap.to(container, {
+    y: 0,
+    duration: 1,
+    ease: Bounce.easeOut,
+    delay: Math.random() * 0.5,
+    onStart() {
+      container.alpha = 1;
+    },
+    onComplete() {
+      isEnterAnimationDone.value = true;
+    }
+  });
+};
 </script>
 
 <template>
@@ -123,34 +144,50 @@ const isReady = computed(() => entity && fx.entityPositionsMap.value.get(entityI
     }"
     event-mode="none"
   >
-    <container
-      :ref="
-        (container: any) => {
-          if (container?.parent) {
-            fx.registerEntityRootContainer(entity.id, container.parent);
-          }
-        }
-      "
-    >
-      <animated-sprite
+    <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onEnter">
+      <container
         :ref="
-          (el: any) => {
-            if (entity) {
-              fx.registerSprite(entity.id, el);
+          (container: any) => {
+            if (container?.parent) {
+              fx.registerEntityRootContainer(entity.id, container.parent);
             }
-            sprite = el;
           }
         "
-        :textures="textures"
-        :filters="filters"
-        :anchor-x="0.5"
-        :anchor-y="1"
-        :y="CELL_HEIGHT * 0.9"
-        :scale-x="scaleX"
-        :playing="true"
-      />
+      >
+        <animated-sprite
+          v-if="textures?.length"
+          :textures="textures"
+          :z-index="1"
+          :filters="shadowFilters"
+          :scale-y="0.45"
+          :skew-x="-1"
+          :anchor="0.5"
+          :x="10"
+          :y="CELL_HEIGHT * 0.5"
+          loop
+          event-mode="none"
+          playing
+        />
+        <animated-sprite
+          :ref="
+            (el: any) => {
+              if (entity) {
+                fx.registerSprite(entity.id, el);
+              }
+              sprite = el;
+            }
+          "
+          :textures="textures"
+          :filters="filters"
+          :anchor-x="0.5"
+          :anchor-y="1"
+          :y="CELL_HEIGHT * 0.9"
+          :scale-x="scaleX"
+          :playing="true"
+        />
 
-      <EntityStats :entity-id="entityId" />
-    </container>
+        <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" />
+      </container>
+    </PTransition>
   </IsoPositioner>
 </template>
