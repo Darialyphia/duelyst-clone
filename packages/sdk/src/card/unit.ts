@@ -29,8 +29,13 @@ export class Unit extends Card<UnitCtx> {
     attack: new Interceptable<number, Unit>(),
     maxHp: new Interceptable<number, Unit>(),
     manaCost: new Interceptable<number, Card<UnitCtx>>(),
-    canSummonAt: new Interceptable<boolean, Unit>()
+    canSummonAt: new Interceptable<boolean, Unit>(),
+    shouldExhaustOnPlay: new Interceptable<boolean, Unit>()
   };
+
+  get shouldExhaustOnPlay(): boolean {
+    return this.interceptors.shouldExhaustOnPlay.getValue(true, this);
+  }
 
   addInterceptor<T extends keyof UnitInterceptor>(
     key: T,
@@ -55,7 +60,9 @@ export class Unit extends Card<UnitCtx> {
       position: ctx.position
     });
 
-    this.entity.exhaust();
+    if (this.shouldExhaustOnPlay) {
+      this.entity.exhaust();
+    }
   }
 
   get attack(): number {

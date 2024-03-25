@@ -1,10 +1,12 @@
-import { hasNearbyUnit, isEmpty, isEnemy } from '../../../entity/entity-utils';
+import { isEmpty, isEnemy } from '../../../entity/entity-utils';
 import { modifierDyingWishMixin } from '../../../modifier/mixins/dying-wish.mixin';
 import { modifierGameEventMixin } from '../../../modifier/mixins/game-event.mixin';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { modifierOpeningGambitMixin } from '../../../modifier/mixins/opening-gambit.mixin';
+import { modifierRushMixin } from '../../../modifier/mixins/rush.mixin';
 import { createModifier } from '../../../modifier/modifier';
 import { dispelAt } from '../../../modifier/modifier-utils';
+import { KEYWORDS } from '../../../utils/keywords';
 import { isWithinCells } from '../../../utils/targeting';
 import { type CardBlueprint } from '../../card-lookup';
 import { CARD_KINDS } from '../../card-utils';
@@ -233,6 +235,26 @@ export const neutral: CardBlueprint[] = [
             }
           })
         ]
+      })
+    ]
+  },
+  {
+    id: 'saberspine_tiger',
+    name: 'Saberspine Tiger',
+    description: 'Rush',
+    spriteId: 'neutral_beastsaberspinetiger',
+    kind: CARD_KINDS.MINION,
+    manaCost: 3,
+    attack: 3,
+    maxHp: 2,
+    modifiers: [
+      createModifier({
+        id: 'rush',
+        visible: true,
+        name: KEYWORDS.RUSH.name,
+        description: KEYWORDS.RUSH.description,
+        stackable: false,
+        mixins: [modifierRushMixin()]
       })
     ]
   }

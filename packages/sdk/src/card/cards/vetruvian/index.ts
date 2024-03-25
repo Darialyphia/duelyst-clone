@@ -25,11 +25,9 @@ export const vetruvian: CardBlueprint[] = [
     manaCost: 1,
     description: 'Give a friendly minion +1/+1. Draw a card.',
     isTargetable(session, point) {
-      return isAlly(
-        session,
-        session.entitySystem.getEntityAt(point)?.id,
-        session.playerSystem.activePlayer.id
-      );
+      const entity = session.entitySystem.getEntityAt(point);
+      if (!entity) return false;
+      return !entity.isGeneral && entity.player.equals(session.playerSystem.activePlayer);
     },
     async onPlay(session, castPoint) {
       const entity = session.entitySystem.getEntityAt(castPoint);

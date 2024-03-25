@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'saberspine_tiger' },
+        { blueprintId: 'saberspine_tiger' },
+        { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },
@@ -66,6 +69,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'saberspine_tiger' },
+        { blueprintId: 'saberspine_tiger' },
+        { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },

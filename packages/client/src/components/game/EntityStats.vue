@@ -58,14 +58,14 @@ watchEffect(() => {
           g.clear();
           g.beginFill('black');
           g.lineStyle({ color: 'yellow', width: 1 });
-          g.drawCircle(-CELL_WIDTH * 0.25, 0, 7);
+          g.drawCircle(-CELL_WIDTH * 0.2, 0, 7);
         }
       "
     >
       <pixi-text
         :style="attackStyle"
         :scale="0.25"
-        :x="-CELL_WIDTH * 0.4 + 14"
+        :x="-CELL_WIDTH * 0.35 + 14"
         :anchor="0.5"
       >
         {{ entity.attack }}
@@ -78,11 +78,11 @@ watchEffect(() => {
           g.clear();
           g.beginFill('black');
           g.lineStyle({ color: 'red', width: 1 });
-          g.drawCircle(22, 0, 7);
+          g.drawCircle(17, 0, 7);
         }
       "
     >
-      <pixi-text :style="hpStyle" :scale="0.25" :x="22" :anchor="0.5">
+      <pixi-text :style="hpStyle" :scale="0.25" :x="17" :anchor="0.5">
         {{ entity.hp }}
       </pixi-text>
     </graphics>
