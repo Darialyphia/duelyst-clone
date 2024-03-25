@@ -25,7 +25,6 @@ const boardDimensions = useGameSelector(session => ({
 
 const isEnterAnimationDone = ref(false);
 const onEnter = (container: Container) => {
-  console.log('enter');
   container.y = -1 * (randomInt(50) + 50);
   container.alpha = 0;
 
@@ -78,13 +77,13 @@ const onShadowEnter = (container: Container) => {
       "
     >
       <container :scale-x="scaleX">
-        <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onShadowEnter">
+        <PTransition appear @enter="onShadowEnter">
           <container>
             <EntityShadow :entity-id="entityId" />
           </container>
         </PTransition>
 
-        <PTransition appear :duration="{ enter: 1000, leave: 0 }" @enter="onEnter">
+        <PTransition appear @enter="onEnter">
           <container>
             <EntitySprite :entity-id="entityId" />
           </container>

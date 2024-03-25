@@ -2,7 +2,7 @@ import { type Nullable, isDefined } from '@game/shared';
 import { GameSession } from '../game-session';
 import { type Point3D } from '../types';
 import { Entity, type EntityId } from './entity';
-import { isAxisAligned, isWithinCells, isWithinRange } from '../utils/targeting';
+import { isAxisAligned, isWithinCells } from '../utils/targeting';
 
 export const getEntityIfOwnerMatches = (
   ctx: GameSession,
@@ -24,8 +24,8 @@ export const isAlly = (
 ) => {
   if (!isDefined(entityId)) return false;
   const entity = session.entitySystem.getEntityById(entityId);
-  if (!entity) return false;
 
+  if (!entity) return false;
   return entity.player.id === playerId;
 };
 

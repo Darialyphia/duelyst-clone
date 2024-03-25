@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'primus_fist' },
+        { blueprintId: 'primus_fist' },
+        { blueprintId: 'primus_fist' },
         { blueprintId: 'void_pulse' },
         { blueprintId: 'void_pulse' },
         { blueprintId: 'void_pulse' },
@@ -63,6 +66,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'primus_fist' },
+        { blueprintId: 'primus_fist' },
+        { blueprintId: 'primus_fist' },
         { blueprintId: 'scions_first_wish' },
         { blueprintId: 'scions_first_wish' },
         { blueprintId: 'scions_first_wish' },

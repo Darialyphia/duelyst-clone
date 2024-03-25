@@ -202,5 +202,38 @@ export const neutral: CardBlueprint[] = [
         return isWithinCells(summonedPoint, point, 1);
       }
     }
+  },
+  {
+    id: 'primus_fist',
+    name: 'Primus fist',
+    description: 'Opening Gambit: Give nearby allied minions +1 / +0',
+    spriteId: 'neutral_gauntletmaster',
+    kind: CARD_KINDS.MINION,
+    manaCost: 2,
+    attack: 2,
+    maxHp: 3,
+    modifiers: [
+      createModifier({
+        id: 'primus_fist',
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierOpeningGambitMixin({
+            keywords: [],
+            handler(session, attachedTo) {
+              session.entitySystem
+                .getNearbyEntities(attachedTo.position)
+                .filter(entity => {
+                  return attachedTo.isAlly(entity.id);
+                })
+                .forEach(entity => {
+                  console.log(entity);
+                  entity.addInterceptor('attack', atk => atk + 1);
+                });
+            }
+          })
+        ]
+      })
+    ]
   }
 ];
