@@ -16,13 +16,17 @@ export type CardInterceptor = Card<any>['interceptors'];
 export type AnyCard = Card<any>;
 
 export const CARD_EVENTS = {
-  PLAYED: 'played'
+  PLAYED: 'played',
+  DRAWN: 'drawn',
+  REPLACED: 'replaced'
 } as const;
 
 export type CardEvent = Values<typeof CARD_EVENTS>;
 
 export type CardEventMap = {
   [CARD_EVENTS.PLAYED]: [Card<any>];
+  [CARD_EVENTS.DRAWN]: [Card<any>];
+  [CARD_EVENTS.REPLACED]: [Card<any>];
 };
 
 export abstract class Card<TCtx extends AnyObject>
@@ -78,6 +82,14 @@ export abstract class Card<TCtx extends AnyObject>
 
   abstract canPlayAt(point: Point3D): boolean;
   abstract onPlay(ctx: TCtx): Promise<void>;
+
+  draw() {
+    this.emit(CARD_EVENTS.DRAWN, this);
+  }
+
+  replace() {
+    this.emit(CARD_EVENTS.REPLACED, this);
+  }
 
   async play(ctx: TCtx) {
     await this.onPlay(ctx);

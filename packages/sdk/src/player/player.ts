@@ -4,7 +4,6 @@ import {
   padArray,
   type JSONObject,
   type Nullable,
-  type Point3D,
   type Serializable,
   type Values
 } from '@game/shared';
@@ -15,7 +14,6 @@ import { config } from '../config';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { CARD_KINDS } from '../card/card-utils';
 import { createCard } from '../card/card-factory';
-import type { Unit } from '../card/unit';
 
 export type PlayerId = string;
 export type CardIndex = number;
@@ -34,13 +32,23 @@ export type SerializedPlayer = JSONObject & {
 
 export const PLAYER_EVENTS = {
   TURN_START: 'turn_start',
-  TURN_END: 'turn_end'
+  TURN_END: 'turn_end',
+  BEFORE_DRAW: 'before-draw',
+  AFTER_DRAW: 'after-draw',
+  BEFORE_REPLACE: 'before-replace',
+  AFTER_REPLACE: 'after-replace'
 } as const;
 
 export type PlayerEvent = Values<typeof PLAYER_EVENTS>;
 export type PlayerEventMap = {
   [PLAYER_EVENTS.TURN_START]: [Player];
   [PLAYER_EVENTS.TURN_END]: [Player];
+  [PLAYER_EVENTS.AFTER_DRAW]: [{ player: Player; cards: AnyCard[] }];
+  [PLAYER_EVENTS.AFTER_DRAW]: [{ player: Player; cards: AnyCard[] }];
+  [PLAYER_EVENTS.BEFORE_REPLACE]: [{ player: Player; replacedCard: AnyCard }];
+  [PLAYER_EVENTS.AFTER_REPLACE]: [
+    { player: Player; replacedCard: AnyCard; replacement: AnyCard }
+  ];
 };
 
 export type PlayerInterceptor = Player['interceptors'];
@@ -177,7 +185,14 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     const card = this.hand[index];
     if (!card) return;
 
-    this.hand[index] = this.deck.replace(card);
+    this.emit(PLAYER_EVENTS.BEFORE_REPLACE, { player: this, replacedCard: card });
+    const replacement = this.deck.replace(card);
+    this.hand[index] = replacement;
+    this.emit(PLAYER_EVENTS.AFTER_REPLACE, {
+      player: this,
+      replacedCard: card,
+      replacement
+    });
     this.cardsReplacedThisTurn++;
   }
 
@@ -189,6 +204,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     const availableSlots = config.MAX_HAND_SIZE - this.handSize;
 
     const newCards = this.deck.draw(Math.min(amount, availableSlots));
+
     this.hand.forEach((slot, index) => {
       if (!isDefined(slot) && newCards.length) {
         this.hand[index] = newCards.shift();

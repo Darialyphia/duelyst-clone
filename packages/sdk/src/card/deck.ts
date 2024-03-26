@@ -51,6 +51,8 @@ export class Deck extends EventEmitter<DeckEventMap> implements Serializable {
     const cards = this.cards.splice(0, amount);
     this.emit(DECK_EVENTS.AFTER_DRAW, { deck: this, cards: cards });
 
+    cards.forEach(card => card.draw());
+
     return cards;
   }
 
@@ -68,6 +70,8 @@ export class Deck extends EventEmitter<DeckEventMap> implements Serializable {
       index = this.session.rngSystem.nextInt(this.cards.length - 1);
       replacement = this.cards[index];
     } while (replacement.blueprintId === replacedCard.blueprintId);
+
+    replacedCard.replace();
 
     this.cards[index] = replacedCard;
 
