@@ -99,7 +99,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     background: radial-gradient(circle at center, black 20%, transparent 80%);
   }
 
-  &:is(.v-enter-active, .v-leave-active) {
+  /* &:is(.v-enter-active, .v-leave-active) {
     transition: all 0.7s ease;
   }
 
@@ -112,12 +112,12 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
   }
 
   &.v-enter-from {
-    transform: translateY(-25px) scale(0);
+    transform: translateY(-10px);
   }
 
   &.v-leave-to {
-    transform: translateX(-25px) scale(0);
-  }
+    transform: translateX(-10px);
+  } */
 
   &:disabled {
     filter: grayscale(1);

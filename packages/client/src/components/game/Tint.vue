@@ -11,8 +11,8 @@ function gradient() {
   c.height = screen.value.height;
   const ctx = c.getContext('2d')!;
   const grd = ctx.createLinearGradient(0, 0, screen.value.width, 0);
-  grd.addColorStop(0, 'rgba(147,39,143,237)');
-  grd.addColorStop(1, 'rgba(67,45,146,237)');
+  grd.addColorStop(0, 'rgba(67,45,146,237)');
+  grd.addColorStop(1, 'rgba(147,39,143,237)');
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, screen.value.width, screen.value.height);
 
