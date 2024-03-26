@@ -32,23 +32,13 @@ export type SerializedPlayer = JSONObject & {
 
 export const PLAYER_EVENTS = {
   TURN_START: 'turn_start',
-  TURN_END: 'turn_end',
-  BEFORE_DRAW: 'before-draw',
-  AFTER_DRAW: 'after-draw',
-  BEFORE_REPLACE: 'before-replace',
-  AFTER_REPLACE: 'after-replace'
+  TURN_END: 'turn_end'
 } as const;
 
 export type PlayerEvent = Values<typeof PLAYER_EVENTS>;
 export type PlayerEventMap = {
   [PLAYER_EVENTS.TURN_START]: [Player];
   [PLAYER_EVENTS.TURN_END]: [Player];
-  [PLAYER_EVENTS.AFTER_DRAW]: [{ player: Player; cards: AnyCard[] }];
-  [PLAYER_EVENTS.AFTER_DRAW]: [{ player: Player; cards: AnyCard[] }];
-  [PLAYER_EVENTS.BEFORE_REPLACE]: [{ player: Player; replacedCard: AnyCard }];
-  [PLAYER_EVENTS.AFTER_REPLACE]: [
-    { player: Player; replacedCard: AnyCard; replacement: AnyCard }
-  ];
 };
 
 export type PlayerInterceptor = Player['interceptors'];
@@ -185,14 +175,8 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     const card = this.hand[index];
     if (!card) return;
 
-    this.emit(PLAYER_EVENTS.BEFORE_REPLACE, { player: this, replacedCard: card });
     const replacement = this.deck.replace(card);
     this.hand[index] = replacement;
-    this.emit(PLAYER_EVENTS.AFTER_REPLACE, {
-      player: this,
-      replacedCard: card,
-      replacement
-    });
     this.cardsReplacedThisTurn++;
   }
 
