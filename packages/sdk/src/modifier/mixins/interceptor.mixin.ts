@@ -1,7 +1,7 @@
 import type { EntityInterceptor } from '../../entity/entity';
 import type { inferInterceptor } from '../../utils/helpers';
 import type { Keyword } from '../../utils/keywords';
-import type { Modifier } from '../modifier';
+import type { EntityModifier } from '../entity-modifier';
 import { modifierDurationMixin } from './duration.mixin';
 
 export const modifierInterceptorMixin = <T extends keyof EntityInterceptor>({
@@ -15,7 +15,7 @@ export const modifierInterceptorMixin = <T extends keyof EntityInterceptor>({
   keywords: Keyword[];
   duration: number;
   tickOn?: Parameters<typeof modifierDurationMixin>[0]['tickOn'];
-  interceptor: (modifier: Modifier) => inferInterceptor<EntityInterceptor[T]>;
+  interceptor: (modifier: EntityModifier) => inferInterceptor<EntityInterceptor[T]>;
 }) => {
   let _interceptor: any;
   return modifierDurationMixin({

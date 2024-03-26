@@ -5,7 +5,10 @@ export { Player, type PlayerId } from './player/player';
 export { BoardSystem as GameMap } from './board/board-system';
 export { config } from './config';
 export { KEYWORDS, type Keyword } from './utils/keywords';
-export { type Modifier, type ModifierId } from './modifier/modifier';
+export {
+  type EntityModifier as Modifier,
+  type ModifierId
+} from './modifier/entity-modifier';
 export { Card, type AnyCard } from './card/card';
 export { CARD_KINDS, type CardKind } from './card/card-utils';
 export { Deck } from './card/deck';

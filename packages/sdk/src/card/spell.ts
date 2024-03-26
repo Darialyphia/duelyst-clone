@@ -12,6 +12,7 @@ type SpellCtx = { position: Point3D; targets: Point3D[] };
 
 export class Spell extends Card<SpellCtx> {
   followupTargets: Point3D[] = [];
+  castPoint!: Point3D;
 
   get blueprint(): SpellBlueprint {
     return CARDS[this.blueprintId] as SpellBlueprint;
@@ -26,7 +27,8 @@ export class Spell extends Card<SpellCtx> {
   }
 
   async onPlay(ctx: SpellCtx) {
+    this.castPoint = ctx.position;
     this.followupTargets = ctx.targets;
-    this.blueprint.onPlay(this.session, ctx.position, ctx.targets, this);
+    this.blueprint.onPlay(this.session, this);
   }
 }

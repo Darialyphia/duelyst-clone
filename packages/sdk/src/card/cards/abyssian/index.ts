@@ -10,7 +10,9 @@ export const abyssian: CardBlueprint[] = [
     spriteId: 'f4_3rdgeneral',
     kind: CARD_KINDS.GENERAL,
     manaCost: 0,
-    modifiers: [],
+    onPlay() {
+      return;
+    },
     description: '',
     attack: config.GENERAL_DEFAULT_ATTACK,
     maxHp: config.GENERAL_DEFAULT_HP
@@ -25,9 +27,9 @@ export const abyssian: CardBlueprint[] = [
     isTargetable(session, point) {
       return !isEmpty(session, point);
     },
-    async onPlay(session, castPoint, otherTargets, card) {
+    async onPlay(session, card) {
       await Promise.all([
-        session.entitySystem.getEntityAt(castPoint)!.takeDamage(1, card),
+        session.entitySystem.getEntityAt(card.castPoint)?.takeDamage(1, card),
         session.playerSystem.activePlayer.general.heal(2, card)
       ]);
     }

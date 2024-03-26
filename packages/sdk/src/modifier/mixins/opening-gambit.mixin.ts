@@ -1,14 +1,14 @@
 import { ENTITY_EVENTS } from '../../entity/entity';
 import { KEYWORDS, type Keyword } from '../../utils/keywords';
-import type { Modifier, ModifierMixin } from '../modifier';
+import type { EntityModifier, EntityModifierMixin } from '../entity-modifier';
 
 export const modifierOpeningGambitMixin = ({
   keywords = [],
   handler
 }: {
-  handler: Modifier['onApplied'];
+  handler: EntityModifier['onApplied'];
   keywords?: Keyword[];
-}): ModifierMixin => {
+}): EntityModifierMixin => {
   return {
     keywords: [...keywords, KEYWORDS.OPENING_GAMBIT],
     onApplied(session, attachedTo, modifier) {

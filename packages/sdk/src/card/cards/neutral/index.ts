@@ -4,12 +4,16 @@ import { modifierGameEventMixin } from '../../../modifier/mixins/game-event.mixi
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { modifierOpeningGambitMixin } from '../../../modifier/mixins/opening-gambit.mixin';
 import { modifierRushMixin } from '../../../modifier/mixins/rush.mixin';
-import { createModifier } from '../../../modifier/modifier';
+import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { dispelAt } from '../../../modifier/modifier-utils';
 import { KEYWORDS } from '../../../utils/keywords';
 import { isWithinCells } from '../../../utils/targeting';
 import { type CardBlueprint } from '../../card-lookup';
 import { CARD_KINDS } from '../../card-utils';
+import { createCardModifier } from '../../../modifier/card-modifier';
+import { CARD_EVENTS } from '../../card';
+import { ENTITY_EVENTS } from '../../../entity/entity';
+import { PLAYER_EVENTS } from '../../../player/player';
 
 export const neutral: CardBlueprint[] = [
   {
@@ -21,25 +25,27 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 2,
     maxHp: 3,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              const [point] = attachedTo.card.followupTargets;
-              if (!point) return;
-              const entity = session.entitySystem.getEntityAt(point);
-              if (entity) {
-                entity.heal(2, attachedTo.card);
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                const [point] = attachedTo.card.followupTargets;
+                if (!point) return;
+                const entity = session.entitySystem.getEntityAt(point);
+                if (entity) {
+                  entity.heal(2, attachedTo.card);
+                }
               }
-            }
-          })
-        ]
-      })
-    ],
+            })
+          ]
+        })
+      );
+    },
     followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
@@ -57,26 +63,29 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 2,
     maxHp: 1,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              const [point] = attachedTo.card.followupTargets;
-              if (!point) return;
+    onPlay(session, card) {
+      console.log('adding modifier');
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                const [point] = attachedTo.card.followupTargets;
+                if (!point) return;
 
-              const entity = session.entitySystem.getEntityAt(point);
-              if (entity) {
-                attachedTo.dealDamage(1, entity);
+                const entity = session.entitySystem.getEntityAt(point);
+                if (entity) {
+                  entity.takeDamage(1, attachedTo.card);
+                }
               }
-            }
-          })
-        ]
-      })
-    ],
+            })
+          ]
+        })
+      );
+    },
     followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
@@ -99,44 +108,46 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 1,
     maxHp: 3,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
+    onPlay(session, card) {
+      const id = 'araki_headhunter_buff';
+      const modifier = createEntityModifier({
+        id,
+        visible: true,
+        name: 'Hunter',
+        description: '+2 Attack.',
+        stackable: true,
+        stacks: 1,
         mixins: [
-          modifierGameEventMixin({
-            eventName: 'entity:created',
+          modifierInterceptorMixin({
+            key: 'attack',
+            duration: Infinity,
             keywords: [],
-            listener([entity], { attachedTo }) {
-              if (!entity.hasKeyword('Opening Gambit')) return;
-              if (attachedTo.isEnemy(entity.id)) return;
-
-              const id = 'araki_headhunter_buff';
-              const modifier = createModifier({
-                id,
-                visible: true,
-                name: 'Hunter',
-                description: '+2 Attack.',
-                stackable: true,
-                stacks: 1,
-                mixins: [
-                  modifierInterceptorMixin({
-                    key: 'attack',
-                    duration: Infinity,
-                    keywords: [],
-                    interceptor: modifier => atk => {
-                      return atk + 2 * modifier.stacks!;
-                    }
-                  })
-                ]
-              });
-
-              attachedTo.addModifier(modifier);
+            interceptor: modifier => atk => {
+              return atk + 2 * modifier.stacks!;
             }
           })
         ]
-      })
-    ]
+      });
+
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierGameEventMixin({
+              eventName: 'entity:created',
+              keywords: [],
+              listener([entity], { attachedTo }) {
+                if (!entity.hasKeyword('Opening Gambit')) return;
+                if (attachedTo.isEnemy(entity.id)) return;
+
+                attachedTo.addModifier(modifier);
+              }
+            })
+          ]
+        })
+      );
+    }
   },
   {
     id: 'azure_horn_shaman',
@@ -147,22 +158,24 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 1,
     maxHp: 4,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierDyingWishMixin({
-            keywords: [],
-            listener(event, { session, attachedTo }) {
-              session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
-                entity.addInterceptor('maxHp', val => val + 4);
-              });
-            }
-          })
-        ]
-      })
-    ]
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierDyingWishMixin({
+              keywords: [],
+              listener(event, { session, attachedTo }) {
+                session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
+                  entity.addInterceptor('maxHp', val => val + 4);
+                });
+              }
+            })
+          ]
+        })
+      );
+    }
   },
   {
     id: 'ephemeral_shroud',
@@ -173,22 +186,24 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 2,
     maxHp: 2,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              const [point] = attachedTo.card.followupTargets;
-              if (!point) return;
-              dispelAt(session, point);
-            }
-          })
-        ]
-      })
-    ],
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                const [point] = attachedTo.card.followupTargets;
+                if (!point) return;
+                dispelAt(session, point);
+              }
+            })
+          ]
+        })
+      );
+    },
     followup: {
       minTargetCount: 0,
       maxTargetCount: 1,
@@ -206,22 +221,24 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 2,
     maxHp: 3,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
-                entity.addInterceptor('attack', atk => atk + 1);
-              });
-            }
-          })
-        ]
-      })
-    ]
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
+                  entity.addInterceptor('attack', atk => atk + 1);
+                });
+              }
+            })
+          ]
+        })
+      );
+    }
   },
   {
     id: 'saberspine_tiger',
@@ -232,15 +249,18 @@ export const neutral: CardBlueprint[] = [
     manaCost: 3,
     attack: 3,
     maxHp: 2,
-    modifiers: [
-      createModifier({
-        visible: true,
-        name: KEYWORDS.RUSH.name,
-        description: KEYWORDS.RUSH.description,
-        stackable: false,
-        mixins: [modifierRushMixin()]
-      })
-    ]
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: true,
+          name: KEYWORDS.RUSH.name,
+          description: KEYWORDS.RUSH.description,
+          stackable: false,
+          mixins: [modifierRushMixin()]
+        })
+      );
+    },
+    modifiers: []
   },
   {
     id: 'emerald_rejuvenator',
@@ -251,20 +271,22 @@ export const neutral: CardBlueprint[] = [
     manaCost: 4,
     attack: 4,
     maxHp: 4,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              attachedTo.player.general.heal(4, attachedTo.card);
-            }
-          })
-        ]
-      })
-    ]
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                attachedTo.player.general.heal(4, attachedTo.card);
+              }
+            })
+          ]
+        })
+      );
+    }
   },
   {
     id: 'flameblood_warlock',
@@ -275,22 +297,24 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 3,
     maxHp: 1,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              session.playerSystem
-                .getList()
-                .forEach(player => player.general.takeDamage(3, attachedTo.card));
-            }
-          })
-        ]
-      })
-    ]
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                session.playerSystem
+                  .getList()
+                  .forEach(player => player.general.takeDamage(3, attachedTo.card));
+              }
+            })
+          ]
+        })
+      );
+    }
   },
   {
     id: 'ghost_lynx',
@@ -301,33 +325,69 @@ export const neutral: CardBlueprint[] = [
     manaCost: 2,
     attack: 1,
     maxHp: 3,
-    modifiers: [
-      createModifier({
-        visible: false,
-        stackable: false,
-        mixins: [
-          modifierOpeningGambitMixin({
-            keywords: [],
-            handler(session, attachedTo) {
-              attachedTo.addModifier(
-                createModifier({
-                  visible: false,
-                  stackable: false,
-                  mixins: [
-                    {
-                      onApplied(session, attachedTo) {
-                        const listener = () => {
-                          attachedTo.player.draw(1);
-                          session.off('player:turn_end', listener);
-                        };
-                        session.on('player:turn_end', listener);
+    onPlay(session, card) {
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            modifierOpeningGambitMixin({
+              keywords: [],
+              handler(session, attachedTo) {
+                attachedTo.addModifier(
+                  createEntityModifier({
+                    visible: false,
+                    stackable: false,
+                    mixins: [
+                      {
+                        onApplied(session, attachedTo) {
+                          const listener = () => {
+                            attachedTo.player.draw(1);
+                            session.off('player:turn_end', listener);
+                          };
+                          session.on('player:turn_end', listener);
+                        }
                       }
-                    }
-                  ]
-                })
-              );
+                    ]
+                  })
+                );
+              }
+            })
+          ]
+        })
+      );
+    }
+  },
+  {
+    id: 'blaze_hound',
+    name: 'Blaze Hound',
+    description:
+      'This card costs 1 less to play if the enemy general took damage this turn.',
+    kind: CARD_KINDS.MINION,
+    spriteId: 'neutral_beastdarkharbinger',
+    manaCost: 3,
+    attack: 4,
+    maxHp: 3,
+    onPlay() {
+      return;
+    },
+    modifiers: [
+      createCardModifier({
+        mixins: [
+          {
+            onApplied(session, attachedTo, modifier) {
+              attachedTo.on(CARD_EVENTS.DRAWN, () => {
+                const interceptor = (val: number) => val - 1;
+
+                attachedTo.player.general.once(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, () => {
+                  attachedTo.addInterceptor('manaCost', interceptor);
+                  attachedTo.player.once(PLAYER_EVENTS.TURN_END, () => {
+                    attachedTo.removeInterceptor('manaCost', interceptor);
+                  });
+                });
+              });
             }
-          })
+          }
         ]
       })
     ]

@@ -52,10 +52,10 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   public currentMana: number;
   private cardsReplacedThisTurn = 0;
 
-  readonly deck: Deck;
-  readonly hand: Nullable<AnyCard>[];
-  readonly graveyard: AnyCard[];
-  readonly cards: AnyCard[];
+  deck!: Deck;
+  hand!: Nullable<AnyCard>[];
+  graveyard!: AnyCard[];
+  cards!: AnyCard[];
 
   protected interceptors = {
     maxReplaces: new Interceptable<number, Player>(),
@@ -64,7 +64,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
 
   constructor(
     private session: GameSession,
-    options: SerializedPlayer
+    private options: SerializedPlayer
   ) {
     super();
     this.id = options.id;
@@ -79,25 +79,32 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     this.cards = options.cards.map((card, index) => {
       return createCard(this.session, card, index, this.id);
     });
+  }
+
+  setup() {
+    this.placeGeneral();
+    this.cards = this.options.cards.map((card, index) => {
+      return createCard(this.session, card, index, this.id);
+    });
 
     this.deck = new Deck(
       this.session,
-      options.deck
-        ? options.deck.map(index => this.cards[index])
+      this.options.deck
+        ? this.options.deck.map(index => this.cards[index])
         : this.cards.filter(card => card.blueprint.kind !== CARD_KINDS.GENERAL),
       this.id
     );
-    if (!options.deck) {
+    if (!this.options.deck) {
       this.deck.shuffle();
     }
     this.hand = padArray(
-      options.hand
-        ? options.hand.map(index => (index ? this.cards[index] : null))
+      this.options.hand
+        ? this.options.hand.map(index => (index ? this.cards[index] : null))
         : this.drawInitialHand(),
       config.MAX_HAND_SIZE,
       null
     );
-    this.graveyard = options.graveyard.map(index => this.cards[index]);
+    this.graveyard = this.options.graveyard.map(index => this.cards[index]);
   }
 
   get maxMana(): number {

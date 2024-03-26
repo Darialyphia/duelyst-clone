@@ -2,7 +2,7 @@ import type { MaybePromise } from '@game/shared';
 import type { Entity, EntityEventMap } from '../../entity/entity';
 import type { GameSession } from '../../game-session';
 import { KEYWORDS, type Keyword } from '../../utils/keywords';
-import type { Modifier, ModifierMixin } from '../modifier';
+import type { EntityModifier, EntityModifierMixin } from '../entity-modifier';
 import { modifierSelfEventMixin } from './self-event.mixin';
 
 export const modifierDyingWishMixin = ({
@@ -11,10 +11,10 @@ export const modifierDyingWishMixin = ({
 }: {
   listener: (
     event: EntityEventMap['destroyed'],
-    ctx: { session: GameSession; attachedTo: Entity; modifier: Modifier }
+    ctx: { session: GameSession; attachedTo: Entity; modifier: EntityModifier }
   ) => MaybePromise<void>;
   keywords?: Keyword[];
-}): ModifierMixin => {
+}): EntityModifierMixin => {
   return modifierSelfEventMixin({
     eventName: 'destroyed',
     keywords: [...keywords, KEYWORDS.DYING_WISH],

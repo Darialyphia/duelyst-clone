@@ -5,6 +5,8 @@ import type { AnyObject, Point3D, Serializable, Values } from '@game/shared';
 
 import type { CardIndex, PlayerId } from '../player/player';
 import EventEmitter from 'eventemitter3';
+import type { EntityModifier, ModifierId } from '../modifier/entity-modifier';
+import type { CardModifier } from '../modifier/card-modifier';
 
 export type CardBlueprintId = string;
 
@@ -34,6 +36,7 @@ export abstract class Card<TCtx extends AnyObject>
   implements Serializable
 {
   readonly blueprintId: CardBlueprintId;
+  modifiers: CardModifier<AnyCard>[] = [];
 
   constructor(
     protected session: GameSession,
@@ -43,6 +46,10 @@ export abstract class Card<TCtx extends AnyObject>
   ) {
     super();
     this.blueprintId = options.blueprintId;
+
+    this.blueprint.modifiers?.forEach(modifier => {
+      this.addModifier(modifier);
+    });
   }
 
   get player() {
@@ -74,6 +81,27 @@ export abstract class Card<TCtx extends AnyObject>
     interceptor: inferInterceptor<CardInterceptor[T]>
   ) {
     this.interceptors[key].remove(interceptor as any);
+  }
+
+  getModifier(id: ModifierId) {
+    return this.modifiers.find(m => m.id === id);
+  }
+
+  addModifier(modifier: CardModifier<AnyCard>) {
+    this.modifiers.push(modifier);
+    return modifier.onApplied(this.session, this, modifier);
+  }
+
+  removeModifier(modifierId: ModifierId) {
+    this.modifiers.forEach(mod => {
+      if (mod.id !== modifierId) return;
+
+      mod.onRemoved(this.session, this, mod);
+    });
+
+    this.modifiers = this.modifiers.filter(mod => {
+      return mod.id !== modifierId;
+    });
   }
 
   get manaCost(): number {

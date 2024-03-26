@@ -60,6 +60,9 @@ export class Unit extends Card<UnitCtx> {
       position: ctx.position
     });
 
+    await this.blueprint.onPlay(this.session, this as any);
+    this.entity.emit('created', this.entity);
+
     if (this.shouldExhaustOnPlay) {
       this.entity.exhaust();
     }

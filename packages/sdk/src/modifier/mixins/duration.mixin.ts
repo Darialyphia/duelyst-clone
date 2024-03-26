@@ -1,7 +1,7 @@
 import type { Entity } from '../../entity/entity';
 import { PLAYER_EVENTS } from '../../player/player';
 import type { Keyword } from '../../utils/keywords';
-import type { Modifier, ModifierMixin } from '../modifier';
+import type { EntityModifier, EntityModifierMixin } from '../entity-modifier';
 
 export const modifierDurationMixin = ({
   duration,
@@ -12,10 +12,10 @@ export const modifierDurationMixin = ({
 }: {
   duration: number;
   tickOn?: 'start' | 'end';
-  onApplied: Modifier['onApplied'];
-  onRemoved: Modifier['onRemoved'];
+  onApplied: EntityModifier['onApplied'];
+  onRemoved: EntityModifier['onRemoved'];
   keywords?: Keyword[];
-}): ModifierMixin => {
+}): EntityModifierMixin => {
   let _duration = duration;
 
   return {

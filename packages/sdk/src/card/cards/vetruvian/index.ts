@@ -1,7 +1,6 @@
 import { config } from '../../../config';
-import { isAlly } from '../../../entity/entity-utils';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
-import { createModifier } from '../../../modifier/modifier';
+import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { type CardBlueprint } from '../../card-lookup';
 import { CARD_KINDS } from '../../card-utils';
 
@@ -12,7 +11,9 @@ export const vetruvian: CardBlueprint[] = [
     spriteId: 'f3_altgeneral',
     kind: CARD_KINDS.GENERAL,
     manaCost: 0,
-    modifiers: [],
+    onPlay() {
+      return;
+    },
     description: '',
     attack: config.GENERAL_DEFAULT_ATTACK,
     maxHp: config.GENERAL_DEFAULT_HP
@@ -29,11 +30,12 @@ export const vetruvian: CardBlueprint[] = [
       if (!entity) return false;
       return !entity.isGeneral && entity.player.equals(session.playerSystem.activePlayer);
     },
-    async onPlay(session, castPoint) {
-      const entity = session.entitySystem.getEntityAt(castPoint);
+    async onPlay(session, card) {
+      console.log(card.castPoint);
+      const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
       entity.addModifier(
-        createModifier({
+        createEntityModifier({
           id: 'scions_first_wish',
           stackable: true,
           visible: true,

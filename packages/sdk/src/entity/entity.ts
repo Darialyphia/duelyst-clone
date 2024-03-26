@@ -6,7 +6,11 @@ import type { CardIndex, PlayerId } from '../player/player';
 import { Interceptable, ReactiveValue, type inferInterceptor } from '../utils/helpers';
 import { isAlly, isEnemy } from './entity-utils';
 import { isWithinCells } from '../utils/targeting';
-import { createModifier, type Modifier, type ModifierId } from '../modifier/modifier';
+import {
+  createEntityModifier,
+  type EntityModifier,
+  type ModifierId
+} from '../modifier/entity-modifier';
 import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
@@ -92,7 +96,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   readonly id: EntityId;
 
-  modifiers: Modifier[] = [];
+  modifiers: EntityModifier[] = [];
 
   position: Vec3;
 
@@ -134,11 +138,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.attacksTaken = options?.attacksTaken ?? 0;
 
     this.currentHp.lazySetInitialValue(options.hp ?? this.maxHp);
-    this.card.blueprint.modifiers.forEach(modifier => {
-      this.addModifier(modifier);
-    });
-
-    this.emit('created', this);
   }
 
   equals(entity: Entity) {
@@ -320,7 +319,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   exhaust() {
     const modifierId = 'exhausted';
-    const modifier = createModifier({
+    const modifier = createEntityModifier({
       id: modifierId,
       visible: true,
       name: KEYWORDS.EXHAUSTED.name,
@@ -379,7 +378,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     return this.modifiers.find(m => m.id === id);
   }
 
-  addModifier(modifier: Modifier) {
+  addModifier(modifier: EntityModifier) {
     const existing = this.getModifier(modifier.id);
     if (existing) {
       if (existing.stackable) {
@@ -424,7 +423,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   hasKeyword(name: KeywordName) {
-    console.log(name, this.modifiers);
     return this.modifiers.some(mod =>
       mod.keywords.some(keyword => keyword.name === name)
     );

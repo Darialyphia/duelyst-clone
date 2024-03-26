@@ -17,12 +17,12 @@ type ModifierBase = {
   onApplied(
     session: GameSession,
     attachedTo: Entity,
-    modifier: Modifier
+    modifier: EntityModifier
   ): MaybePromise<void>;
   onRemoved(
     session: GameSession,
     attachedTo: Entity,
-    modifier: Modifier
+    modifier: EntityModifier
   ): MaybePromise<void>;
 };
 
@@ -41,29 +41,29 @@ type StackableMixin =
       onReapply(
         session: GameSession,
         attachedTo: Entity,
-        modifier: Modifier
+        modifier: EntityModifier
       ): MaybePromise<void>;
     };
 
-export type Modifier = Prettify<ModifierBase & StackableMixin & VisibilityMixin>;
+export type EntityModifier = Prettify<ModifierBase & StackableMixin & VisibilityMixin>;
 
-export type ModifierMixin = Partial<
+export type EntityModifierMixin = Partial<
   Pick<
-    Modifier & { stackable: false },
+    EntityModifier & { stackable: false },
     'keywords' | 'onApplied' | 'onRemoved' | 'onReapply'
   >
 >;
 
 type ModifierBuilderOptions = PartialBy<
-  Pick<Modifier, 'id' | 'visible' | 'description' | 'name'>,
+  Pick<EntityModifier, 'id' | 'visible' | 'description' | 'name'>,
   'id'
 > &
-  Omit<StackableMixin, 'onReapply'> & { mixins: ModifierMixin[] };
+  Omit<StackableMixin, 'onReapply'> & { mixins: EntityModifierMixin[] };
 
-export const createModifier = ({
+export const createEntityModifier = ({
   mixins,
   ...options
-}: ModifierBuilderOptions): Modifier => {
+}: ModifierBuilderOptions): EntityModifier => {
   return {
     ...options,
     id: options.id ?? nanoid(6),
@@ -90,5 +90,5 @@ export const createModifier = ({
         mixin.onReapply?.(session, attachedTo, this);
       }
     }
-  } as Modifier;
+  } as EntityModifier;
 };

@@ -16,7 +16,6 @@ export class PlayerSystem {
         if (player.isPlayer1) {
           this.activePlayerId = player.id;
         }
-        player.placeGeneral();
       });
   }
 
@@ -52,6 +51,7 @@ export class PlayerSystem {
 
   addPlayer(player: Player) {
     this.playerMap.set(player.id, player);
+    player.setup();
     this.setupListeners(player);
   }
 

@@ -1,7 +1,6 @@
 import { keyBy } from 'lodash-es';
-import type { Card, CardBlueprintId } from './card';
-import type { Point3D, Prettify } from '@game/shared';
-import type { Modifier } from '../modifier/modifier';
+import type { CardBlueprintId } from './card';
+import type { MaybePromise, Point3D, Prettify } from '@game/shared';
 import type { GameSession } from '../game-session';
 import type { Entity } from '../entity/entity';
 import { lyonar } from './cards/lyonar';
@@ -14,6 +13,8 @@ import { neutral } from './cards/neutral';
 import type { CardKind } from './card-utils';
 import type { Unit } from './unit';
 import type { Spell } from './spell';
+import type { CardModifier } from '../modifier/card-modifier';
+import type { Artifact } from './artifact';
 
 type CardBlueprintBase = {
   id: CardBlueprintId;
@@ -26,7 +27,8 @@ type CardBlueprintBase = {
 type CardBlueprintUnit = {
   attack: number;
   maxHp: number;
-  modifiers: Modifier[];
+  modifiers?: CardModifier<Unit>[];
+  onPlay(session: GameSession, card: Unit & { entity: Entity }): MaybePromise<void>;
   followup?: {
     minTargetCount: number;
     maxTargetCount: number;
@@ -40,12 +42,8 @@ type CardBlueprintUnit = {
 };
 
 type CardBlueprintSpell = {
-  onPlay(
-    session: GameSession,
-    castPoint: Point3D,
-    otherTargets: Point3D[],
-    card: Spell
-  ): Promise<void>;
+  onPlay(session: GameSession, card: Spell): Promise<void>;
+  modifiers?: CardModifier<Spell>[];
   isTargetable(session: GameSession, point: Point3D): boolean;
   followup?: {
     minTargetCount: number;
@@ -62,6 +60,7 @@ type CardBlueprintSpell = {
 type CardBlueprintArtifact = {
   onEquiped(session: GameSession, equipedOn: Entity): Promise<void>;
   onRemoved(session: GameSession, equipedOn: Entity): Promise<void>;
+  modifiers?: CardModifier<Artifact>[];
   followup?: {
     minTargetCount: number;
     maxTargetCount: number;
