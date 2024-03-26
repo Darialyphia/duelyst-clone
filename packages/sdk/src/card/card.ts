@@ -74,6 +74,7 @@ export abstract class Card<TCtx extends AnyObject>
     priority?: number
   ) {
     this.interceptors[key].add(interceptor as any, priority);
+    return () => this.removeInterceptor(key, interceptor);
   }
 
   removeInterceptor<T extends keyof CardInterceptor>(

@@ -76,16 +76,13 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
         ? config.PLAYER_1_STARTING_MANA
         : config.PLAYER_2_STARTING_MANA;
     this.currentMana = options.currentMana ?? this.maxMana;
-    this.cards = options.cards.map((card, index) => {
-      return createCard(this.session, card, index, this.id);
-    });
   }
 
   setup() {
-    this.placeGeneral();
     this.cards = this.options.cards.map((card, index) => {
       return createCard(this.session, card, index, this.id);
     });
+    this.placeGeneral();
 
     this.deck = new Deck(
       this.session,
@@ -243,6 +240,8 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     priority?: number
   ) {
     this.interceptors[key].add(interceptor as any, priority);
+
+    return () => this.removeInterceptor(key, interceptor);
   }
 
   removeInterceptor<T extends keyof PlayerInterceptor>(

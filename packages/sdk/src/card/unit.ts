@@ -43,6 +43,7 @@ export class Unit extends Card<UnitCtx> {
     priority?: number
   ) {
     this.interceptors[key].add(interceptor as any, priority);
+    return () => this.removeInterceptor(key, interceptor);
   }
 
   removeInterceptor<T extends keyof UnitInterceptor>(
