@@ -160,6 +160,8 @@ const filters = computed(() => {
           }
         "
       />
+
+      <MapCellHighlights :cell="cell" />
       <animated-sprite
         v-if="tileTexture"
         event-mode="none"
@@ -167,8 +169,6 @@ const filters = computed(() => {
         :anchor="0.5"
         :y="-CELL_HEIGHT * 0.45"
       />
-
-      <MapCellHighlights :cell="cell" />
       <HoveredCell v-if="isHovered" />
     </container>
   </IsoPositioner>

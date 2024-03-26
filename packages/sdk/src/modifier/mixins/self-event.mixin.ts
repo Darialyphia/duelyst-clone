@@ -7,14 +7,14 @@ import type { Modifier, ModifierMixin } from '../modifier';
 export const modifierSelfEventMixin = <T extends EntityEvent>({
   eventName,
   listener,
-  keywords
+  keywords = []
 }: {
   eventName: T;
   listener: (
     event: EntityEventMap[T],
     ctx: { session: GameSession; attachedTo: Entity; modifier: Modifier }
   ) => MaybePromise<void>;
-  keywords: Keyword[];
+  keywords?: Keyword[];
 }): ModifierMixin => {
   let _listener: any;
 

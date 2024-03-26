@@ -5,5 +5,8 @@ export const modifierRushMixin = (): ModifierMixin => ({
   keywords: [KEYWORDS.RUSH],
   onApplied(session, attachedTo) {
     attachedTo.card.addInterceptor('shouldExhaustOnPlay', () => false);
+  },
+  onRemoved(session, attachedTo, modifier) {
+    attachedTo.exhaust();
   }
 });

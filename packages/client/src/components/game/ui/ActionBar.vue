@@ -29,9 +29,10 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
         class="card-button"
         :class="[
           card && ui.selectedCard.value === card && 'selected',
-          card && card?.blueprint.kind.toLowerCase()
+          card && card?.blueprint.kind.toLowerCase(),
+          card && card.manaCost > activePlayer.currentMana && 'disabled'
         ]"
-        :disabled="!card || card.manaCost > activePlayer.currentMana"
+        :disabled="!card"
         :data-cost="card && card.manaCost"
         @click="ui.selectCardAtIndex(index)"
       >
@@ -114,7 +115,8 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     transform: translateX(-10px);
   } */
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     filter: grayscale(1);
   }
 

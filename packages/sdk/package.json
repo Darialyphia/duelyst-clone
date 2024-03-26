@@ -13,6 +13,7 @@
     "eventemitter3": "^5.0.1",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",
+    "nanoid": "^5.0.6",
     "seedrandom": "^3.0.5",
     "ts-pattern": "^5.0.8",
     "ts-priority-queue": "^0.1.1",

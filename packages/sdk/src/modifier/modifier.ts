@@ -1,7 +1,13 @@
-import type { MaybePromise, Prettify } from '@game/shared';
+import {
+  isDefined,
+  type MaybePromise,
+  type PartialBy,
+  type Prettify
+} from '@game/shared';
 import type { Entity } from '../entity/entity';
 import type { GameSession } from '../game-session';
 import type { Keyword } from '../utils/keywords';
+import { nanoid } from 'nanoid';
 
 export type ModifierId = string;
 
@@ -48,7 +54,10 @@ export type ModifierMixin = Partial<
   >
 >;
 
-type ModifierBuilderOptions = Pick<Modifier, 'id' | 'visible' | 'description' | 'name'> &
+type ModifierBuilderOptions = PartialBy<
+  Pick<Modifier, 'id' | 'visible' | 'description' | 'name'>,
+  'id'
+> &
   Omit<StackableMixin, 'onReapply'> & { mixins: ModifierMixin[] };
 
 export const createModifier = ({
@@ -57,7 +66,15 @@ export const createModifier = ({
 }: ModifierBuilderOptions): Modifier => {
   return {
     ...options,
-    keywords: [...new Set(mixins.map(m => m.keywords).flat())],
+    id: options.id ?? nanoid(6),
+    keywords: [
+      ...new Set(
+        mixins
+          .map(m => m.keywords)
+          .flat()
+          .filter(isDefined)
+      )
+    ],
     async onApplied(session, attachedTo) {
       for (const mixin of mixins) {
         mixin.onApplied?.(session, attachedTo, this);

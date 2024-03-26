@@ -41,10 +41,10 @@ export const displayDamageIndicator: FxCommand<'displayDamageIndicator'> = (
       : -1;
 
   const path = [
-    { x: 0, y: -64, alpha: 1, scale: 0 },
-    { x: direction * 30, y: -96, alpha: 1, scale: 1 },
-    { x: direction * 45, y: -80, alpha: 1, scale: 1 },
-    { x: direction * 60, y: -64, alpha: 0, scale: 1 }
+    { x: 0, y: -10, alpha: 1, scale: 0.5 },
+    { x: direction * 30, y: -50, alpha: 1, scale: 1 },
+    { x: direction * 60, y: -10, alpha: 1, scale: 1 },
+    { x: direction * 80, y: 6, alpha: 0, scale: 1 }
   ];
   container.addChild(textSprite);
   // gsap motionpath doesn't work with gsap pixi plugin, so we apply values to a dummy object and update the text on update

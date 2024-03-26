@@ -17,6 +17,10 @@ export const KEYWORDS = {
   OPENING_GAMBIT: {
     name: 'Opening Gambit',
     description: 'Triggers an effect when summoned from your action bar.'
+  },
+  DYING_WISH: {
+    name: 'Dying With',
+    description: 'Triggers an effect wgen this unit dies.'
   }
 } as const satisfies Record<string, Keyword>;
 

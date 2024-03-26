@@ -23,7 +23,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 3,
     modifiers: [
       createModifier({
-        id: 'healing_mystic',
         visible: false,
         stackable: false,
         mixins: [
@@ -60,7 +59,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 1,
     modifiers: [
       createModifier({
-        id: 'bloodtear_alchemist',
         visible: false,
         stackable: false,
         mixins: [
@@ -103,7 +101,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 3,
     modifiers: [
       createModifier({
-        id: 'araki_headhunter',
         visible: false,
         stackable: false,
         mixins: [
@@ -152,19 +149,15 @@ export const neutral: CardBlueprint[] = [
     maxHp: 4,
     modifiers: [
       createModifier({
-        id: 'azure_horn_shaman',
         visible: false,
         stackable: false,
         mixins: [
           modifierDyingWishMixin({
             keywords: [],
             listener(event, { session, attachedTo }) {
-              session.entitySystem
-                .getNearbyEntities(attachedTo.position)
-                .filter(entity => !entity.isGeneral && attachedTo.isAlly(entity.id))
-                .forEach(entity => {
-                  entity.addInterceptor('maxHp', val => val + 4);
-                });
+              session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
+                entity.addInterceptor('maxHp', val => val + 4);
+              });
             }
           })
         ]
@@ -182,7 +175,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 2,
     modifiers: [
       createModifier({
-        id: 'ephemeral_shroud',
         visible: false,
         stackable: false,
         mixins: [
@@ -216,19 +208,15 @@ export const neutral: CardBlueprint[] = [
     maxHp: 3,
     modifiers: [
       createModifier({
-        id: 'primus_fist',
         visible: false,
         stackable: false,
         mixins: [
           modifierOpeningGambitMixin({
             keywords: [],
             handler(session, attachedTo) {
-              session.entitySystem
-                .getNearbyEntities(attachedTo.position)
-                .filter(entity => attachedTo.isAlly(entity.id))
-                .forEach(entity => {
-                  entity.addInterceptor('attack', atk => atk + 1);
-                });
+              session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
+                entity.addInterceptor('attack', atk => atk + 1);
+              });
             }
           })
         ]
@@ -246,7 +234,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 2,
     modifiers: [
       createModifier({
-        id: 'rush',
         visible: true,
         name: KEYWORDS.RUSH.name,
         description: KEYWORDS.RUSH.description,
@@ -266,7 +253,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 4,
     modifiers: [
       createModifier({
-        id: 'emerald_rejuvenator',
         visible: false,
         stackable: false,
         mixins: [
@@ -274,6 +260,72 @@ export const neutral: CardBlueprint[] = [
             keywords: [],
             handler(session, attachedTo) {
               attachedTo.player.general.heal(4, attachedTo.card);
+            }
+          })
+        ]
+      })
+    ]
+  },
+  {
+    id: 'flameblood_warlock',
+    name: 'Flameblood Warlock',
+    description: 'Opening Gambit: Deal 3 damage to both generals.',
+    spriteId: 'neutral_mercflamebloodwarlock',
+    kind: CARD_KINDS.MINION,
+    manaCost: 2,
+    attack: 3,
+    maxHp: 1,
+    modifiers: [
+      createModifier({
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierOpeningGambitMixin({
+            keywords: [],
+            handler(session, attachedTo) {
+              session.playerSystem
+                .getList()
+                .forEach(player => player.general.takeDamage(3, attachedTo.card));
+            }
+          })
+        ]
+      })
+    ]
+  },
+  {
+    id: 'ghost_lynx',
+    name: 'Ghost Lynx',
+    description: 'Opening Gambit: Drawa card at the end of your turn.',
+    spriteId: 'neutral_ghostlynx',
+    kind: CARD_KINDS.MINION,
+    manaCost: 2,
+    attack: 1,
+    maxHp: 3,
+    modifiers: [
+      createModifier({
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierOpeningGambitMixin({
+            keywords: [],
+            handler(session, attachedTo) {
+              attachedTo.addModifier(
+                createModifier({
+                  visible: false,
+                  stackable: false,
+                  mixins: [
+                    {
+                      onApplied(session, attachedTo) {
+                        const listener = () => {
+                          attachedTo.player.draw(1);
+                          session.off('player:turn_end', listener);
+                        };
+                        session.on('player:turn_end', listener);
+                      }
+                    }
+                  ]
+                })
+              );
             }
           })
         ]

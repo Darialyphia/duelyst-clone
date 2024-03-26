@@ -424,6 +424,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   hasKeyword(name: KeywordName) {
+    console.log(name, this.modifiers);
     return this.modifiers.some(mod =>
       mod.keywords.some(keyword => keyword.name === name)
     );

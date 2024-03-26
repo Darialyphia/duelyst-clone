@@ -3,11 +3,11 @@ import { KEYWORDS, type Keyword } from '../../utils/keywords';
 import type { Modifier, ModifierMixin } from '../modifier';
 
 export const modifierOpeningGambitMixin = ({
-  keywords,
+  keywords = [],
   handler
 }: {
   handler: Modifier['onApplied'];
-  keywords: Keyword[];
+  keywords?: Keyword[];
 }): ModifierMixin => {
   return {
     keywords: [...keywords, KEYWORDS.OPENING_GAMBIT],

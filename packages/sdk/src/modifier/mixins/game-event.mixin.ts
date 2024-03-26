@@ -7,14 +7,14 @@ import type { Modifier, ModifierMixin } from '../modifier';
 export const modifierGameEventMixin = <T extends GameEvent>({
   eventName,
   listener,
-  keywords
+  keywords = []
 }: {
   eventName: T;
   listener: (
     event: GameEventMap[T],
     ctx: { session: GameSession; attachedTo: Entity; modifier: Modifier }
   ) => MaybePromise<void>;
-  keywords: Keyword[];
+  keywords?: Keyword[];
 }): ModifierMixin => {
   let _listener: any;
 

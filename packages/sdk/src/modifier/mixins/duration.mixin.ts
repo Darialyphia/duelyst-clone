@@ -8,13 +8,13 @@ export const modifierDurationMixin = ({
   tickOn = 'end',
   onApplied,
   onRemoved,
-  keywords
+  keywords = []
 }: {
   duration: number;
   tickOn?: 'start' | 'end';
   onApplied: Modifier['onApplied'];
   onRemoved: Modifier['onRemoved'];
-  keywords: Keyword[];
+  keywords?: Keyword[];
 }): ModifierMixin => {
   let _duration = duration;
 

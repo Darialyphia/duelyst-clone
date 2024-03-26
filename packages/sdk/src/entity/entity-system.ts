@@ -69,6 +69,26 @@ export class EntitySystem {
     ].filter(isDefined)
   }
 
+  getNearbyAllies(origin: Entity) {
+    return this.getNearbyEntities(origin.position).filter(entity =>
+      origin.isAlly(entity.id)
+    );
+  }
+
+  getNearbyAllyMinions(origin: Entity) {
+    return this.getNearbyAllies(origin).filter(entity => !entity.isGeneral);
+  }
+
+  getNearbyEnemies(origin: Entity) {
+    return this.getNearbyEntities(origin.position).filter(entity =>
+      origin.isEnemy(entity.id)
+    );
+  }
+
+  getNearbyEnemyMinions(origin: Entity) {
+    return this.getNearbyEnemies(origin).filter(entity => !entity.isGeneral);
+  }
+
   setupListeners(entity: Entity) {
     Object.values(ENTITY_EVENTS).forEach(eventName => {
       entity.on(eventName, event => {
