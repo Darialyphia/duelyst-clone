@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'emerald_rejuvenator' },
+        { blueprintId: 'emerald_rejuvenator' },
+        { blueprintId: 'emerald_rejuvenator' },
         { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'saberspine_tiger' },
@@ -69,6 +72,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'emerald_rejuvenator' },
+        { blueprintId: 'emerald_rejuvenator' },
+        { blueprintId: 'emerald_rejuvenator' },
         { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'saberspine_tiger' },
         { blueprintId: 'saberspine_tiger' },

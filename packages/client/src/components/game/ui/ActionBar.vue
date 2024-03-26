@@ -22,12 +22,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     >
       Replace
     </UiFancyButton>
-    <TransitionGroup
-      tag="div"
-      class="flex gap-9 iems-center"
-      mode="out-in"
-      :duration="700"
-    >
+    <div class="flex gap-9 iems-center">
       <button
         v-for="(card, index) in hand"
         :key="`${card?.blueprintId}:${index}`"
@@ -48,7 +43,7 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
           class="icon"
         />
       </button>
-    </TransitionGroup>
+    </div>
     <UiFancyButton
       :style="{ '--hue': '10DEG', '--hue2': '20DEG', 'min-width': '13ch' }"
       @click="dispatch('endTurn')"

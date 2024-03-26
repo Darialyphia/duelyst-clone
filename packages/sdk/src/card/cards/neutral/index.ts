@@ -225,11 +225,8 @@ export const neutral: CardBlueprint[] = [
             handler(session, attachedTo) {
               session.entitySystem
                 .getNearbyEntities(attachedTo.position)
-                .filter(entity => {
-                  return attachedTo.isAlly(entity.id);
-                })
+                .filter(entity => attachedTo.isAlly(entity.id))
                 .forEach(entity => {
-                  console.log(entity);
                   entity.addInterceptor('attack', atk => atk + 1);
                 });
             }
@@ -255,6 +252,31 @@ export const neutral: CardBlueprint[] = [
         description: KEYWORDS.RUSH.description,
         stackable: false,
         mixins: [modifierRushMixin()]
+      })
+    ]
+  },
+  {
+    id: 'emerald_rejuvenator',
+    name: 'Emerald Rejuvenator',
+    description: 'Opening Gambit: heal your general for 4.',
+    spriteId: 'neutral_rejuvenator',
+    kind: CARD_KINDS.MINION,
+    manaCost: 4,
+    attack: 4,
+    maxHp: 4,
+    modifiers: [
+      createModifier({
+        id: 'emerald_rejuvenator',
+        visible: false,
+        stackable: false,
+        mixins: [
+          modifierOpeningGambitMixin({
+            keywords: [],
+            handler(session, attachedTo) {
+              attachedTo.player.general.heal(4, attachedTo.card);
+            }
+          })
+        ]
       })
     ]
   }

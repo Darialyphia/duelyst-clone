@@ -46,7 +46,7 @@ export const vetruvian: CardBlueprint[] = [
               duration: Infinity,
               keywords: [],
               interceptor: modifier => atk => {
-                return atk + 2 * modifier.stacks!;
+                return atk + 1 * modifier.stacks!;
               }
             }),
             modifierInterceptorMixin({

@@ -212,7 +212,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   }
 
   canPlayCardAtIndex(index: number) {
-    const card = this.cards[index];
+    const card = this.hand[index];
     if (!card) {
       console.error(`No card in hand at index ${index}`);
       return;
