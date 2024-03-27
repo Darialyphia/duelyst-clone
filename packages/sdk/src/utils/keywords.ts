@@ -20,7 +20,7 @@ export const KEYWORDS = {
   },
   DYING_WISH: {
     name: 'Dying With',
-    description: 'Triggers an effect wgen this unit dies.'
+    description: 'Triggers an effect when destroyed.'
   }
 } as const satisfies Record<string, Keyword>;
 

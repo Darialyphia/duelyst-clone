@@ -29,7 +29,11 @@ export class EntitySystem {
   }
 
   getEntityAt(position: Point3D) {
-    return this.getList().find(e => e.position.equals(position)) ?? null;
+    return (
+      this.getList().find(e => {
+        return e.position.equals(position);
+      }) ?? null
+    );
   }
 
   getNearbyEntities({ x, y, z }: Point3D) {

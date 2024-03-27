@@ -16,6 +16,7 @@ type UnitCtx = { position: Point3D; targets: Point3D[] };
 export class Unit extends Card<UnitCtx> {
   entity: Nullable<Entity> = null;
   followupTargets: Point3D[] = [];
+  summonPoint!: Point3D;
 
   get blueprint(): UnitBlueprint {
     return CARDS[this.blueprintId] as UnitBlueprint;
@@ -29,12 +30,21 @@ export class Unit extends Card<UnitCtx> {
     attack: new Interceptable<number, Unit>(),
     maxHp: new Interceptable<number, Unit>(),
     manaCost: new Interceptable<number, Card<UnitCtx>>(),
-    canSummonAt: new Interceptable<boolean, Unit>(),
+    canSummonAt: new Interceptable<boolean, { unit: Unit; point: Point3D }>(),
     shouldExhaustOnPlay: new Interceptable<boolean, Unit>()
   };
 
   get shouldExhaustOnPlay(): boolean {
     return this.interceptors.shouldExhaustOnPlay.getValue(true, this);
+  }
+
+  get attack(): number {
+    this.blueprint.kind;
+    return this.interceptors.attack.getValue(this.blueprint.attack, this);
+  }
+
+  get maxHp(): number {
+    return this.interceptors.maxHp.getValue(this.blueprint.maxHp, this);
   }
 
   addInterceptor<T extends keyof UnitInterceptor>(
@@ -55,6 +65,7 @@ export class Unit extends Card<UnitCtx> {
 
   async onPlay(ctx: UnitCtx) {
     this.followupTargets = ctx.targets;
+    this.summonPoint = ctx.position;
     this.entity = this.session.entitySystem.addEntity({
       cardIndex: this.index,
       playerId: this.playerId,
@@ -69,21 +80,12 @@ export class Unit extends Card<UnitCtx> {
     }
   }
 
-  get attack(): number {
-    this.blueprint.kind;
-    return this.interceptors.attack.getValue(this.blueprint.attack, this);
-  }
-
-  get maxHp(): number {
-    return this.interceptors.maxHp.getValue(this.blueprint.maxHp, this);
-  }
-
   canPlayAt(point: Point3D) {
     const isOccupied = !!this.session.entitySystem.getEntityAt(point);
     if (isOccupied) return false;
     const nearby = this.session.boardSystem.getNeighbors(point);
     const predicate = nearby.some(cell => cell.entity?.player.equals(this.player));
 
-    return this.interceptors.canSummonAt.getValue(predicate, this);
+    return this.interceptors.canSummonAt.getValue(predicate, { unit: this, point });
   }
 }

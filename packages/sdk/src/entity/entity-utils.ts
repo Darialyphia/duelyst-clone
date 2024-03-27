@@ -3,6 +3,7 @@ import { GameSession } from '../game-session';
 import { type Point3D } from '../types';
 import { Entity, type EntityId } from './entity';
 import { isAxisAligned, isWithinCells } from '../utils/targeting';
+import { match } from 'ts-pattern';
 
 export const getEntityIfOwnerMatches = (
   ctx: GameSession,
@@ -78,4 +79,36 @@ export const getEntityBehind = (
   };
 
   return session.entitySystem.getEntityAt({ ...point, z: entity.position.z });
+};
+
+export const getNearest = (
+  session: GameSession,
+  direction: 'up' | 'down' | 'left' | 'right',
+  point: Point3D
+) => {
+  let found: Entity | null = null;
+  let n = 0;
+  while (!found) {
+    n++;
+    console.log(n);
+    const newPoint: Point3D = match(direction)
+      .with('up', () => {
+        return { ...point, y: point.y - n };
+      })
+      .with('down', () => {
+        return { ...point, y: point.y + n };
+      })
+      .with('left', () => {
+        return { ...point, x: point.x - n };
+      })
+      .with('right', () => {
+        return { ...point, x: point.x + n };
+      })
+      .exhaustive();
+    const cell = session.boardSystem.getCellAt(newPoint);
+    if (!cell) break;
+    found = cell.entity;
+  }
+
+  return found;
 };

@@ -1,7 +1,7 @@
-import { isEmpty, isEnemy } from '../../../entity/entity-utils';
+import { getNearest, isEmpty, isEnemy } from '../../../entity/entity-utils';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { createEntityModifier } from '../../../modifier/entity-modifier';
-import { dispelAt } from '../../../modifier/modifier-utils';
+import { airdrop, dispelAt } from '../../../modifier/modifier-utils';
 import { isWithinCells } from '../../../utils/targeting';
 import { type CardBlueprint } from '../../card-lookup';
 import {
@@ -280,5 +280,28 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ]
+  },
+  {
+    id: 'rift_walker',
+    name: 'Rift Walker',
+    description:
+      'Airdrop\nOpening Gambit: Deal 2 damage to the nearest unit in front, behind, above, and below this.',
+    kind: CARD_KINDS.MINION,
+    spriteId: 'neutral_astralprime',
+    manaCost: 3,
+    attack: 2,
+    maxHp: 1,
+    onPlay(session, card) {
+      [
+        getNearest(session, 'up', card.entity.position),
+        getNearest(session, 'down', card.entity.position),
+        getNearest(session, 'right', card.entity.position),
+        getNearest(session, 'left', card.entity.position)
+      ].forEach(entity => {
+        if (!entity) return;
+        entity.takeDamage(2, card);
+      });
+    },
+    modifiers: [airdrop()]
   }
 ];

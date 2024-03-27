@@ -47,7 +47,13 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     </div>
     <UiFancyButton
       :style="{ '--hue': '10DEG', '--hue2': '20DEG', 'min-width': '13ch' }"
-      @click="dispatch('endTurn')"
+      @click="
+        () => {
+          dispatch('endTurn');
+          ui.unselectCard();
+          ui.unselectEntity();
+        }
+      "
     >
       End turn
     </UiFancyButton>

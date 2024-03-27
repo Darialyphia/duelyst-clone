@@ -46,10 +46,6 @@ export abstract class Card<TCtx extends AnyObject>
   ) {
     super();
     this.blueprintId = options.blueprintId;
-
-    this.blueprint.modifiers?.forEach(modifier => {
-      this.addModifier(modifier);
-    });
   }
 
   get player() {
@@ -67,6 +63,12 @@ export abstract class Card<TCtx extends AnyObject>
   protected interceptors = {
     manaCost: new Interceptable<number, Card<TCtx>>()
   };
+
+  setup() {
+    this.blueprint.modifiers?.forEach(modifier => {
+      this.addModifier(modifier);
+    });
+  }
 
   addInterceptor<T extends keyof CardInterceptor>(
     key: T,

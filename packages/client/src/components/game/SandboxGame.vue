@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'rift_walker' },
+        { blueprintId: 'rift_walker' },
+        { blueprintId: 'rift_walker' },
         { blueprintId: 'blaze_hound' },
         { blueprintId: 'blaze_hound' },
         { blueprintId: 'blaze_hound' },
@@ -81,6 +84,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'rift_walker' },
+        { blueprintId: 'rift_walker' },
+        { blueprintId: 'rift_walker' },
         { blueprintId: 'blaze_hound' },
         { blueprintId: 'blaze_hound' },
         { blueprintId: 'blaze_hound' },

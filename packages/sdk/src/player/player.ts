@@ -78,56 +78,12 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
     this.currentMana = options.currentMana ?? this.maxMana;
   }
 
-  setup() {
-    this.cards = this.options.cards.map((card, index) => {
-      return createCard(this.session, card, index, this.id);
-    });
-    this.placeGeneral();
-
-    this.deck = new Deck(
-      this.session,
-      this.options.deck
-        ? this.options.deck.map(index => this.cards[index])
-        : this.cards.filter(card => card.blueprint.kind !== CARD_KINDS.GENERAL),
-      this.id
-    );
-    if (!this.options.deck) {
-      this.deck.shuffle();
-    }
-    this.hand = padArray(
-      this.options.hand
-        ? this.options.hand.map(index => (index ? this.cards[index] : null))
-        : this.drawInitialHand(),
-      config.MAX_HAND_SIZE,
-      null
-    );
-    this.graveyard = this.options.graveyard.map(index => this.cards[index]);
-  }
-
   get maxMana(): number {
     return this.interceptors.maxMana.getValue(this._maxMana, this);
   }
 
   set maxMana(val) {
     this._maxMana = val;
-  }
-
-  placeGeneral() {
-    const generalIndex = this.cards.findIndex(
-      card => card.blueprint.kind === CARD_KINDS.GENERAL
-    );
-
-    this.session.entitySystem.addEntity({
-      cardIndex: generalIndex,
-      playerId: this.id,
-      position: this.isPlayer1
-        ? this.session.boardSystem.player1StartPosition
-        : this.session.boardSystem.player2StartPosition
-    });
-  }
-
-  private drawInitialHand() {
-    return this.deck.draw(config.STARTING_HAND);
   }
 
   get maxReplaces(): number {
@@ -154,6 +110,50 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
 
   get opponent() {
     return this.session.playerSystem.getOpponent(this.id);
+  }
+
+  setup() {
+    this.cards = this.options.cards.map((card, index) => {
+      return createCard(this.session, card, index, this.id);
+    });
+    this.placeGeneral();
+
+    this.deck = new Deck(
+      this.session,
+      this.options.deck
+        ? this.options.deck.map(index => this.cards[index])
+        : this.cards.filter(card => card.blueprint.kind !== CARD_KINDS.GENERAL),
+      this.id
+    );
+    if (!this.options.deck) {
+      this.deck.shuffle();
+    }
+    this.hand = padArray(
+      this.options.hand
+        ? this.options.hand.map(index => (index ? this.cards[index] : null))
+        : this.drawInitialHand(),
+      config.MAX_HAND_SIZE,
+      null
+    );
+    this.graveyard = this.options.graveyard.map(index => this.cards[index]);
+  }
+
+  placeGeneral() {
+    const generalIndex = this.cards.findIndex(
+      card => card.blueprint.kind === CARD_KINDS.GENERAL
+    );
+
+    this.session.entitySystem.addEntity({
+      cardIndex: generalIndex,
+      playerId: this.id,
+      position: this.isPlayer1
+        ? this.session.boardSystem.player1StartPosition
+        : this.session.boardSystem.player2StartPosition
+    });
+  }
+
+  private drawInitialHand() {
+    return this.deck.draw(config.STARTING_HAND);
   }
 
   serialize(): SerializedPlayer {

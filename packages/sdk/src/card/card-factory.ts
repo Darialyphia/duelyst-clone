@@ -10,18 +10,21 @@ import { Unit } from './unit';
 
 export const createCard = (
   session: GameSession,
-  card: SerializedCard,
+  options: SerializedCard,
   index: CardIndex,
   playerId: PlayerId
 ) => {
-  const blueprint = CARDS[card.blueprintId];
-  return match(blueprint.kind)
+  const blueprint = CARDS[options.blueprintId];
+  const card = match(blueprint.kind)
     .with(
       CARD_KINDS.GENERAL,
       CARD_KINDS.MINION,
-      () => new Unit(session, index, card, playerId)
+      () => new Unit(session, index, options, playerId)
     )
-    .with(CARD_KINDS.SPELL, () => new Spell(session, index, card, playerId))
-    .with(CARD_KINDS.ARTIFACT, () => new Artifact(session, index, card, playerId))
+    .with(CARD_KINDS.SPELL, () => new Spell(session, index, options, playerId))
+    .with(CARD_KINDS.ARTIFACT, () => new Artifact(session, index, options, playerId))
     .exhaustive();
+  card.setup();
+
+  return card;
 };
