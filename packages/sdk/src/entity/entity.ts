@@ -169,7 +169,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   private set hp(val: number) {
-    this.currentHp.value = clamp(val, 0, this.maxHp);
+    this.currentHp.value = Math.min(val, this.maxHp);
   }
 
   get maxHp(): number {
@@ -314,7 +314,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       amount
     );
     await this.session.fxSystem.playAnimation(this.id, 'hit');
-    this.hp -= amount;
+    this.hp = this.currentHp.value - amount;
 
     this.emit(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, payload);
   }

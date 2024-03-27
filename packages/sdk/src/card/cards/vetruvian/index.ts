@@ -31,7 +31,6 @@ export const vetruvian: CardBlueprint[] = [
       return !entity.isGeneral && entity.player.equals(session.playerSystem.activePlayer);
     },
     async onPlay(session, card) {
-      console.log(card.castPoint);
       const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
       entity.addModifier(
