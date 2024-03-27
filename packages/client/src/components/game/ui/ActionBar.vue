@@ -4,6 +4,7 @@ const { dispatch, ui } = useGame();
 const hand = useGameSelector(session => session.playerSystem.activePlayer.hand);
 
 const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
+const hoveredIndex = ref<number | null>(null);
 </script>
 
 <template>
@@ -35,12 +36,15 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
         :disabled="!card"
         :data-cost="card && card.manaCost"
         @click="ui.selectCardAtIndex(index)"
+        @mouseenter="hoveredIndex = index"
+        @mouseleave="hoveredIndex = null"
       >
         <AnimatedCardIcon
           v-if="card"
           :sprite-id="card.blueprint.spriteId"
           :kind="card.blueprint.kind"
           :is-active="ui.selectedCardIndex.value === index"
+          :is-hovered="hoveredIndex === index"
           class="icon"
         />
       </button>
@@ -160,10 +164,11 @@ const activePlayer = useGameSelector(session => session.playerSystem.activePlaye
     transition:
       transform 0.3s ease-out,
       filter 0.3s;
-    &:hover,
-    .card-button.selected > & {
-      filter: drop-shadow(0 0 3px cyan);
-    }
+  }
+
+  &.card-button.selected > .icon,
+  &:hover > .icon {
+    filter: drop-shadow(0 0 1px cyan) brightness(130%) contrast(115%);
   }
 
   &.spell > .icon {

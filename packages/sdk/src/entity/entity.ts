@@ -246,6 +246,12 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   destroy() {
     this.session.entitySystem.removeEntity(this);
     this.emit('destroyed', this);
+
+    this.session.actionSystem.schedule(() => {
+      this.modifiers.forEach(modifier => {
+        modifier.onRemoved(this.session, this, modifier);
+      });
+    });
   }
 
   async move(path: Point3D[]) {

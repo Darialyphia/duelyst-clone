@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'aethermaster' },
+        { blueprintId: 'aethermaster' },
+        { blueprintId: 'aethermaster' },
         { blueprintId: 'rift_walker' },
         { blueprintId: 'rift_walker' },
         { blueprintId: 'rift_walker' },
@@ -84,6 +87,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'aethermaster' },
+        { blueprintId: 'aethermaster' },
+        { blueprintId: 'aethermaster' },
         { blueprintId: 'rift_walker' },
         { blueprintId: 'rift_walker' },
         { blueprintId: 'rift_walker' },

@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { CARD_KINDS, type CardKind } from '@game/sdk';
 import { match } from 'ts-pattern';
-const { spriteId, kind, isActive } = defineProps<{
+const { spriteId, kind, isActive, isHovered } = defineProps<{
   spriteId: string;
   kind: CardKind;
   isActive?: boolean;
+  isHovered?: boolean;
 }>();
 const { assets } = useGame();
 
 const sheet = assets.getSpritesheet(spriteId);
-const el = ref<HTMLElement>();
-const isHovered = useElementHover(el);
+
 const animationName = computed(() =>
   match(kind)
     .with(CARD_KINDS.MINION, CARD_KINDS.GENERAL, () =>
-      isHovered.value || isActive ? 'idle' : 'breathing'
+      isHovered || isActive ? 'idle' : 'breathing'
     )
     .with(CARD_KINDS.SPELL, CARD_KINDS.ARTIFACT, () =>
-      isHovered.value || isActive ? 'active' : 'default'
+      isHovered || isActive ? 'active' : 'default'
     )
     .exhaustive()
 );
@@ -31,7 +31,7 @@ useIntervalFn(() => {
   frame.value = (frame.value + 1) % (animation.value.length - 1);
 }, frameDuration);
 
-watch([isHovered, () => isActive], () => {
+watch([() => isHovered, () => isActive], () => {
   frame.value = 0;
 });
 
@@ -49,11 +49,13 @@ const style = computed(() => {
 </script>
 
 <template>
-  <div ref="el" :style="style" />
+  <div :style="style" />
 </template>
 
 <style scoped lang="postcss">
 div {
+  pointer-events: none;
+
   width: calc(1px * var(--width));
   height: calc(1px * var(--height));
 

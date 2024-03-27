@@ -90,7 +90,6 @@ export const getNearest = (
   let n = 0;
   while (!found) {
     n++;
-    console.log(n);
     const newPoint: Point3D = match(direction)
       .with('up', () => {
         return { ...point, y: point.y - n };

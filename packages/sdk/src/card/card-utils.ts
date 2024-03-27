@@ -9,6 +9,7 @@ import { modifierGameEventMixin } from '../modifier/mixins/game-event.mixin';
 import { KEYWORDS } from '../utils/keywords';
 import type { GameEvent, GameEventMap, GameSession } from '../game-session';
 import { CARD_EVENTS, type AnyCard } from './card';
+import type { PlayerInterceptor } from '../player/player';
 
 export const CARD_KINDS = {
   MINION: 'MINION',

@@ -126,6 +126,7 @@ export const neutral: CardBlueprint[] = [
     maxHp: 4,
     onPlay(session, card) {
       dyingWish(card, (event, { session, attachedTo }) => {
+        console.log('dying wish');
         session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
           entity.addInterceptor('maxHp', val => val + 4);
         });
@@ -303,5 +304,34 @@ export const neutral: CardBlueprint[] = [
       });
     },
     modifiers: [airdrop()]
+  },
+  {
+    id: 'aethermaster',
+    name: 'Aethermaster',
+    description: 'You can replace an additional card each turn',
+    kind: CARD_KINDS.MINION,
+    spriteId: 'neutral_aethermaster',
+    manaCost: 2,
+    attack: 1,
+    maxHp: 3,
+    onPlay(session, card) {
+      const interceptor = (val: number) => val + 1;
+      card.entity.addModifier(
+        createEntityModifier({
+          visible: false,
+          stackable: false,
+          mixins: [
+            {
+              onApplied() {
+                card.player.addInterceptor('maxReplaces', interceptor);
+              },
+              onRemoved() {
+                card.player.removeInterceptor('maxReplaces', interceptor);
+              }
+            }
+          ]
+        })
+      );
+    }
   }
 ];
