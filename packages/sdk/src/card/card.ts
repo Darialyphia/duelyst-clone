@@ -108,7 +108,10 @@ export abstract class Card<TCtx extends AnyObject>
   }
 
   get manaCost(): number {
-    return this.interceptors.manaCost.getValue(this.blueprint.manaCost, this);
+    return this.interceptors.manaCost.getValue(
+      this.player.interceptors.manaCost.getValue(this.blueprint.manaCost, this),
+      this
+    );
   }
 
   abstract canPlayAt(point: Point3D): boolean;

@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'archon_spellbinder' },
+        { blueprintId: 'archon_spellbinder' },
+        { blueprintId: 'archon_spellbinder' },
         { blueprintId: 'dancing_blades' },
         { blueprintId: 'dancing_blades' },
         { blueprintId: 'dancing_blades' },
@@ -75,6 +78,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'archon_spellbinder' },
+        { blueprintId: 'archon_spellbinder' },
+        { blueprintId: 'archon_spellbinder' },
         { blueprintId: 'dancing_blades' },
         { blueprintId: 'dancing_blades' },
         { blueprintId: 'dancing_blades' },
@@ -99,9 +105,9 @@ const state: SerializedGameState = {
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },
         { blueprintId: 'primus_fist' },
-        { blueprintId: 'void_pulse' },
-        { blueprintId: 'void_pulse' },
-        { blueprintId: 'void_pulse' },
+        { blueprintId: 'scions_first_wish' },
+        { blueprintId: 'scions_first_wish' },
+        { blueprintId: 'scions_first_wish' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' },
         { blueprintId: 'healing_mystic' }

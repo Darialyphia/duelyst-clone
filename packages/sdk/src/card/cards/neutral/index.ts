@@ -18,7 +18,7 @@ import {
   whileInHand
 } from '../../card-utils';
 import { createCardModifier } from '../../../modifier/card-modifier';
-import { CARD_EVENTS } from '../../card';
+import { CARD_EVENTS, type AnyCard } from '../../card';
 import { ENTITY_EVENTS } from '../../../entity/entity';
 import { PLAYER_EVENTS } from '../../../player/player';
 
@@ -354,6 +354,30 @@ export const neutral: CardBlueprint[] = [
         if (!target) return;
         target.takeDamage(3, card);
       });
+    }
+  },
+  {
+    id: 'archon_spellbinder',
+    name: 'Archon Spellbinder',
+    description: "Your opponent's spells cost 1 more to play",
+    kind: CARD_KINDS.MINION,
+    spriteId: 'neutral_mercarchonspellbinder',
+    manaCost: 6,
+    attack: 6,
+    maxHp: 9,
+    onPlay(session, card) {
+      const interceptor = (val: number, card: Readonly<AnyCard>) => {
+        if (card.kind !== CARD_KINDS.SPELL) return val;
+
+        return val + 1;
+      };
+      card.player.opponent.addInterceptor('manaCost', interceptor);
+
+      const unsub = () => {
+        card.player.opponent.removeInterceptor('manaCost', interceptor);
+        card.entity.off(ENTITY_EVENTS.DESTROYED, unsub);
+      };
+      card.entity.on(ENTITY_EVENTS.DESTROYED, unsub);
     }
   }
 ];

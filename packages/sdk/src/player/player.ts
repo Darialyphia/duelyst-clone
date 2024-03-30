@@ -57,9 +57,10 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   graveyard!: AnyCard[];
   cards!: AnyCard[];
 
-  protected interceptors = {
+  readonly interceptors = {
     maxReplaces: new Interceptable<number, Player>(),
-    maxMana: new Interceptable<number, Player>()
+    maxMana: new Interceptable<number, Player>(),
+    manaCost: new Interceptable<number, AnyCard>()
   };
 
   constructor(

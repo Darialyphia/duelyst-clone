@@ -1,6 +1,6 @@
 import type { AnyFunction, MaybePromise, Values } from '@game/shared';
 import type { Unit } from './unit';
-import type { Entity } from '../entity/entity';
+import { ENTITY_EVENTS, type Entity } from '../entity/entity';
 import { createEntityModifier, type EntityModifier } from '../modifier/entity-modifier';
 import { modifierOpeningGambitMixin } from '../modifier/mixins/opening-gambit.mixin';
 import { modifierDyingWishMixin } from '../modifier/mixins/dying-wish.mixin';
