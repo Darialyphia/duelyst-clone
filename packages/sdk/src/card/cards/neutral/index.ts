@@ -1,4 +1,9 @@
-import { getNearest, isEmpty, isEnemy } from '../../../entity/entity-utils';
+import {
+  getEntityInFront,
+  getNearest,
+  isEmpty,
+  isEnemy
+} from '../../../entity/entity-utils';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { airdrop, dispelAt } from '../../../modifier/modifier-utils';
@@ -332,6 +337,23 @@ export const neutral: CardBlueprint[] = [
           ]
         })
       );
+    }
+  },
+  {
+    id: 'dancing_blades',
+    name: 'Dancing Blades',
+    description: 'Opening Gambit: Deal 3 damage to ANY minion in front of this.',
+    kind: CARD_KINDS.MINION,
+    spriteId: 'neutral_monsterdancingblades',
+    manaCost: 5,
+    attack: 4,
+    maxHp: 6,
+    onPlay(session, card) {
+      openingGambit(card, () => {
+        const target = getEntityInFront(session, card.entity);
+        if (!target) return;
+        target.takeDamage(3, card);
+      });
     }
   }
 ];

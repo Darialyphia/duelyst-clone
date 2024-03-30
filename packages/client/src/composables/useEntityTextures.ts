@@ -14,6 +14,7 @@ export const useEntityTexture = (
   const animationName = computed(
     () => fx.entityAnimationsMap.value.get(entityId) ?? 'breathing'
   );
+
   const setTextures = () => {
     if (!entity.value) return;
     const sheet = assets.getSpritesheet(entity.value.card.blueprint.spriteId);

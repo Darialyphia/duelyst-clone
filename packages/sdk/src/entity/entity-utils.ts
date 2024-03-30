@@ -56,31 +56,6 @@ export const pointsToEntities = (session: GameSession, points: Point3D[]): Entit
 export const pointsToEntityIds = (session: GameSession, points: Point3D[]): EntityId[] =>
   pointsToEntities(session, points).map(e => e.id);
 
-export const getEntityBehind = (
-  session: GameSession,
-  entity: Entity,
-  reference: Point3D
-) => {
-  if (!isAxisAligned(entity.position, reference)) return null;
-
-  const point = {
-    x:
-      reference.x === entity.position.x
-        ? reference.x
-        : reference.x < entity.position.x
-          ? entity.position.x + 1
-          : entity.position.x - 1,
-    y:
-      reference.y === entity.position.y
-        ? reference.y
-        : reference.y < entity.position.y
-          ? entity.position.y + 1
-          : entity.position.y - 1
-  };
-
-  return session.entitySystem.getEntityAt({ ...point, z: entity.position.z });
-};
-
 export const getNearest = (
   session: GameSession,
   direction: 'up' | 'down' | 'left' | 'right',
@@ -110,4 +85,12 @@ export const getNearest = (
   }
 
   return found;
+};
+
+export const getEntityInFront = (session: GameSession, entity: Entity) => {
+  const xOffset = entity.player.isPlayer1 ? 1 : -1;
+  return session.entitySystem.getEntityAt({
+    ...entity.position,
+    x: entity.position.x + xOffset
+  });
 };
