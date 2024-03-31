@@ -9,7 +9,7 @@ import { modifierGameEventMixin } from '../modifier/mixins/game-event.mixin';
 import { KEYWORDS } from '../utils/keywords';
 import type { GameEvent, GameEventMap, GameSession } from '../game-session';
 import { CARD_EVENTS, type AnyCard } from './card';
-import type { PlayerInterceptor } from '../player/player';
+import { PLAYER_EVENTS, type PlayerInterceptor } from '../player/player';
 
 export const CARD_KINDS = {
   MINION: 'MINION',
@@ -91,13 +91,47 @@ export const onGameEvent = <T extends GameEvent>(
   );
 };
 
-export const whileInHand = (card: AnyCard, cb: AnyFunction, cleanup: AnyFunction) => {
+export const whileInHand = (
+  card: AnyCard,
+  cb: (card: AnyCard) => any,
+  cleanup: (card: AnyCard) => any
+) => {
   card.on(CARD_EVENTS.DRAWN, cb);
   const unsub = () => {
-    cleanup();
+    cleanup(card);
     card.off(CARD_EVENTS.PLAYED, unsub);
     card.off(CARD_EVENTS.REPLACED, unsub);
   };
   card.on(CARD_EVENTS.PLAYED, unsub);
   card.on(CARD_EVENTS.REPLACED, unsub);
+};
+
+export const onlyDuringOwnerTurn = (card: AnyCard, cb: () => void) => {
+  const listener = () => {
+    cb();
+    card.player.once(PLAYER_EVENTS.TURN_END, () => {
+      card.player.off(PLAYER_EVENTS.TURN_START, listener);
+    });
+  };
+
+  return {
+    activate() {
+      card.player.on(PLAYER_EVENTS.TURN_START, listener);
+    },
+    deactivate() {
+      card.player.off(PLAYER_EVENTS.TURN_START, listener);
+    }
+  };
+};
+
+export const untilDestroyed = (
+  card: Unit,
+  cb: (card: AnyCard) => any,
+  cleanup: (card: AnyCard) => any
+) => {
+  cb(card);
+  if (!card.entity) {
+    throw new Error('Cannot use untilDestroyed() if the card has not been played');
+  }
+  card.entity.once(ENTITY_EVENTS.DESTROYED, () => cleanup(card));
 };

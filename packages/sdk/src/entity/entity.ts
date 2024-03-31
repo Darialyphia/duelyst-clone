@@ -321,7 +321,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     );
     await this.session.fxSystem.playAnimation(this.id, 'hit');
     this.hp = this.currentHp.value - amount;
-
     this.emit(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, payload);
   }
 

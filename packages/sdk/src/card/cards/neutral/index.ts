@@ -13,8 +13,10 @@ import {
   CARD_KINDS,
   dyingWish,
   onGameEvent,
+  onlyDuringOwnerTurn,
   openingGambit,
   rush,
+  untilDestroyed,
   whileInHand
 } from '../../card-utils';
 import { createCardModifier } from '../../../modifier/card-modifier';
@@ -260,7 +262,7 @@ export const neutral: CardBlueprint[] = [
         mixins: [
           {
             onApplied(session, attachedTo) {
-              const listener = () => {
+              const { activate, deactivate } = onlyDuringOwnerTurn(attachedTo, () => {
                 attachedTo.player.opponent.general.once(
                   ENTITY_EVENTS.AFTER_TAKE_DAMAGE,
                   () => {
@@ -271,16 +273,9 @@ export const neutral: CardBlueprint[] = [
                     attachedTo.player.once(PLAYER_EVENTS.TURN_END, remove);
                   }
                 );
-              };
-              whileInHand(
-                attachedTo,
-                () => {
-                  attachedTo.player.on(PLAYER_EVENTS.TURN_START, listener);
-                },
-                () => {
-                  attachedTo.player.off(PLAYER_EVENTS.TURN_START, listener);
-                }
-              );
+              });
+
+              whileInHand(attachedTo, activate, deactivate);
             }
           }
         ]
@@ -371,13 +366,16 @@ export const neutral: CardBlueprint[] = [
 
         return val + 1;
       };
-      card.player.opponent.addInterceptor('manaCost', interceptor);
 
-      const unsub = () => {
-        card.player.opponent.removeInterceptor('manaCost', interceptor);
-        card.entity.off(ENTITY_EVENTS.DESTROYED, unsub);
-      };
-      card.entity.on(ENTITY_EVENTS.DESTROYED, unsub);
+      untilDestroyed(
+        card,
+        () => {
+          card.player.opponent.addInterceptor('manaCost', interceptor);
+        },
+        () => {
+          card.player.opponent.removeInterceptor('manaCost', interceptor);
+        }
+      );
     }
   }
 ];

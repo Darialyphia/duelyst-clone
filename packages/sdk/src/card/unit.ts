@@ -47,22 +47,6 @@ export class Unit extends Card<UnitCtx> {
     return this.interceptors.maxHp.getValue(this.blueprint.maxHp, this);
   }
 
-  addInterceptor<T extends keyof UnitInterceptor>(
-    key: T,
-    interceptor: inferInterceptor<UnitInterceptor[T]>,
-    priority?: number
-  ) {
-    this.interceptors[key].add(interceptor as any, priority);
-    return () => this.removeInterceptor(key, interceptor);
-  }
-
-  removeInterceptor<T extends keyof UnitInterceptor>(
-    key: T,
-    interceptor: inferInterceptor<UnitInterceptor[T]>
-  ) {
-    this.interceptors[key].remove(interceptor as any);
-  }
-
   async onPlay(ctx: UnitCtx) {
     this.followupTargets = ctx.targets;
     this.summonPoint = ctx.position;
