@@ -15,7 +15,7 @@ import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
 import type { AnyCard } from '../card/card';
-import { KEYWORDS, type KeywordName } from '../utils/keywords';
+import { KEYWORDS, type Keyword, type KeywordName } from '../utils/keywords';
 import { modifierInterceptorMixin } from '../modifier/mixins/interceptor.mixin';
 
 export type EntityId = number;
@@ -31,8 +31,10 @@ export type SerializedEntity = {
 };
 
 export const ENTITY_EVENTS = {
-  DESTROYED: 'destroyed',
   CREATED: 'created',
+
+  BEFORE_DESTROY: 'before_destroy',
+  AFTER_DESTROY: 'after_destroy',
 
   BEFORE_MOVE: 'before-move',
   AFTER_MOVE: 'after-move',
@@ -69,7 +71,9 @@ type AttackEvent = {
 
 export type EntityEventMap = {
   [ENTITY_EVENTS.CREATED]: [entity: Entity];
-  [ENTITY_EVENTS.DESTROYED]: [entity: Entity];
+
+  [ENTITY_EVENTS.BEFORE_DESTROY]: [entity: Entity];
+  [ENTITY_EVENTS.AFTER_DESTROY]: [entity: Entity];
 
   [ENTITY_EVENTS.BEFORE_MOVE]: [entity: Entity];
   [ENTITY_EVENTS.AFTER_MOVE]: [entity: Entity];
@@ -244,13 +248,14 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   destroy() {
+    this.emit(ENTITY_EVENTS.BEFORE_DESTROY, this);
     this.session.entitySystem.removeEntity(this);
-    this.emit('destroyed', this);
 
     this.session.actionSystem.schedule(() => {
       this.modifiers.forEach(modifier => {
         modifier.onRemoved(this.session, this, modifier);
       });
+      this.emit(ENTITY_EVENTS.AFTER_DESTROY, this);
     });
   }
 
@@ -429,9 +434,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     return this.card.blueprint.kind == CARD_KINDS.GENERAL;
   }
 
-  hasKeyword(name: KeywordName) {
-    return this.modifiers.some(mod =>
-      mod.keywords.some(keyword => keyword.name === name)
-    );
+  hasKeyword(keyword: Keyword) {
+    return this.modifiers.some(mod => mod.keywords.some(k => keyword.id === k.id));
   }
 }

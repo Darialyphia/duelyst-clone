@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash-es';
 import type { CardBlueprintId } from './card';
-import type { MaybePromise, Point3D, Prettify } from '@game/shared';
+import type { MaybePromise, Point3D, Prettify, Values } from '@game/shared';
 import type { GameSession } from '../game-session';
 import type { Entity } from '../entity/entity';
 import { lyonar } from './cards/lyonar';
@@ -10,7 +10,7 @@ import { abyssian } from './cards/abyssian';
 import { magmar } from './cards/magmar';
 import { vanar } from './cards/vanar';
 import { neutral } from './cards/neutral';
-import type { CardKind } from './card-utils';
+import type { CardKind, Faction, Rarity } from './card-utils';
 import type { Unit } from './unit';
 import type { Spell } from './spell';
 import type { CardModifier } from '../modifier/card-modifier';
@@ -20,6 +20,8 @@ type CardBlueprintBase = {
   id: CardBlueprintId;
   name: string;
   description: string;
+  faction: Faction;
+  rarity: Rarity;
   manaCost: number;
   spriteId: string;
 };

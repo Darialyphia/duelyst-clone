@@ -1,4 +1,5 @@
 import {
+  getCellBehind,
   getEntityInFront,
   getNearest,
   isEmpty,
@@ -12,9 +13,11 @@ import { type CardBlueprint } from '../../card-lookup';
 import {
   CARD_KINDS,
   dyingWish,
+  FACTIONS,
   onGameEvent,
   onlyDuringOwnerTurn,
   openingGambit,
+  RARITIES,
   rush,
   untilDestroyed,
   whileInHand
@@ -23,11 +26,15 @@ import { createCardModifier } from '../../../modifier/card-modifier';
 import { CARD_EVENTS, type AnyCard } from '../../card';
 import { ENTITY_EVENTS } from '../../../entity/entity';
 import { PLAYER_EVENTS } from '../../../player/player';
+import { KEYWORDS } from '../../../utils/keywords';
+import type { Unit } from '../../unit';
 
 export const neutral: CardBlueprint[] = [
   {
     id: 'healing_mystic',
     name: 'Healing Mystic',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     description: 'Opening Gambit: Restore 2 Health to anything.',
     spriteId: 'neutral_healingmystic',
     kind: CARD_KINDS.MINION,
@@ -56,6 +63,8 @@ export const neutral: CardBlueprint[] = [
     id: 'bloodtear_alchemist',
     name: 'Bloodtear Alchemist',
     description: 'Opening Gambit: Deal 1 damage to another unit.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_bloodstonealchemist',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -89,6 +98,8 @@ export const neutral: CardBlueprint[] = [
     name: 'Araki Headhunter',
     description:
       'Whenever you summon a minion with Opening Gambit from your action bar, gain +2 Attack.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.RARE,
     spriteId: 'neutral_arakiheadhunter',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -115,7 +126,7 @@ export const neutral: CardBlueprint[] = [
       });
 
       onGameEvent(card, 'entity:created', ([entity], { attachedTo }) => {
-        if (!entity.hasKeyword('Opening Gambit')) return;
+        if (!entity.hasKeyword(KEYWORDS.OPENING_GAMBIT)) return;
         if (attachedTo.isEnemy(entity.id)) return;
 
         attachedTo.addModifier(modifier);
@@ -126,6 +137,8 @@ export const neutral: CardBlueprint[] = [
     id: 'azure_horn_shaman',
     name: 'Azure Horn Shaman',
     description: 'Dying Wish: Give +4 Health to friendly minions around it.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_mercazurehorn',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -133,7 +146,6 @@ export const neutral: CardBlueprint[] = [
     maxHp: 4,
     onPlay(session, card) {
       dyingWish(card, (event, { session, attachedTo }) => {
-        console.log('dying wish');
         session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
           entity.addInterceptor('maxHp', val => val + 4);
         });
@@ -144,6 +156,8 @@ export const neutral: CardBlueprint[] = [
     id: 'ephemeral_shroud',
     name: 'Ephemeral Shroud',
     description: 'Opening Gambit: Dispel 1 nearby space.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_monsterdreamoracle',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -168,6 +182,8 @@ export const neutral: CardBlueprint[] = [
     id: 'primus_fist',
     name: 'Primus fist',
     description: 'Opening Gambit: Give nearby allied minions +1 / +0',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_gauntletmaster',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -185,6 +201,8 @@ export const neutral: CardBlueprint[] = [
     id: 'saberspine_tiger',
     name: 'Saberspine Tiger',
     description: 'Rush',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_beastsaberspinetiger',
     kind: CARD_KINDS.MINION,
     manaCost: 3,
@@ -199,6 +217,8 @@ export const neutral: CardBlueprint[] = [
     id: 'emerald_rejuvenator',
     name: 'Emerald Rejuvenator',
     description: 'Opening Gambit: heal your general for 4.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_rejuvenator',
     kind: CARD_KINDS.MINION,
     manaCost: 4,
@@ -214,6 +234,8 @@ export const neutral: CardBlueprint[] = [
     id: 'flameblood_warlock',
     name: 'Flameblood Warlock',
     description: 'Opening Gambit: Deal 3 damage to both generals.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_mercflamebloodwarlock',
     kind: CARD_KINDS.MINION,
     manaCost: 2,
@@ -231,8 +253,10 @@ export const neutral: CardBlueprint[] = [
     id: 'ghost_lynx',
     name: 'Ghost Lynx',
     description: 'Opening Gambit: Drawa card at the end of your turn.',
-    spriteId: 'neutral_ghostlynx',
     kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
+    spriteId: 'neutral_ghostlynx',
     manaCost: 2,
     attack: 1,
     maxHp: 3,
@@ -249,6 +273,8 @@ export const neutral: CardBlueprint[] = [
     name: 'Blaze Hound',
     description:
       'This card costs 1 less to play if the enemy general took damage this turn.',
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.RARE,
     kind: CARD_KINDS.MINION,
     spriteId: 'neutral_beastdarkharbinger',
     manaCost: 3,
@@ -288,6 +314,8 @@ export const neutral: CardBlueprint[] = [
     description:
       'Airdrop\nOpening Gambit: Deal 2 damage to the nearest unit in front, behind, above, and below this.',
     kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.RARE,
     spriteId: 'neutral_astralprime',
     manaCost: 3,
     attack: 2,
@@ -310,6 +338,8 @@ export const neutral: CardBlueprint[] = [
     name: 'Aethermaster',
     description: 'You can replace an additional card each turn',
     kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.RARE,
     spriteId: 'neutral_aethermaster',
     manaCost: 2,
     attack: 1,
@@ -339,6 +369,8 @@ export const neutral: CardBlueprint[] = [
     name: 'Dancing Blades',
     description: 'Opening Gambit: Deal 3 damage to ANY minion in front of this.',
     kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     spriteId: 'neutral_monsterdancingblades',
     manaCost: 5,
     attack: 4,
@@ -356,6 +388,8 @@ export const neutral: CardBlueprint[] = [
     name: 'Archon Spellbinder',
     description: "Your opponent's spells cost 1 more to play",
     kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.EPIC,
     spriteId: 'neutral_mercarchonspellbinder',
     manaCost: 6,
     attack: 6,
@@ -377,5 +411,52 @@ export const neutral: CardBlueprint[] = [
         }
       );
     }
+  },
+  {
+    id: 'dream_gazer',
+    name: 'Dream Gazer',
+    description:
+      'When you replace this card, summon it on the space directly behind your general and deal 2 damage to your general',
+    kind: CARD_KINDS.MINION,
+    rarity: RARITIES.EPIC,
+    faction: FACTIONS.NEUTRAL,
+    spriteId: 'neutral_dreamgazer',
+    manaCost: 2,
+    attack: 2,
+    maxHp: 2,
+    onPlay() {
+      return;
+    },
+    modifiers: [
+      createCardModifier({
+        mixins: [
+          {
+            onApplied(session, card) {
+              const onReplaced = () => {
+                const behind = getCellBehind(session, card.player.general);
+                if (!behind) return;
+
+                card.player.deck.pluck(card);
+                card.play({
+                  position: behind.position,
+                  targets: []
+                });
+                card.player.general.takeDamage(2, card);
+              };
+
+              whileInHand(
+                card,
+                () => {
+                  card.on(CARD_EVENTS.REPLACED, onReplaced);
+                },
+                () => {
+                  card.off(CARD_EVENTS.REPLACED, onReplaced);
+                }
+              );
+            }
+          }
+        ]
+      })
+    ]
   }
 ];

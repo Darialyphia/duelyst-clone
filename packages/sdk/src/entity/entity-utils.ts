@@ -87,10 +87,26 @@ export const getNearest = (
   return found;
 };
 
-export const getEntityInFront = (session: GameSession, entity: Entity) => {
+export const getCellInFront = (session: GameSession, entity: Entity) => {
   const xOffset = entity.player.isPlayer1 ? 1 : -1;
-  return session.entitySystem.getEntityAt({
+  return session.boardSystem.getCellAt({
     ...entity.position,
     x: entity.position.x + xOffset
   });
+};
+
+export const getEntityInFront = (session: GameSession, entity: Entity) => {
+  return getCellInFront(session, entity)?.entity;
+};
+
+export const getCellBehind = (session: GameSession, entity: Entity) => {
+  const xOffset = entity.player.isPlayer1 ? -1 : 1;
+  return session.boardSystem.getCellAt({
+    ...entity.position,
+    x: entity.position.x + xOffset
+  });
+};
+
+export const getEntityBehind = (session: GameSession, entity: Entity) => {
+  return getCellInFront(session, entity)?.entity;
 };

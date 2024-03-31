@@ -7,16 +7,18 @@ import { modifierSelfEventMixin } from './self-event.mixin';
 
 export const modifierDyingWishMixin = ({
   listener,
+  phase = 'before',
   keywords = []
 }: {
   listener: (
-    event: EntityEventMap['destroyed'],
+    event: EntityEventMap['before_destroy'],
     ctx: { session: GameSession; attachedTo: Entity; modifier: EntityModifier }
   ) => MaybePromise<void>;
+  phase?: 'after' | 'before';
   keywords?: Keyword[];
 }): EntityModifierMixin => {
   return modifierSelfEventMixin({
-    eventName: 'destroyed',
+    eventName: phase === 'before' ? 'before_destroy' : 'after_destroy',
     keywords: [...keywords, KEYWORDS.DYING_WISH],
     listener
   });

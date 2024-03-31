@@ -2,8 +2,7 @@ import { CARDS, type CardBlueprint } from './card-lookup';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { Card } from './card';
 import type { Nullable, Point3D } from '@game/shared';
-import { config } from '../config';
-import type { Entity } from '../entity/entity';
+import { ENTITY_EVENTS, type Entity } from '../entity/entity';
 
 export type UnitInterceptor = Unit['interceptors'];
 
@@ -50,6 +49,7 @@ export class Unit extends Card<UnitCtx> {
   async onPlay(ctx: UnitCtx) {
     this.followupTargets = ctx.targets;
     this.summonPoint = ctx.position;
+
     this.entity = this.session.entitySystem.addEntity({
       cardIndex: this.index,
       playerId: this.playerId,
@@ -57,7 +57,7 @@ export class Unit extends Card<UnitCtx> {
     });
 
     await this.blueprint.onPlay(this.session, this as any);
-    this.entity.emit('created', this.entity);
+    this.entity.emit(ENTITY_EVENTS.CREATED, this.entity);
 
     if (this.shouldExhaustOnPlay) {
       this.entity.exhaust();

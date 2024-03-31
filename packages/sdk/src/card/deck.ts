@@ -60,6 +60,11 @@ export class Deck extends EventEmitter<DeckEventMap> implements Serializable {
     return this.cards.slice(0, amount);
   }
 
+  pluck(card: AnyCard) {
+    this.cards = this.cards.filter(c => c !== card);
+    return card;
+  }
+
   replace(replacedCard: AnyCard) {
     this.emit(DECK_EVENTS.BEFORE_REPLACE, { deck: this, replacedCard });
 

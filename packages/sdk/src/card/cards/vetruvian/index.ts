@@ -2,7 +2,7 @@ import { config } from '../../../config';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { type CardBlueprint } from '../../card-lookup';
-import { CARD_KINDS } from '../../card-utils';
+import { CARD_KINDS, FACTIONS, RARITIES } from '../../card-utils';
 
 export const vetruvian: CardBlueprint[] = [
   {
@@ -10,6 +10,8 @@ export const vetruvian: CardBlueprint[] = [
     name: 'Scioness Sajj',
     spriteId: 'f3_altgeneral',
     kind: CARD_KINDS.GENERAL,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.BASIC,
     manaCost: 0,
     onPlay() {
       return;
@@ -23,6 +25,8 @@ export const vetruvian: CardBlueprint[] = [
     name: "Scion's First Wish",
     spriteId: 'icon_f3_scionsfirstwish',
     kind: CARD_KINDS.SPELL,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
     manaCost: 1,
     description: 'Give a friendly minion +1/+1. Draw a card.',
     isTargetable(session, point) {

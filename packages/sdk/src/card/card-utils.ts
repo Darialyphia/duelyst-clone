@@ -20,6 +20,28 @@ export const CARD_KINDS = {
 
 export type CardKind = Values<typeof CARD_KINDS>;
 
+export const FACTIONS = {
+  LYONAR: 'Lyonar',
+  SONGHAI: 'Songhai',
+  VETRUVIAN: 'Vetruvian',
+  ABYSSIAN: 'Abyssian',
+  MAGMAR: 'Magmar',
+  VANAR: 'Vanar',
+  NEUTRAL: 'Neutral'
+} as const;
+
+export type Faction = Values<typeof FACTIONS>;
+
+export const RARITIES = {
+  BASIC: 'basic',
+  COMMON: 'common',
+  RARE: 'rare',
+  EPIC: 'epic',
+  LEGENDARY: 'legendary'
+} as const;
+
+export type Rarity = Values<typeof RARITIES>;
+
 export const openingGambit = (
   card: Unit & { entity: Entity },
   handler: Parameters<typeof modifierOpeningGambitMixin>[0]['handler']
@@ -40,7 +62,8 @@ export const openingGambit = (
 
 export const dyingWish = (
   card: Unit & { entity: Entity },
-  handler: Parameters<typeof modifierDyingWishMixin>[0]['listener']
+  handler: Parameters<typeof modifierDyingWishMixin>[0]['listener'],
+  phase?: 'after' | 'before'
 ) => {
   card.entity.addModifier(
     createEntityModifier({
@@ -49,7 +72,8 @@ export const dyingWish = (
       mixins: [
         modifierDyingWishMixin({
           keywords: [],
-          listener: handler
+          listener: handler,
+          phase
         })
       ]
     })
@@ -133,5 +157,5 @@ export const untilDestroyed = (
   if (!card.entity) {
     throw new Error('Cannot use untilDestroyed() if the card has not been played');
   }
-  card.entity.once(ENTITY_EVENTS.DESTROYED, () => cleanup(card));
+  card.entity.once(ENTITY_EVENTS.BEFORE_DESTROY, () => cleanup(card));
 };
