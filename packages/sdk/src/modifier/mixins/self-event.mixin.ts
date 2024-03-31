@@ -24,6 +24,7 @@ export const modifierSelfEventMixin = <T extends EntityEvent>({
       _listener = (...args: any[]) => {
         return listener(args as any, { session, attachedTo, modifier });
       };
+      console.log('adding listener on event', eventName);
       attachedTo.on(eventName, _listener);
     },
     onRemoved(session, attachedTo) {

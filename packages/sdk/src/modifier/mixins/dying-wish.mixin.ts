@@ -1,5 +1,5 @@
 import type { MaybePromise } from '@game/shared';
-import type { Entity, EntityEventMap } from '../../entity/entity';
+import { ENTITY_EVENTS, type Entity, type EntityEventMap } from '../../entity/entity';
 import type { GameSession } from '../../game-session';
 import { KEYWORDS, type Keyword } from '../../utils/keywords';
 import type { EntityModifier, EntityModifierMixin } from '../entity-modifier';
@@ -18,7 +18,8 @@ export const modifierDyingWishMixin = ({
   keywords?: Keyword[];
 }): EntityModifierMixin => {
   return modifierSelfEventMixin({
-    eventName: phase === 'before' ? 'before_destroy' : 'after_destroy',
+    eventName:
+      phase === 'before' ? ENTITY_EVENTS.BEFORE_DESTROY : ENTITY_EVENTS.AFTER_DESTROY,
     keywords: [...keywords, KEYWORDS.DYING_WISH],
     listener
   });

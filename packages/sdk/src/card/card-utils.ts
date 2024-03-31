@@ -1,4 +1,4 @@
-import type { AnyFunction, MaybePromise, Values } from '@game/shared';
+import type { MaybePromise, Values } from '@game/shared';
 import type { Unit } from './unit';
 import { ENTITY_EVENTS, type Entity } from '../entity/entity';
 import { createEntityModifier, type EntityModifier } from '../modifier/entity-modifier';
@@ -9,7 +9,7 @@ import { modifierGameEventMixin } from '../modifier/mixins/game-event.mixin';
 import { KEYWORDS } from '../utils/keywords';
 import type { GameEvent, GameEventMap, GameSession } from '../game-session';
 import { CARD_EVENTS, type AnyCard } from './card';
-import { PLAYER_EVENTS, type PlayerInterceptor } from '../player/player';
+import { PLAYER_EVENTS } from '../player/player';
 import { modifierRangedMixin } from '../modifier/mixins/ranged.mixin';
 
 export const CARD_KINDS = {
@@ -136,10 +136,10 @@ export const whileInHand = (
   card.on(CARD_EVENTS.DRAWN, cb);
   const unsub = () => {
     cleanup(card);
-    card.off(CARD_EVENTS.PLAYED, unsub);
+    card.off(CARD_EVENTS.AFTER_PLAYED, unsub);
     card.off(CARD_EVENTS.REPLACED, unsub);
   };
-  card.on(CARD_EVENTS.PLAYED, unsub);
+  card.on(CARD_EVENTS.AFTER_PLAYED, unsub);
   card.on(CARD_EVENTS.REPLACED, unsub);
 };
 

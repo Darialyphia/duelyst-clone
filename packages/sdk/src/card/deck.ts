@@ -48,10 +48,11 @@ export class Deck extends EventEmitter<DeckEventMap> implements Serializable {
 
   draw(amount: number) {
     this.emit(DECK_EVENTS.BEFORE_DRAW, this);
-    const cards = this.cards.splice(0, amount);
-    this.emit(DECK_EVENTS.AFTER_DRAW, { deck: this, cards: cards });
 
+    const cards = this.cards.splice(0, amount);
     cards.forEach(card => card.draw());
+
+    this.emit(DECK_EVENTS.AFTER_DRAW, { deck: this, cards: cards });
 
     return cards;
   }

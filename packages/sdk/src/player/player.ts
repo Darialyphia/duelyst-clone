@@ -8,7 +8,7 @@ import {
   type Values
 } from '@game/shared';
 import { Deck } from '../card/deck';
-import { type AnyCard, type SerializedCard } from '../card/card';
+import { type AnyCard, type CardBlueprintId, type SerializedCard } from '../card/card';
 import EventEmitter from 'eventemitter3';
 import { config } from '../config';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
@@ -155,6 +155,18 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
 
   private drawInitialHand() {
     return this.deck.draw(config.STARTING_HAND);
+  }
+
+  generateCard(blueprintId: CardBlueprintId) {
+    const card = createCard(
+      this.session,
+      { blueprintId: 'mini_jax' },
+      this.cards.length,
+      this.id
+    );
+    this.cards.push(card);
+
+    return card;
   }
 
   serialize(): SerializedPlayer {

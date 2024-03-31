@@ -83,7 +83,7 @@ watchEffect(() => {
       "
     >
       <pixi-text :style="hpStyle" :scale="0.25" :x="17" :anchor="0.5">
-        {{ entity.hp }}
+        {{ Math.max(0, entity.hp) }}
       </pixi-text>
     </graphics>
   </container>

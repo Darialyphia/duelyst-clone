@@ -15,7 +15,7 @@ import { Unit } from '../card/unit';
 import { CARD_KINDS } from '../card/card-utils';
 import { config } from '../config';
 import type { AnyCard } from '../card/card';
-import { KEYWORDS, type Keyword, type KeywordName } from '../utils/keywords';
+import { KEYWORDS, type Keyword } from '../utils/keywords';
 import { modifierInterceptorMixin } from '../modifier/mixins/interceptor.mixin';
 
 export type EntityId = number;
@@ -110,8 +110,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   private currentHp = new ReactiveValue(0, hp => {
     const intercepted = this.interceptors.maxHp.getValue(hp, this);
     if (intercepted <= 0) {
-      this.session.actionSystem.schedule(async () => {
-        await this.session.fxSystem.playAnimation(this.id, 'death');
+      this.session.actionSystem.schedule(() => {
         this.destroy();
       });
     }
@@ -201,7 +200,10 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   canRetaliate(source: Entity) {
-    return this.interceptors.canRetaliate.getValue(true, { entity: this, source });
+    return this.interceptors.canRetaliate.getValue(this.canAttackAt(source.position), {
+      entity: this,
+      source
+    });
   }
 
   canBeAttacked(source: Entity) {
@@ -254,19 +256,22 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
 
   destroy() {
     this.emit(ENTITY_EVENTS.BEFORE_DESTROY, this);
-    this.session.entitySystem.removeEntity(this);
+    this.session.fxSystem.playAnimation(this.id, 'death').then(() => {
+      this.session.entitySystem.removeEntity(this);
 
-    this.session.actionSystem.schedule(() => {
-      this.modifiers.forEach(modifier => {
-        modifier.onRemoved(this.session, this, modifier);
+      this.session.actionSystem.schedule(() => {
+        this.emit(ENTITY_EVENTS.AFTER_DESTROY, this);
+        this.modifiers.forEach(modifier => {
+          modifier.onRemoved(this.session, this, modifier);
+        });
       });
-      this.emit(ENTITY_EVENTS.AFTER_DESTROY, this);
     });
   }
 
   async move(path: Point3D[]) {
-    const stopRunning = this.session.fxSystem.playAnimationUntil(this.id, 'run');
+    this.emit(ENTITY_EVENTS.BEFORE_MOVE, this);
 
+    const stopRunning = this.session.fxSystem.playAnimationUntil(this.id, 'run');
     await this.session.fxSystem.moveEntity(
       this.id,
       path.map(point => ({
@@ -275,7 +280,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       }))
     );
     stopRunning();
-    this.emit(ENTITY_EVENTS.BEFORE_MOVE, this);
 
     for (const point of path) {
       this.position = Vec3.fromPoint3D(point);
@@ -362,9 +366,8 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     this.addModifier(modifier);
     const remove = () => {
       this.removeModifier(modifierId);
-      this.player.off('turn_end', remove);
     };
-    this.player.on('turn_end', remove);
+    this.session.once('player:turn_end', remove);
   }
 
   async performAttack(target: Entity) {

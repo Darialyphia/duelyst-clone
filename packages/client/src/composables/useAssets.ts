@@ -72,7 +72,11 @@ export const useAssetsProvider = () => {
       return Assets.get<SpritesheetWithAnimations>(key);
     },
     getSpritesheet(key: string) {
-      return Assets.get<SpritesheetWithAnimations>(key);
+      const sheet = Assets.get<SpritesheetWithAnimations>(key);
+      if (!sheet) {
+        throw new Error(`Spritesheet not found for ${key}`);
+      }
+      return sheet;
     },
     getTexture(key: string) {
       return Assets.get<Texture>(key);

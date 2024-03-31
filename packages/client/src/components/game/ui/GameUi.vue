@@ -4,4 +4,5 @@
   <TeamInfos />
   <ActionBar />
   <SummonFollowupUi />
+  <CombatLog />
 </template>

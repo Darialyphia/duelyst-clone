@@ -35,6 +35,9 @@ const state: SerializedGameState = {
       name: 'Player 1',
       cards: [
         { blueprintId: 'maehv' },
+        { blueprintId: 'jaxi' },
+        { blueprintId: 'jaxi' },
+        { blueprintId: 'jaxi' },
         { blueprintId: 'dream_gazer' },
         { blueprintId: 'dream_gazer' },
         { blueprintId: 'dream_gazer' },
@@ -81,6 +84,9 @@ const state: SerializedGameState = {
       name: 'Player 2',
       cards: [
         { blueprintId: 'sajj' },
+        { blueprintId: 'jaxi' },
+        { blueprintId: 'jaxi' },
+        { blueprintId: 'jaxi' },
         { blueprintId: 'dream_gazer' },
         { blueprintId: 'dream_gazer' },
         { blueprintId: 'dream_gazer' },

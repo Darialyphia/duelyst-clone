@@ -1,5 +1,5 @@
 import type { EntityId } from '@game/sdk';
-import { AnimatedSprite, type FrameObject } from 'pixi.js';
+import { AnimatedSprite, Texture, type FrameObject } from 'pixi.js';
 
 export const useEntityTexture = (
   entityId: EntityId,
@@ -9,15 +9,15 @@ export const useEntityTexture = (
   const entity = useGameSelector(
     session => session.entitySystem.getEntityById(entityId)!
   );
-  const textures = ref<FrameObject[]>([]);
+  const textures = ref<FrameObject[]>([{ texture: Texture.EMPTY, time: 100 }]);
 
   const animationName = computed(
     () => fx.entityAnimationsMap.value.get(entityId) ?? 'breathing'
   );
 
-  const setTextures = () => {
+  const setTextures = async () => {
     if (!entity.value) return;
-    const sheet = assets.getSpritesheet(entity.value.card.blueprint.spriteId);
+    const sheet = await assets.loadSpritesheet(entity.value.card.blueprint.spriteId);
     textures.value = createSpritesheetFrameObject(animationName.value, sheet);
   };
   setTextures();

@@ -1,3 +1,4 @@
+import { CARD_EVENTS } from '../card/card';
 import { DECK_EVENTS } from '../card/deck';
 import { GameSession } from '../game-session';
 import { type PlayerId, Player, type SerializedPlayer, PLAYER_EVENTS } from './player';
@@ -33,6 +34,14 @@ export class PlayerSystem {
     Object.values(DECK_EVENTS).forEach(eventName => {
       player.deck.on(eventName, event => {
         this.session.emit(`deck:${eventName}`, event as any);
+      });
+    });
+
+    Object.values(CARD_EVENTS).forEach(eventName => {
+      player.cards.forEach(card => {
+        card.on(eventName, event => {
+          this.session.emit(`card:${eventName}`, event as any);
+        });
       });
     });
   }

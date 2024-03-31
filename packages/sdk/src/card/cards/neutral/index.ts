@@ -147,8 +147,8 @@ export const neutral: CardBlueprint[] = [
     attack: 1,
     maxHp: 4,
     onPlay(session, card) {
-      dyingWish(card, (event, { session, attachedTo }) => {
-        session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
+      dyingWish(card, () => {
+        session.entitySystem.getNearbyAllyMinions(card.entity).forEach(entity => {
           entity.addInterceptor('maxHp', val => val + 4);
         });
       });
@@ -471,12 +471,7 @@ export const neutral: CardBlueprint[] = [
       dyingWish(
         card,
         () => {
-          const miniJax = createCard(
-            session,
-            { blueprintId: 'mini_jax' },
-            -1,
-            card.player.id
-          ) as Unit;
+          const miniJax = card.player.generateCard('mini_jax') as Unit;
           miniJax.play({ position: card.entity.position, targets: [] });
         },
         'after'
