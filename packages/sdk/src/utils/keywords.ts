@@ -26,6 +26,11 @@ export const KEYWORDS = {
     id: 'dying_wish',
     name: 'Dying With',
     description: 'Triggers an effect when destroyed.'
+  },
+  RANGED: {
+    id: 'ranged',
+    name: 'Ranged',
+    description: 'Can attack any enemy, regardeless of distance.'
   }
 } as const satisfies Record<string, Keyword>;
 

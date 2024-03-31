@@ -17,10 +17,11 @@ import {
   onGameEvent,
   onlyDuringOwnerTurn,
   openingGambit,
+  ranged,
   RARITIES,
   rush,
-  untilDestroyed,
-  whileInHand
+  whileInHand,
+  whileOnBoard
 } from '../../card-utils';
 import { createCardModifier } from '../../../modifier/card-modifier';
 import { CARD_EVENTS, type AnyCard } from '../../card';
@@ -28,6 +29,7 @@ import { ENTITY_EVENTS } from '../../../entity/entity';
 import { PLAYER_EVENTS } from '../../../player/player';
 import { KEYWORDS } from '../../../utils/keywords';
 import type { Unit } from '../../unit';
+import { createCard } from '../../card-factory';
 
 export const neutral: CardBlueprint[] = [
   {
@@ -321,14 +323,16 @@ export const neutral: CardBlueprint[] = [
     attack: 2,
     maxHp: 1,
     onPlay(session, card) {
-      [
-        getNearest(session, 'up', card.entity.position),
-        getNearest(session, 'down', card.entity.position),
-        getNearest(session, 'right', card.entity.position),
-        getNearest(session, 'left', card.entity.position)
-      ].forEach(entity => {
-        if (!entity) return;
-        entity.takeDamage(2, card);
+      openingGambit(card, () => {
+        [
+          getNearest(session, 'up', card.entity.position),
+          getNearest(session, 'down', card.entity.position),
+          getNearest(session, 'right', card.entity.position),
+          getNearest(session, 'left', card.entity.position)
+        ].forEach(entity => {
+          if (!entity) return;
+          entity.takeDamage(2, card);
+        });
       });
     },
     modifiers: [airdrop()]
@@ -346,21 +350,14 @@ export const neutral: CardBlueprint[] = [
     maxHp: 3,
     onPlay(session, card) {
       const interceptor = (val: number) => val + 1;
-      card.entity.addModifier(
-        createEntityModifier({
-          visible: false,
-          stackable: false,
-          mixins: [
-            {
-              onApplied() {
-                card.player.addInterceptor('maxReplaces', interceptor);
-              },
-              onRemoved() {
-                card.player.removeInterceptor('maxReplaces', interceptor);
-              }
-            }
-          ]
-        })
+      whileOnBoard(
+        card,
+        () => {
+          card.player.addInterceptor('maxReplaces', interceptor);
+        },
+        () => {
+          card.player.removeInterceptor('maxReplaces', interceptor);
+        }
       );
     }
   },
@@ -401,7 +398,7 @@ export const neutral: CardBlueprint[] = [
         return val + 1;
       };
 
-      untilDestroyed(
+      whileOnBoard(
         card,
         () => {
           card.player.opponent.addInterceptor('manaCost', interceptor);
@@ -458,5 +455,47 @@ export const neutral: CardBlueprint[] = [
         ]
       })
     ]
+  },
+  {
+    id: 'jaxi',
+    name: 'Jaxi',
+    description: 'Dying Widh: Symmon a Mini-Jax on this space',
+    kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
+    spriteId: 'neutral_jaxi',
+    manaCost: 2,
+    attack: 3,
+    maxHp: 1,
+    onPlay(session, card) {
+      dyingWish(
+        card,
+        () => {
+          const miniJax = createCard(
+            session,
+            { blueprintId: 'mini_jax' },
+            -1,
+            card.player.id
+          ) as Unit;
+          miniJax.play({ position: card.entity.position, targets: [] });
+        },
+        'after'
+      );
+    }
+  },
+  {
+    id: 'mini_jax',
+    name: 'Mini-Jax',
+    description: 'Ranged',
+    kind: CARD_KINDS.MINION,
+    faction: FACTIONS.NEUTRAL,
+    rarity: RARITIES.COMMON,
+    spriteId: 'neutral_minijax',
+    manaCost: 1,
+    attack: 1,
+    maxHp: 1,
+    onPlay(session, card) {
+      ranged(card);
+    }
   }
 ];

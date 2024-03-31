@@ -10,6 +10,7 @@ import { KEYWORDS } from '../utils/keywords';
 import type { GameEvent, GameEventMap, GameSession } from '../game-session';
 import { CARD_EVENTS, type AnyCard } from './card';
 import { PLAYER_EVENTS, type PlayerInterceptor } from '../player/player';
+import { modifierRangedMixin } from '../modifier/mixins/ranged.mixin';
 
 export const CARD_KINDS = {
   MINION: 'MINION',
@@ -92,6 +93,18 @@ export const rush = (card: Unit & { entity: Entity }) => {
   );
 };
 
+export const ranged = (card: Unit & { entity: Entity }) => {
+  card.entity.addModifier(
+    createEntityModifier({
+      visible: true,
+      name: KEYWORDS.RANGED.name,
+      description: KEYWORDS.RANGED.description,
+      stackable: false,
+      mixins: [modifierRangedMixin()]
+    })
+  );
+};
+
 export const onGameEvent = <T extends GameEvent>(
   card: Unit & { entity: Entity },
   eventName: T,
@@ -130,6 +143,30 @@ export const whileInHand = (
   card.on(CARD_EVENTS.REPLACED, unsub);
 };
 
+export const whileOnBoard = (
+  card: Unit & { entity: Entity },
+  onApplied: EntityModifier['onApplied'],
+  onRemoved: EntityModifier['onRemoved']
+) => {
+  card.entity.addModifier(
+    createEntityModifier({
+      stackable: false,
+      visible: false,
+      mixins: [
+        {
+          onApplied(session, attachedTo, modifier) {
+            onApplied(session, attachedTo, modifier);
+            card.entity.once(ENTITY_EVENTS.BEFORE_DESTROY, () => {
+              onRemoved(session, attachedTo, modifier);
+            });
+          },
+          onRemoved
+        }
+      ]
+    })
+  );
+};
+
 export const onlyDuringOwnerTurn = (card: AnyCard, cb: () => void) => {
   const listener = () => {
     cb();
@@ -146,16 +183,4 @@ export const onlyDuringOwnerTurn = (card: AnyCard, cb: () => void) => {
       card.player.off(PLAYER_EVENTS.TURN_START, listener);
     }
   };
-};
-
-export const untilDestroyed = (
-  card: Unit,
-  cb: (card: AnyCard) => any,
-  cleanup: (card: AnyCard) => any
-) => {
-  cb(card);
-  if (!card.entity) {
-    throw new Error('Cannot use untilDestroyed() if the card has not been played');
-  }
-  card.entity.once(ENTITY_EVENTS.BEFORE_DESTROY, () => cleanup(card));
 };

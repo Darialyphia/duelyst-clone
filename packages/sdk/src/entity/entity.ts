@@ -121,6 +121,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     attack: new Interceptable<number, Entity>(),
     maxHp: new Interceptable<number, Entity>(),
     reach: new Interceptable<number, Entity>(),
+    range: new Interceptable<number, Entity>(),
     canMove: new Interceptable<boolean, Entity>(),
     canAttack: new Interceptable<boolean, { entity: Entity; target: Entity }>(),
     canRetaliate: new Interceptable<boolean, { entity: Entity; source: Entity }>(),
@@ -188,6 +189,10 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     return this.interceptors.reach.getValue(config.UNIT_REACH, this);
   }
 
+  get range(): number {
+    return this.interceptors.range.getValue(config.UNIT_ATTACK_RANGE, this);
+  }
+
   canMove(distance: number) {
     return this.interceptors.canMove.getValue(
       distance <= this.reach && this.movementsTaken < 1 && this.attacksTaken === 0,
@@ -204,7 +209,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   canAttackAt(point: Point3D, simulatedPosition?: Point3D) {
-    return isWithinCells(simulatedPosition ?? this.position, point, 1);
+    return isWithinCells(simulatedPosition ?? this.position, point, this.range);
   }
 
   canAttack(target: Entity) {

@@ -2,10 +2,9 @@ import type { GameSession } from '../game-session';
 import { CARDS } from './card-lookup';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import type { AnyObject, Point3D, Serializable, Values } from '@game/shared';
-
 import type { CardIndex, PlayerId } from '../player/player';
 import EventEmitter from 'eventemitter3';
-import type { EntityModifier, ModifierId } from '../modifier/entity-modifier';
+import type { ModifierId } from '../modifier/entity-modifier';
 import type { CardModifier } from '../modifier/card-modifier';
 
 export type CardBlueprintId = string;
