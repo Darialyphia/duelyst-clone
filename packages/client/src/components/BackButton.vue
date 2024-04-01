@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { NuxtLinkProps } from 'nuxt/app';
 
-const { to = { name: 'ClientHome' }, ...props } = defineProps<NuxtLinkProps>();
+const { to = { name: 'ClientHome' }, ...props } = defineProps<{
+  to?: NuxtLinkProps['to'];
+}>();
 </script>
 
 <template>

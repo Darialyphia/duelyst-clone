@@ -10,14 +10,10 @@ import { presetOpenProps } from "./preset-open-props";
 import * as csstree from "css-tree";
 
 export const createUnoConfig = (options: {
-  themePath: string;
+  cssTheme: string;
   additional: string[];
 }) => {
-  const cssTheme = fs.readFileSync(options.themePath, {
-    encoding: "utf-8",
-  });
-
-  const ast = csstree.parse(cssTheme);
+  const ast = csstree.parse(options.cssTheme);
   const themeColors: Record<string, string> = {};
   const colorIdentifierRE = new RegExp("--color-(.+)-hsl$");
 

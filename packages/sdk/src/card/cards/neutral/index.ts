@@ -29,7 +29,6 @@ import { ENTITY_EVENTS } from '../../../entity/entity';
 import { PLAYER_EVENTS } from '../../../player/player';
 import { KEYWORDS } from '../../../utils/keywords';
 import type { Unit } from '../../unit';
-import { createCard } from '../../card-factory';
 
 export const neutral: CardBlueprint[] = [
   {

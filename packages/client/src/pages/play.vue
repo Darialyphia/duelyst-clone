@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import bg from '../assets/backgrounds/spire.jpg';
+import bg from '@/assets/backgrounds/frostfire.jpg';
 
 definePageMeta({
   middleware: ['auth'],

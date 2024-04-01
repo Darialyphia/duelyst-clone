@@ -9,7 +9,7 @@
 
   "cssvar.files": [
     "./node_modules/open-props/open-props.min.css",
-    "./packages/client/styles/theme.css"
+    "./packages/client/src/styles/theme.css"
   ],
 
   "cssvar.ignore": [],
