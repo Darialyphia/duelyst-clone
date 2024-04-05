@@ -48,6 +48,7 @@ type GlobalCardEvents = {
 type GameEventsBase = {
   '*': [string];
   'game:action': [GameAction<any>];
+  'scheduler:flushed': [];
   'game:ready': [];
 };
 export type GameEventMap = Prettify<

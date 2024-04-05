@@ -49,6 +49,7 @@ export class ActionSystem implements Serializable {
     for (const action of rawHistory) {
       await this.dispatch(action);
     }
+    this.session.emit('scheduler:flushed');
   }
 
   private isActionType(type: string): type is keyof typeof actionMap {
