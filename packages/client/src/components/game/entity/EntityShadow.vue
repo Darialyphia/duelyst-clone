@@ -2,13 +2,14 @@
 import type { EntityId } from '@game/sdk';
 import { AnimatedSprite } from 'pixi.js';
 import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
+import IlluminatedSprite from '../IlluminatedSprite.vue';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
 const { camera } = useGame();
 const entity = useGameSelector(session => session.entitySystem.getEntityById(entityId)!);
 const sprite = ref<AnimatedSprite>();
-const textures = useEntityTexture(entityId, sprite);
+const { diffuseTextures, normalTextures } = useEntityTexture(entityId, sprite);
 
 const skewX = computed(() => {
   let value = entity.value.player.isPlayer1 ? -1 : 1;
@@ -31,10 +32,11 @@ const shadowFilters = [new ColorOverlayFilter(0x000000)];
 </script>
 
 <template>
-  <animated-sprite
-    v-if="textures?.length"
+  <IlluminatedSprite
+    v-if="diffuseTextures?.length && normalTextures?.length"
     ref="sprite"
-    :textures="textures"
+    :diffuse-textures="diffuseTextures"
+    :normal-textures="normalTextures"
     :z-index="1"
     :alpha="0.85"
     :filters="shadowFilters"

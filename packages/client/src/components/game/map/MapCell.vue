@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import { Unit } from '@game/sdk';
 import type { CellId } from '@game/sdk/src/board/cell';
-import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
-import type { FederatedPointerEvent, Filter } from 'pixi.js';
+import type { FederatedPointerEvent } from 'pixi.js';
 import { match } from 'ts-pattern';
-import { Hitbox } from '~/utils/hitbox';
-
+import {
+  DEFAULT_MOUSE_LIGHT_COLOR,
+  DEFAULT_MOUSE_LIGHT_STRENGTH
+} from '@/composables/useGameUi';
 const { cellId } = defineProps<{ cellId: CellId }>();
 
 const { assets, camera, ui, dispatch, pathfinding, fx, session } = useGame();
 const cell = useGameSelector(session => session.boardSystem.getCellAt(cellId)!);
+const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
 
-const textures = computed(() => {
-  const sheet = assets.getSpritesheet(cell.value.spriteId);
-  return sheet.animations[0];
+const tileDiffuseTexture = computed(() => {
+  if (!cell.value.tile) return null;
+  const sheet = assets.getSpritesheet(cell.value.tile.blueprint.spriteId);
+  return createSpritesheetFrameObject('idle', sheet);
 });
-
-const tileTexture = computed(() => {
+const tileNormalTextures = computed(() => {
   if (!cell.value.tile) return null;
   const sheet = assets.getSpritesheet(cell.value.tile.blueprint.spriteId);
   return createSpritesheetFrameObject('idle', sheet);
@@ -26,54 +28,8 @@ const boardDimensions = useGameSelector(session => ({
   width: session.boardSystem.width,
   height: session.boardSystem.height
 }));
-const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
 
 const isHovered = computed(() => ui.hoveredCell.value?.equals(cell.value));
-
-const shape = assets.getHitbox('tile');
-const hitArea = Hitbox.from(shape.shapes[0].points, shape.shapes[0].source, 0.5);
-
-const pathFilter = new ColorOverlayFilter(0x4455bb, 0.5);
-const attackFilter = new ColorOverlayFilter(0xff0000, 0.5);
-const isMovePathHighlighted = computed(() => {
-  if (!ui.hoveredCell.value) return false;
-  if (ui.targetingMode.value !== TARGETING_MODES.BASIC) return false;
-
-  const entityOnCell = session.entitySystem.getEntityAt(cell.value);
-  if (!ui.selectedEntity.value) return false;
-
-  const canMoveTo = pathfinding.canMoveTo(ui.selectedEntity.value, cell.value);
-  if (!canMoveTo) return false;
-
-  const path = pathfinding.getPath(
-    ui.selectedEntity.value,
-    ui.hoveredCell.value,
-    ui.selectedEntity.value.reach
-  );
-
-  if (!path) return false;
-
-  const isInPath = path.some(vec => vec.equals(cell.value.position));
-
-  return isInPath || entityOnCell?.equals(ui.selectedEntity.value);
-});
-
-const filters = computed(() => {
-  const result: Filter[] = [];
-  if (fx.isPlaying.value) return result;
-  if (isMovePathHighlighted.value) result.push(pathFilter);
-  if (
-    ui.selectedEntity.value &&
-    ui.hoveredCell.value?.equals(cell.value) &&
-    ui.hoveredEntity.value?.isEnemy(ui.selectedEntity.value.id) &&
-    ui.selectedEntity.value.canAttack(ui.hoveredEntity.value) &&
-    ui.targetingMode.value === TARGETING_MODES.BASIC
-  ) {
-    result.push(attackFilter);
-  }
-
-  return result;
-});
 </script>
 
 <template>
@@ -85,13 +41,50 @@ const filters = computed(() => {
     :width="boardDimensions.width"
   >
     <container>
-      <animated-sprite
-        :textures="textures"
-        :anchor="0.5"
-        :hit-area="hitArea"
-        :filters="filters"
-        @pointerenter="ui.hoverAt(cell.position)"
-        @pointerleave="ui.unhover()"
+      <container
+        @pointerenter="
+          () => {
+            ui.hoverAt(cell.position);
+            match(ui.targetingMode.value)
+              .with(TARGETING_MODES.SUMMON, TARGETING_MODES.NONE, () => {})
+              .with(TARGETING_MODES.BASIC, () => {
+                if (
+                  ui.selectedEntity.value &&
+                  ui.hoveredCell.value?.equals(cell) &&
+                  ui.hoveredEntity.value?.isEnemy(ui.selectedEntity.value.id) &&
+                  ui.selectedEntity.value.canAttack(ui.hoveredEntity.value) &&
+                  ui.targetingMode.value === TARGETING_MODES.BASIC
+                ) {
+                  ui.setMouseLightColor('#ff0000');
+                  ui.setMouseLightStrength(8);
+                }
+              })
+              .with(TARGETING_MODES.FOLLOWUP, () => {
+                if (!cell.entity) return;
+                if (
+                  ui.selectedCard.value instanceof Unit &&
+                  ui.selectedCard.value.blueprint.followup?.isTargetable(
+                    session,
+                    cell,
+                    ui.summonTarget.value!,
+                    ui.selectedCard.value
+                  )
+                ) {
+                  ui.setMouseLightStrength(8);
+                  ui.setMouseLightColor(
+                    cell.entity?.player.equals(activePlayer) ? '#77ff77' : '#ff7777'
+                  );
+                }
+              });
+          }
+        "
+        @pointerleave="
+          () => {
+            ui.unhover();
+            ui.setMouseLightColor(DEFAULT_MOUSE_LIGHT_COLOR);
+            ui.setMouseLightStrength(DEFAULT_MOUSE_LIGHT_STRENGTH);
+          }
+        "
         @pointerup="
           (event: FederatedPointerEvent) => {
             if (event.button !== 0) {
@@ -159,16 +152,25 @@ const filters = computed(() => {
               });
           }
         "
-      />
-
+      >
+        <MapCellSprite :cell-id="cellId" />
+      </container>
       <MapCellHighlights :cell="cell" />
-      <animated-sprite
-        v-if="tileTexture"
-        event-mode="none"
-        :textures="tileTexture"
-        :anchor="0.5"
+      <container
+        v-if="tileDiffuseTexture && tileNormalTextures"
         :y="-CELL_HEIGHT * 0.45"
-      />
+        event-mode="none"
+      >
+        <PointLight :color="0x00ffff" :brightness="0.5" :x="0" :y="0" />
+
+        <IlluminatedSprite
+          v-if="tileDiffuseTexture && tileNormalTextures"
+          :diffuse-textures="tileDiffuseTexture"
+          :normal-textures="tileNormalTextures"
+          :anchor="0.5"
+        />
+      </container>
+
       <HoveredCell v-if="isHovered" />
     </container>
   </IsoPositioner>

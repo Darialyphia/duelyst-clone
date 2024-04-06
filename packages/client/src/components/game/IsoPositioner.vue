@@ -45,11 +45,15 @@ const rotatedCartesian = computed(() => {
   const hackX = angle === 270 || angle === 180 ? Math.floor : Math.ceil;
   const hackY = angle === 90 || angle === 180 ? Math.floor : Math.ceil;
 
+  const bounds = {
+    height: Math.max(height, y + 1),
+    width: Math.max(width, x + 1)
+  };
   const floor: any[][] = [];
-  for (let floorY = 0; floorY <= height; floorY++) {
+  for (let floorY = 0; floorY <= bounds.height; floorY++) {
     const row: any[] = [];
     floor.push(row);
-    for (let floorX = 0; floorX <= width; floorX++) {
+    for (let floorX = 0; floorX <= bounds.width; floorX++) {
       row.push(hackX(track.x) === floorX && hackY(track.y) === floorY ? track : null);
     }
   }

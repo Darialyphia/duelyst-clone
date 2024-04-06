@@ -1,9 +1,11 @@
 import type { AnyCard, Cell, Entity, EntityId, GameSession } from '@game/sdk';
-import { Unit } from '@game/sdk/src/card/unit';
-import { type Nullable, type Point3D, type Values } from '@game/shared';
+import { type Nullable, type Point, type Point3D, type Values } from '@game/shared';
 import type { Layer } from '@pixi/layers';
 import type { DisplayObject } from 'pixi.js';
 import type { InjectionKey } from 'vue';
+
+export const DEFAULT_MOUSE_LIGHT_STRENGTH = 16;
+export const DEFAULT_MOUSE_LIGHT_COLOR = '#ffffff';
 
 export const TARGETING_MODES = {
   NONE: 'NONE',
@@ -17,6 +19,12 @@ type LayerName = 'ui' | 'scene';
 
 export type GameUiContext = {
   targetingMode: Ref<TargetingMode>;
+
+  mousePosition: Ref<Point>;
+  mouseLightColor: Ref<number | string>;
+  setMouseLightColor(val: number | string): void;
+  mouseLightStrength: Ref<number>;
+  setMouseLightStrength(val: number): void;
 
   hoveredCell: ComputedRef<Nullable<Cell>>;
   hoveredEntity: ComputedRef<Nullable<Entity>>;
@@ -61,6 +69,23 @@ export const useGameUiProvider = (session: GameSession) => {
     summonTarget,
     followupTargets,
     selectedCardIndex,
+    mousePosition: ref({ x: 0, y: 0 }),
+    mouseLightColor: ref(DEFAULT_MOUSE_LIGHT_COLOR),
+    setMouseLightColor(val) {
+      gsap.to(api.mouseLightColor, {
+        value: val,
+        duration: 0.5,
+        ease: Power2.easeOut
+      });
+    },
+    mouseLightStrength: ref(DEFAULT_MOUSE_LIGHT_STRENGTH),
+    setMouseLightStrength(val) {
+      gsap.to(api.mouseLightStrength, {
+        value: val,
+        duration: 0.5,
+        ease: Power2.easeOut
+      });
+    },
     switchTargetingMode(mode) {
       targetingMode.value = mode;
     },

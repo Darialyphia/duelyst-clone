@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const { camera, fx, assets } = useGame();
+import type { Spritesheet } from 'pixi.js';
 
-const DEPTH = 1;
-const UNDERGROUND_SPRITE_SIZE = 4;
+const { camera, fx, assets, session } = useGame();
 
 const cells = useGameSelector(session => session.boardSystem.cells);
 const boardDimensions = useGameSelector(session => ({
@@ -14,59 +13,95 @@ const edgeCells = computed(() =>
   cells.value.filter(
     cell =>
       cell.z === 0 &&
-      (cell.x === 0 ||
-        cell.y === 0 ||
-        cell.x === boardDimensions.value.width - 1 ||
-        cell.y === boardDimensions.value.height - 1)
+      (cell.x === 3 ||
+        cell.y === 3 ||
+        cell.x === boardDimensions.value.width - 1 + 3 ||
+        cell.y === boardDimensions.value.height - 1 + 3)
   )
 );
 
-const textures = computed(() => {
-  const sheet = assets.getSpritesheet('underground');
+const water = Array.from({ length: session.boardSystem.height + 7 }, (_, y) =>
+  Array.from({ length: session.boardSystem.width + 7 }, (_, x) => ({
+    x: x,
+    y: y,
+    z: -1
+  }))
+)
+  .flat()
+  .filter(
+    cell =>
+      cell.x < 3 ||
+      cell.x >= session.boardSystem.width ||
+      cell.y < 3 ||
+      cell.y >= session.boardSystem.height
+  );
+
+const waterTextures = computed(() => {
+  const sheet = assets.getSpritesheet('water');
+  return sheet.animations[0];
+});
+const waterNormalSheet = ref<Spritesheet | null>(null);
+const waterNormalTextures = computed(() => {
+  if (!waterNormalSheet.value) return null;
+
+  return waterNormalSheet.value.animations[0];
+});
+
+const diffuseTextures = computed(() => {
+  const sheet = assets.getSpritesheet('ground');
+
   return sheet.animations[0];
 });
 
-// const floor = Array.from({ length: state.value.map.height + 6 }, (_, y) =>
-//   Array.from({ length: state.value.map.width + 6 }, (_, x) => ({
-//     x: x,
-//     y: y,
-//     z: -1
-//   }))
-// )
-//   .flat()
-//   .filter(cell => cell.x > state.value.map.width || cell.y > state.value.map.height);
+const normalSheet = ref<Spritesheet | null>(null);
 
-// const floorTexture = computed(() => {
-//   const sheet = assets.getSpritesheet('water');
-//   return sheet.animations[0];
-// });
+onMounted(async () => {
+  const diffuseSheet = assets.getSpritesheet('ground');
+  const waterDiffuseSheet = assets.getSpritesheet('water');
+  normalSheet.value = await assets.loadNormalSpritesheet('ground', diffuseSheet);
+  waterNormalSheet.value = await assets.loadNormalSpritesheet('water', waterDiffuseSheet);
+});
+const normalTextures = computed(() => {
+  if (!normalSheet.value) return null;
+
+  return normalSheet.value.animations[0];
+});
 </script>
 
 <template>
-  <template v-for="cell in edgeCells">
+  <template v-for="(cell, index) in edgeCells" :key="index">
     <IsoPositioner
-      v-for="i in DEPTH"
-      :key="`${cell.id}:${i}`"
       :animated="!fx.isPlaying.value"
       v-bind="cell.position"
-      :z="-i * UNDERGROUND_SPRITE_SIZE + 1.5"
+      :z="-1"
       :angle="camera.angle.value"
       :height="boardDimensions.height"
       :width="boardDimensions.width"
     >
-      <animated-sprite :textures="textures" :anchor="0.5" event-mode="none" />
+      <IlluminatedSprite
+        v-if="diffuseTextures && normalTextures"
+        :diffuse-textures="diffuseTextures"
+        :normal-textures="normalTextures"
+        :anchor="0.5"
+        event-mode="none"
+      />
     </IsoPositioner>
   </template>
-  <!-- <IsoPositioner
-    v-for="(cell, index) in floor"
-    :key="index"
-    :animated="!fx.isPlaying.value"
-    v-bind="cell"
-    :angle="0"
-    :height="state.map.height + 5"
-    :width="state.map.width + 5"
-    :z-index-offset="100"
-  >
-    <animated-sprite :textures="floorTexture" :anchor="0.5" event-mode="none" />
-  </IsoPositioner> -->
+  <!-- <template v-for="(cell, index) in water" :key="index">
+    <IsoPositioner
+      :animated="!fx.isPlaying.value"
+      v-bind="cell"
+      :angle="camera.angle.value"
+      :height="boardDimensions.height"
+      :width="boardDimensions.width"
+    >
+      <IlluminatedSprite
+        v-if="waterTextures && waterNormalTextures"
+        :diffuse-textures="waterTextures"
+        :normal-textures="waterNormalTextures"
+        :anchor="0.5"
+        event-mode="none"
+      />
+    </IsoPositioner>
+  </template> -->
 </template>

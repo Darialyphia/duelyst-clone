@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStage } from 'vue3-pixi';
+import { diffuseGroup, normalGroup, lightGroup, PointLight } from '@pixi/lights';
 
 // watchEffect(() => {
 //   if (gameObjectsLayer.value) {
@@ -15,17 +15,28 @@ const entities = useGameSelector(session => session.entitySystem.getList());
 
 <template>
   <Sky />
-  <Camera>
-    <Layer :ref="(layer: any) => ui.registerLayer(layer, 'scene')">
-      <!-- <Underground /> -->
-      <MapCell v-for="cell in cells" :key="cell.id" :cell-id="cell.id" />
 
-      <Entity v-for="entity in entities" :key="entity.id" :entity-id="entity.id" />
-      <SummonPreview />
-    </Layer>
+  <Camera>
+    <Layer :group="diffuseGroup" />
+    <Layer :group="normalGroup" />
+    <Layer :group="lightGroup" />
+
+    <AmbientLight :color="0xffffff" :brightness="0.8" />
+
+    <Underground />
+    <MapCell v-for="cell in cells" :key="cell.id" :cell-id="cell.id" />
+
+    <Entity v-for="entity in entities" :key="entity.id" :entity-id="entity.id" />
+    <SummonPreview />
+    <PointLight
+      :brightness="10"
+      :color="ui.mouseLightColor.value"
+      :position="ui.mousePosition.value"
+      :falloff="[ui.mouseLightStrength.value, 3, 10]"
+    />
   </Camera>
 
-  <Tint />
+  <!-- <Tint /> -->
   <FollowupOverlay />
   <Layer :ref="(layer: any) => ui.registerLayer(layer, 'ui')" />
   <Fps />

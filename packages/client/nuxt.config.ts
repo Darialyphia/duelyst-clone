@@ -5,7 +5,7 @@ import glsl from 'vite-plugin-glsl';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 
-const customElements = ['viewport', 'layer'];
+const customElements = ['viewport', 'layer', 'point-light', 'ambient-light'];
 const prefix = 'pixi-';
 
 export default defineNuxtConfig({

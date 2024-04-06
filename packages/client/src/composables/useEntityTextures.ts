@@ -1,5 +1,31 @@
 import type { EntityId } from '@game/sdk';
-import { AnimatedSprite, Texture, type FrameObject } from 'pixi.js';
+import {
+  AnimatedSprite,
+  Spritesheet,
+  Texture,
+  type FrameObject,
+  type ISpritesheetData
+} from 'pixi.js';
+
+const getNormalAssetData = (
+  asset: ISpritesheetData,
+  imagePath: string
+): ISpritesheetData => {
+  const animations = Object.fromEntries(
+    Object.entries(asset.animations!).map(([key, frames]) => [
+      key,
+      frames.map(frame => `n_${frame}`)
+    ])
+  );
+  const frames = Object.fromEntries(
+    Object.entries(asset.frames).map(([key, frame]) => [`n_${key}`, frame])
+  );
+  return {
+    animations,
+    frames,
+    meta: { ...asset.meta, image: imagePath }
+  };
+};
 
 export const useEntityTexture = (
   entityId: EntityId,
@@ -9,7 +35,12 @@ export const useEntityTexture = (
   const entity = useGameSelector(
     session => session.entitySystem.getEntityById(entityId)!
   );
-  const textures = ref<FrameObject[]>([{ texture: Texture.EMPTY, time: 100 }]);
+  const diffuseTextures = ref<FrameObject[]>([
+    { texture: Texture.EMPTY, time: 100 }
+  ]) as Ref<FrameObject[]>;
+  const normalTextures = ref<FrameObject[]>([
+    { texture: Texture.EMPTY, time: 100 }
+  ]) as Ref<FrameObject[]>;
 
   const animationName = computed(
     () => fx.entityAnimationsMap.value.get(entityId) ?? 'breathing'
@@ -17,8 +48,18 @@ export const useEntityTexture = (
 
   const setTextures = async () => {
     if (!entity.value) return;
-    const sheet = await assets.loadSpritesheet(entity.value.card.blueprint.spriteId);
-    textures.value = createSpritesheetFrameObject(animationName.value, sheet);
+    const diffuseSheet = await assets.loadSpritesheet(
+      entity.value.card.blueprint.spriteId
+    );
+    const normalSheet = await assets.loadNormalSpritesheet(
+      entity.value.card.blueprint.spriteId,
+      diffuseSheet
+    );
+    diffuseTextures.value = createSpritesheetFrameObject(
+      animationName.value,
+      diffuseSheet
+    );
+    normalTextures.value = createSpritesheetFrameObject(animationName.value, normalSheet);
   };
   setTextures();
 
@@ -27,7 +68,7 @@ export const useEntityTexture = (
       setTextures();
       nextTick(() => {
         if (!sprite.value) return;
-        sprite.value.gotoAndPlay(0);
+        sprite.value?.gotoAndPlay?.(0);
       });
     };
 
@@ -46,5 +87,5 @@ export const useEntityTexture = (
     }
   });
 
-  return textures;
+  return { diffuseTextures, normalTextures };
 };

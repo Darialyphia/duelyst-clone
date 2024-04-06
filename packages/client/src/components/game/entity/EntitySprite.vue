@@ -4,13 +4,14 @@ import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom';
 import { KEYWORDS, type EntityId } from '@game/sdk';
 import { AnimatedSprite, type Filter } from 'pixi.js';
 import { AdjustmentFilter } from '@pixi/filter-adjustment';
+import IlluminatedSprite from '../IlluminatedSprite.vue';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
 const { ui, fx } = useGame();
 const entity = useGameSelector(session => session.entitySystem.getEntityById(entityId)!);
 const sprite = ref<AnimatedSprite>();
-const textures = useEntityTexture(entityId, sprite);
+const { diffuseTextures, normalTextures } = useEntityTexture(entityId, sprite);
 
 const isSelected = computed(() => ui.selectedEntity.value?.equals(entity.value));
 watchEffect(() => {
@@ -53,23 +54,45 @@ const filters = computed(() => {
 
   return result;
 });
+
+watch(sprite, newSprite => {
+  if (entity.value) {
+    fx.registerSprite(entity.value.id, newSprite);
+  }
+});
 </script>
 
 <template>
-  <animated-sprite
+  <container
     :ref="
       (el: any) => {
-        if (entity) {
-          fx.registerSprite(entity.id, el);
-        }
-        sprite = el;
+        const spriteInst = el?.children?.find(
+          (child: any) => child instanceof AnimatedSprite
+        );
+
+        if (spriteInst) sprite = spriteInst;
       }
     "
-    :textures="textures"
     :filters="filters"
-    :anchor-x="0.5"
-    :anchor-y="1"
-    :y="CELL_HEIGHT * 0.9"
-    :playing="true"
-  />
+  >
+    <!-- <animated-sprite
+      :textures="textures"
+      :filters="filters"
+      :anchor-x="0.5"
+      :anchor-y="1"
+      :y="CELL_HEIGHT * 0.9"
+      :playing="true"
+    /> -->
+
+    <!-- <PointLight :color="0xffffff" :brightness="0.7" :x="0" :y="50" /> -->
+    <IlluminatedSprite
+      v-if="diffuseTextures && normalTextures"
+      :diffuse-textures="diffuseTextures"
+      :normal-textures="normalTextures"
+      :anchor-x="0.5"
+      :anchor-y="1"
+      :y="CELL_HEIGHT * 0.9"
+      :playing="true"
+    />
+  </container>
 </template>

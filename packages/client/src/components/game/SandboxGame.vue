@@ -3,6 +3,7 @@ import { GameSession, type SerializedGameState } from '@game/sdk';
 
 const WIDTH = 9;
 const HEIGHT = 5;
+const OFFSET = 3;
 const state: SerializedGameState = {
   activeEntityId: null,
   history: [],
@@ -14,8 +15,8 @@ const state: SerializedGameState = {
     cells: Array.from({ length: HEIGHT }, (_, y) =>
       Array.from({ length: WIDTH }, (_, x) => ({
         position: {
-          x,
-          y,
+          x: x + OFFSET,
+          y: y + OFFSET,
           z: 0
         },
         spriteId: 'ground',
@@ -25,8 +26,8 @@ const state: SerializedGameState = {
             : null
       }))
     ).flat(),
-    player1StartPosition: { x: 0, y: 2, z: 0 },
-    player2StartPosition: { x: WIDTH - 1, y: 2, z: 0 }
+    player1StartPosition: { x: 0 + OFFSET, y: 2 + OFFSET, z: 0 },
+    player2StartPosition: { x: WIDTH - 1 + OFFSET, y: 2 + OFFSET, z: 0 }
   },
   entities: [],
   players: [

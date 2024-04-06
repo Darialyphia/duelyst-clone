@@ -1,6 +1,7 @@
 import {
   Assets,
   type AssetsManifest,
+  type ISpritesheetData,
   Spritesheet,
   Texture,
   type UnresolvedAsset,
@@ -14,6 +15,11 @@ export type SpritesheetWithAnimations = Spritesheet & {
 export type AssetsContext = {
   loaded: Ref<boolean>;
   loadSpritesheet(key: string): Promise<SpritesheetWithAnimations>;
+  loadTexture(key: string): Promise<Texture>;
+  loadNormalSpritesheet(
+    key: string,
+    diffuseSheet: SpritesheetWithAnimations
+  ): Promise<SpritesheetWithAnimations>;
   getSpritesheet(key: string): SpritesheetWithAnimations;
   getTexture(key: string): Texture;
   getHitbox(key: string): any;
@@ -33,6 +39,26 @@ const splitBundle = (manifest: AssetsManifest, name: string) => {
   });
 };
 
+const getNormalAssetData = (
+  asset: ISpritesheetData,
+  imagePath: string
+): ISpritesheetData => {
+  const animations = Object.fromEntries(
+    Object.entries(asset.animations!).map(([key, frames]) => [
+      key,
+      frames.map(frame => `n_${frame}`)
+    ])
+  );
+  const frames = Object.fromEntries(
+    Object.entries(asset.frames).map(([key, frame]) => [`n_${key}`, frame])
+  );
+  return {
+    animations,
+    frames,
+    meta: { ...asset.meta, image: imagePath }
+  };
+};
+
 export const useAssetsProvider = () => {
   const loaded = ref(false);
   const load = async () => {
@@ -41,10 +67,11 @@ export const useAssetsProvider = () => {
     Assets.cache.reset();
     const manifest = await $fetch<AssetsManifest>('/assets/assets-manifest.json');
 
+    // createNormalSheetsBundle(manifest, 'units');
     // transform the manifest to add separate bundles for units and icons, as loading everything at once is way too expensive
     splitBundle(manifest, 'units');
     splitBundle(manifest, 'icons');
-
+    splitBundle(manifest, 'normals');
     Assets.init({ manifest });
 
     await Promise.all([
@@ -60,9 +87,31 @@ export const useAssetsProvider = () => {
   };
 
   const bundlesLoaded = new Set<string>();
+  const normalPromises = new Map<string, Promise<SpritesheetWithAnimations>>();
   const api: AssetsContext = {
     loaded,
     load,
+    async loadNormalSpritesheet(key: string, diffuseSheet: Spritesheet) {
+      const normalKey = `${key}_n`;
+      // avoids pixi warning messages when wetry to load a bundle multiple times
+      if (!normalPromises.has(normalKey)) {
+        normalPromises.set(
+          normalKey,
+          (async () => {
+            const texture = await api.loadTexture(`${normalKey}.png`);
+            const assetData = getNormalAssetData(
+              diffuseSheet.data,
+              texture.baseTexture.resource.src
+            );
+
+            const sheet = new Spritesheet(texture, assetData);
+            await sheet.parse();
+            return sheet;
+          })()
+        );
+      }
+      return normalPromises.get(normalKey)!;
+    },
     async loadSpritesheet(key) {
       // avoids pixi warning messages when wetry to load a bundle multiple times
       if (!bundlesLoaded.has(key)) {
@@ -70,6 +119,15 @@ export const useAssetsProvider = () => {
         bundlesLoaded.add(key);
       }
       return Assets.get<SpritesheetWithAnimations>(key);
+    },
+    async loadTexture(key) {
+      // avoids pixi warning messages when wetry to load a bundle multiple times
+      if (!bundlesLoaded.has(key)) {
+        await Assets.loadBundle(key);
+
+        bundlesLoaded.add(key);
+      }
+      return Assets.get<Texture>(key);
     },
     getSpritesheet(key: string) {
       const sheet = Assets.get<SpritesheetWithAnimations>(key);

@@ -3,7 +3,7 @@ import { Unit } from '@game/sdk/src/card/unit';
 import { AnimatedSprite } from 'pixi.js';
 import { match } from 'ts-pattern';
 
-const { camera, assets, ui, fx } = useGame();
+const { camera, assets, ui } = useGame();
 
 const textures = computed(() => {
   const id = ui.selectedCard.value?.blueprint.spriteId;

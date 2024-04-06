@@ -9,6 +9,8 @@ const { bitmask, sheet, isEnabled } = defineProps<{
   isEnabled: boolean;
 }>();
 
+const { assets } = useGame();
+
 const texture = computed(() => {
   if (!isDefined(bitmask)) return;
 
@@ -31,7 +33,11 @@ const { autoDestroyRef } = useAutoDestroy();
       :ref="container => autoDestroyRef(container)"
       event-mode="none"
     >
-      <sprite :texture="texture" :anchor="0.5" />
+      <IlluminatedSprite
+        :diffuse-textures="[texture]"
+        :normal-textures="[texture]"
+        :anchor="0.5"
+      />
     </container>
   </PTransition>
 </template>

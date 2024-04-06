@@ -2,7 +2,7 @@
 import { useApplication } from 'vue3-pixi';
 import { type Viewport } from 'pixi-viewport';
 import { CELL_HEIGHT, CELL_WIDTH } from '@/utils/constants';
-import { pointToIndex } from '@game/shared';
+import { pointToIndex, type Point } from '@game/shared';
 import { Container } from 'pixi.js';
 import type { FederatedPointerEvent } from 'pixi.js';
 
@@ -104,6 +104,15 @@ until(screenViewport)
     :events="app.renderer.events"
     :disable-on-context-menu="true"
     :sortable-children="true"
+    @pointermove="
+      (e: FederatedPointerEvent) => {
+        const pos = screenViewport!.toWorld(e.global);
+        ui.mousePosition.value = {
+          x: pos.x - containerOffset.x,
+          y: pos.y - containerOffset.y
+        };
+      }
+    "
     @pointerup="
       (e: FederatedPointerEvent) => {
         if (e.target === screenViewport) {

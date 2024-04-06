@@ -30,6 +30,7 @@ const prefixByAssetType = {
   ui: "",
   interactables: "",
   fx: "",
+  normals: "",
   modifiers: "",
   hitboxes: "hitbox-",
 };
@@ -41,7 +42,6 @@ function manifestEntryParser(tree, processor) {
     const name = processor.trimOutputPath(file.name ?? file.paths[0]);
 
     const assetType = name.split("/")[0];
-    const loadParser = loadParserByAssetType[assetType];
 
     const assetName = name.split("/").at(-1);
     const prefix = prefixByAssetType[assetType];
