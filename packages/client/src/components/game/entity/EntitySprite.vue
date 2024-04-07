@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { OutlineFilter } from '@pixi/filter-outline';
-import { KEYWORDS, type EntityId } from '@game/sdk';
+import { FACTIONS, KEYWORDS, type EntityId } from '@game/sdk';
 import { AnimatedSprite, type Filter } from 'pixi.js';
 import { AdjustmentFilter } from '@pixi/filter-adjustment';
 import IlluminatedSprite from '../IlluminatedSprite.vue';
+import { match } from 'ts-pattern';
 
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
 const { ui, fx } = useGame();
 const entity = useGameSelector(session => session.entitySystem.getEntityById(entityId)!);
+const activePlayer = useGameSelector(session => session.playerSystem.activePlayer);
 const sprite = ref<AnimatedSprite>();
 const { diffuseTextures, normalTextures } = useEntityTexture(entityId, sprite);
 
@@ -48,13 +50,27 @@ watch(sprite, newSprite => {
   fx.registerSprite(entityId, newSprite);
 });
 
+const lightColor = computed(() => {
+  const faction = entity.value.player.general.card.blueprint.faction;
+  return match(faction)
+    .with(FACTIONS.LYONAR, () => 0xffcc00)
+    .with(FACTIONS.SONGHAI, () => 0xff6600)
+    .with(FACTIONS.VETRUVIAN, () => 0x88aa00)
+    .with(FACTIONS.ABYSSIAN, () => 0x770099)
+    .with(FACTIONS.MAGMAR, () => 0x00ff77)
+    .with(FACTIONS.VANAR, () => 0x0077ff)
+    .with(FACTIONS.NEUTRAL, () => 0xffffff)
+    .exhaustive();
+});
 const MIN_LIGHTNESS = 0.1;
-const MAX_LIGHTNESS = 0.6;
+const MAX_LIGHTNESS = 1.7;
 const lightBrightness = ref(MIN_LIGHTNESS);
 watchEffect(() => {
+  const isAlly = activePlayer.value.equals(entity.value.player);
   gsap.to(lightBrightness, {
     duration: 0.3,
-    value: isSelected.value || isHovered.value ? MAX_LIGHTNESS : MIN_LIGHTNESS,
+    value:
+      isAlly && (isSelected.value || isHovered.value) ? MAX_LIGHTNESS : MIN_LIGHTNESS,
     ease: Power2.easeOut
   });
 });
@@ -74,7 +90,7 @@ watchEffect(() => {
       }
     "
   >
-    <PointLight :color="0xff5500" :brightness="lightBrightness" :x="0" :y="50" />
+    <PointLight :color="lightColor" :brightness="lightBrightness" :x="0" :y="50" />
 
     <IlluminatedSprite
       v-if="diffuseTextures && normalTextures"

@@ -16,3 +16,4 @@ export { type Animation } from './fx-system';
 export { Unit } from './card/unit';
 export { Spell } from './card/spell';
 export { Artifact } from './card/artifact';
+export { type Faction, FACTIONS } from './card/card-utils';

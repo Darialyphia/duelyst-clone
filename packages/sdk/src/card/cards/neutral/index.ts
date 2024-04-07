@@ -14,6 +14,7 @@ import {
   CARD_KINDS,
   dyingWish,
   FACTIONS,
+  getFollowupEntities,
   onGameEvent,
   onlyDuringOwnerTurn,
   openingGambit,
@@ -44,9 +45,7 @@ export const neutral: CardBlueprint[] = [
     maxHp: 3,
     onPlay(session, card) {
       openingGambit(card, (session, attachedTo) => {
-        const [point] = attachedTo.card.followupTargets;
-        if (!point) return;
-        const entity = session.entitySystem.getEntityAt(point);
+        const [entity] = getFollowupEntities(session, card);
         if (entity) {
           entity.heal(2, attachedTo.card);
         }
@@ -288,21 +287,24 @@ export const neutral: CardBlueprint[] = [
       createCardModifier({
         mixins: [
           {
-            onApplied(session, attachedTo) {
-              const { activate, deactivate } = onlyDuringOwnerTurn(attachedTo, () => {
-                attachedTo.player.opponent.general.once(
-                  ENTITY_EVENTS.AFTER_TAKE_DAMAGE,
-                  () => {
-                    const remove = attachedTo.addInterceptor(
-                      'manaCost',
-                      (val: number) => val - 1
-                    );
-                    attachedTo.player.once(PLAYER_EVENTS.TURN_END, remove);
-                  }
-                );
-              });
+            onApplied(session, card) {
+              const handler = () => {
+                const onTakeDamage = () => {
+                  const remove = card.addInterceptor(
+                    'manaCost',
+                    (val: number) => val - 1
+                  );
+                  card.player.once(PLAYER_EVENTS.TURN_END, remove);
+                };
 
-              whileInHand(attachedTo, activate, deactivate);
+                card.player.opponent.general.once(
+                  ENTITY_EVENTS.AFTER_TAKE_DAMAGE,
+                  onTakeDamage
+                );
+              };
+
+              const { activate, deactivate } = onlyDuringOwnerTurn(card, handler);
+              whileInHand(card, activate, deactivate);
             }
           }
         ]

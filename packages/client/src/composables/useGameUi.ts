@@ -88,6 +88,7 @@ export const useGameUiProvider = (session: GameSession) => {
     },
     switchTargetingMode(mode) {
       targetingMode.value = mode;
+      api.mouseLightColor.value = DEFAULT_MOUSE_LIGHT_COLOR;
     },
     registerLayer(layer, name) {
       if (!layer) return;

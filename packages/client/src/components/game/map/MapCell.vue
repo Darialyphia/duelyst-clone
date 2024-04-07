@@ -157,14 +157,19 @@ const isHovered = computed(() => ui.hoveredCell.value?.equals(cell.value));
       </container>
       <MapCellHighlights :cell="cell" />
       <container
-        v-if="tileDiffuseTexture && tileNormalTextures"
+        v-if="cell.tile && tileDiffuseTexture && tileNormalTextures"
         :y="-CELL_HEIGHT * 0.45"
         event-mode="none"
       >
-        <PointLight :color="0x00ffff" :brightness="0.5" :x="0" :y="0" />
+        <PointLight
+          v-if="cell.tile.blueprint.lightColor"
+          :color="cell.tile.blueprint.lightColor"
+          :brightness="0.5"
+          :x="0"
+          :y="0"
+        />
 
         <IlluminatedSprite
-          v-if="tileDiffuseTexture && tileNormalTextures"
           :diffuse-textures="tileDiffuseTexture"
           :normal-textures="tileNormalTextures"
           :anchor="0.5"

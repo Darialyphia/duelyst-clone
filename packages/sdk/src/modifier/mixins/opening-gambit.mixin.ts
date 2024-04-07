@@ -11,12 +11,10 @@ export const modifierOpeningGambitMixin = ({
 }): EntityModifierMixin => {
   return {
     keywords: [...keywords, KEYWORDS.OPENING_GAMBIT],
-    onApplied(session, attachedTo, modifier) {
-      const listener = async () => {
-        await handler(session, attachedTo, modifier);
-        attachedTo.off(ENTITY_EVENTS.CREATED, listener);
-      };
-      attachedTo.on(ENTITY_EVENTS.CREATED, listener);
+    onApplied(session, entity, modifier) {
+      entity.once(ENTITY_EVENTS.CREATED, async () => {
+        await handler(session, entity, modifier);
+      });
     }
   };
 };

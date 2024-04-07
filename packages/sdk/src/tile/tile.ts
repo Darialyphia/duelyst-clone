@@ -30,7 +30,7 @@ export class Tile {
 
     this.checkOccupation = this.checkOccupation.bind(this);
     this.session.on('entity:created', this.checkOccupation);
-    this.session.on('entity:destroyed', this.checkOccupation);
+    this.session.on('entity:after_destroy', this.checkOccupation);
     this.session.on('entity:after-move', this.checkOccupation);
   }
 

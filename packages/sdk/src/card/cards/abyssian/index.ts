@@ -9,7 +9,7 @@ export const abyssian: CardBlueprint[] = [
     name: 'Maehv Skinsolder',
     spriteId: 'f4_3rdgeneral',
     kind: CARD_KINDS.GENERAL,
-    faction: FACTIONS.NEUTRAL,
+    faction: FACTIONS.ABYSSIAN,
     rarity: RARITIES.BASIC,
     manaCost: 0,
     onPlay() {
@@ -24,7 +24,7 @@ export const abyssian: CardBlueprint[] = [
     name: 'Void Pulse',
     spriteId: 'icon_f4_voidpulse',
     kind: CARD_KINDS.SPELL,
-    faction: FACTIONS.NEUTRAL,
+    faction: FACTIONS.ABYSSIAN,
     rarity: RARITIES.COMMON,
     manaCost: 1,
     description: 'Deal 1 damage to a unit and heal your general for 2.',

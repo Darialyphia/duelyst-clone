@@ -54,6 +54,13 @@ export type FXSystem = {
       delay?: number;
     }
   ): Promise<void>;
+
+  playSfxOnScreenCenter(options: {
+    resourceName: string;
+    animationName: string;
+    offset?: Point;
+    delay?: number;
+  }): Promise<void>;
 };
 
 export const noopFXContext: FXSystem = {
@@ -90,6 +97,10 @@ export const noopFXContext: FXSystem = {
   },
 
   playSfxOnEntity() {
+    return Promise.resolve();
+  },
+
+  playSfxOnScreenCenter() {
     return Promise.resolve();
   }
 };

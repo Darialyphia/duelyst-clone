@@ -9,6 +9,7 @@ export type TileblueprintId = string;
 export type TileBlueprint = {
   id: string;
   spriteId: string;
+  lightColor?: number;
   onEnter(session: GameSession, entity: Entity, tile: Tile): MaybePromise<void>;
   onLeave(session: GameSession, entity: Entity, tile: Tile): MaybePromise<void>;
 };
@@ -17,6 +18,7 @@ const allTiles: TileBlueprint[] = [
   {
     id: 'mana-tile',
     spriteId: 'mana-tile',
+    lightColor: 0x00ffff,
     onEnter(session, entity, tile) {
       const interceptor = (val: number) => val + 1;
       entity.player.addInterceptor('maxMana', interceptor);

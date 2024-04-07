@@ -10,7 +10,7 @@ export const vetruvian: CardBlueprint[] = [
     name: 'Scioness Sajj',
     spriteId: 'f3_altgeneral',
     kind: CARD_KINDS.GENERAL,
-    faction: FACTIONS.NEUTRAL,
+    faction: FACTIONS.VETRUVIAN,
     rarity: RARITIES.BASIC,
     manaCost: 0,
     onPlay() {
@@ -25,7 +25,7 @@ export const vetruvian: CardBlueprint[] = [
     name: "Scion's First Wish",
     spriteId: 'icon_f3_scionsfirstwish',
     kind: CARD_KINDS.SPELL,
-    faction: FACTIONS.NEUTRAL,
+    faction: FACTIONS.VETRUVIAN,
     rarity: RARITIES.COMMON,
     manaCost: 1,
     description: 'Give a friendly minion +1/+1. Draw a card.',
