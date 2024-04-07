@@ -25,7 +25,7 @@ const { autoDestroyRef } = useAutoDestroy();
     appear
     :duration="{ enter: 300, leave: 300 }"
     :before-enter="{ alpha: 0 }"
-    :enter="{ alpha: 1 }"
+    :enter="{ alpha: 0.8 }"
     :leave="{ alpha: 0 }"
   >
     <container

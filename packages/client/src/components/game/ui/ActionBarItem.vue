@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Unit } from '@game/sdk';
 const { index } = defineProps<{ index: number }>();
 const { ui } = useGame();
 
@@ -9,30 +10,48 @@ const hoveredIndex = ref<number | null>(null);
 </script>
 
 <template>
-  <button
-    class="card-button"
-    :class="[
-      card && ui.selectedCard.value === card && 'selected',
-      card && card?.blueprint.kind.toLowerCase(),
-      card && card.manaCost > activePlayer.currentMana && 'disabled',
-      card && card.manaCost > card.blueprint.manaCost && 'cost-debuff',
-      card && card.manaCost < card.blueprint.manaCost && 'cost-buff'
-    ]"
-    :disabled="!card"
-    :data-cost="card && card.manaCost"
-    @click="ui.selectCardAtIndex(index)"
-    @mouseenter="hoveredIndex = index"
-    @mouseleave="hoveredIndex = null"
-  >
-    <AnimatedCardIcon
+  <UiTooltip :side-offset="30" :delay="250">
+    <template #trigger>
+      <button
+        class="card-button"
+        :class="[
+          card && ui.selectedCard.value === card && 'selected',
+          card && card?.blueprint.kind.toLowerCase(),
+          card && card.manaCost > activePlayer.currentMana && 'disabled',
+          card && card.manaCost > card.blueprint.manaCost && 'cost-debuff',
+          card && card.manaCost < card.blueprint.manaCost && 'cost-buff'
+        ]"
+        :disabled="!card"
+        :data-cost="card && card.manaCost"
+        @click="ui.selectCardAtIndex(index)"
+        @mouseenter="hoveredIndex = index"
+        @mouseleave="hoveredIndex = null"
+      >
+        <AnimatedCardIcon
+          v-if="card"
+          :sprite-id="card.blueprint.spriteId"
+          :kind="card.blueprint.kind"
+          :is-active="ui.selectedCardIndex.value === index"
+          :is-hovered="hoveredIndex === index"
+          class="icon"
+        />
+      </button>
+    </template>
+
+    <Card
       v-if="card"
-      :sprite-id="card.blueprint.spriteId"
-      :kind="card.blueprint.kind"
-      :is-active="ui.selectedCardIndex.value === index"
-      :is-hovered="hoveredIndex === index"
-      class="icon"
+      :card="{
+        name: card.blueprint.name,
+        description: card.blueprint.description,
+        kind: card.kind,
+        spriteId: card.blueprint.spriteId,
+        rarity: card.blueprint.rarity,
+        attack: (card as Unit).blueprint.attack,
+        hp: (card as Unit).blueprint.maxHp,
+        cost: card.blueprint.manaCost
+      }"
     />
-  </button>
+  </UiTooltip>
 </template>
 
 <style scoped lang="postcss">

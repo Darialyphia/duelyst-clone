@@ -27,7 +27,7 @@ export const abyssian: CardBlueprint[] = [
     faction: FACTIONS.NEUTRAL,
     rarity: RARITIES.COMMON,
     manaCost: 1,
-    description: 'deal 1 damage to a unit and heal your general for 2',
+    description: 'Deal 1 damage to a unit and heal your general for 2.',
     isTargetable(session, point) {
       return !isEmpty(session, point);
     },

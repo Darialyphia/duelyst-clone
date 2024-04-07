@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { OutlineFilter } from '@pixi/filter-outline';
-import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom';
 import { KEYWORDS, type EntityId } from '@game/sdk';
 import { AnimatedSprite, type Filter } from 'pixi.js';
 import { AdjustmentFilter } from '@pixi/filter-adjustment';
@@ -14,49 +13,50 @@ const sprite = ref<AnimatedSprite>();
 const { diffuseTextures, normalTextures } = useEntityTexture(entityId, sprite);
 
 const isSelected = computed(() => ui.selectedEntity.value?.equals(entity.value));
+const isHovered = computed(() => ui.hoveredEntity.value?.equals(entity.value));
+
 watchEffect(() => {
   fx.entityAnimationsMap.value.set(entityId, isSelected.value ? 'idle' : 'breathing');
 });
 
-const hoveredFilters = [
-  new AdvancedBloomFilter({
-    blur: 0,
-    bloomScale: 0.9,
-    threshold: 0.75
-  }),
-  new OutlineFilter(2, 0xffffff, 0.2, 0)
-] as const;
 const exhaustedFilter = new AdjustmentFilter({ saturation: 0 });
-
-const isHovered = computed(() => ui.hoveredEntity.value?.equals(entity.value));
+const outlineFilter = new OutlineFilter(1, 0xffffff, 0.2, 0);
 
 watchEffect(() => {
-  gsap.to(hoveredFilters[0], {
-    duration: 0.2,
-    blur: isHovered.value ? 4 : 0,
-    ease: Power2.easeOut
-  });
-  gsap.to(hoveredFilters[1], {
-    duration: 0.2,
-    alpha: isHovered.value ? 1 : 0,
+  // gsap.to(bloomFilter, {
+  //   duration: 0.2,
+  //   blur: isSelected.value ? 4 : 0,
+  //   ease: Power2.easeOut
+  // });
+  gsap.to(outlineFilter, {
+    duration: 0.3,
+    alpha: isSelected.value || isHovered.value ? 1 : 0,
     ease: Power2.easeOut
   });
 });
 
 const filters = computed(() => {
-  const result: Filter[] = [];
-  if (isHovered.value) {
-    result.push(...hoveredFilters);
-  }
+  const result: Filter[] = [outlineFilter];
+
   if (entity.value.hasKeyword(KEYWORDS.EXHAUSTED)) {
     result.push(exhaustedFilter);
   }
-
   return result;
 });
 
 watch(sprite, newSprite => {
   fx.registerSprite(entityId, newSprite);
+});
+
+const MIN_LIGHTNESS = 0.1;
+const MAX_LIGHTNESS = 0.6;
+const lightBrightness = ref(MIN_LIGHTNESS);
+watchEffect(() => {
+  gsap.to(lightBrightness, {
+    duration: 0.3,
+    value: isSelected.value || isHovered.value ? MAX_LIGHTNESS : MIN_LIGHTNESS,
+    ease: Power2.easeOut
+  });
 });
 </script>
 
@@ -73,18 +73,9 @@ watch(sprite, newSprite => {
         }
       }
     "
-    :filters="filters"
   >
-    <!-- <animated-sprite
-      :textures="textures"
-      :filters="filters"
-      :anchor-x="0.5"
-      :anchor-y="1"
-      :y="CELL_HEIGHT * 0.9"
-      :playing="true"
-    /> -->
+    <PointLight :color="0xff5500" :brightness="lightBrightness" :x="0" :y="50" />
 
-    <!-- <PointLight :color="0xffffff" :brightness="0.7" :x="0" :y="50" /> -->
     <IlluminatedSprite
       v-if="diffuseTextures && normalTextures"
       :diffuse-textures="diffuseTextures"
@@ -93,6 +84,7 @@ watch(sprite, newSprite => {
       :anchor-y="1"
       :y="CELL_HEIGHT * 0.9"
       :playing="true"
+      :filters="filters"
     />
   </container>
 </template>
