@@ -16,7 +16,7 @@ const loadParserByAssetType = {
   tiles: SPRITESHEET_PARSER,
   ui: SPRITESHEET_PARSER,
   interactables: SPRITESHEET_PARSER,
-  fx: SPRITESHEET_PARSER,
+  fx: PLIST_PARSER,
   modifiers: SPRITESHEET_PARSER,
   hitboxes: undefined,
 };

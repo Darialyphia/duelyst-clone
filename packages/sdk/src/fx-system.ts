@@ -1,4 +1,4 @@
-import type { Point3D } from '@game/shared';
+import type { Point, Point3D } from '@game/shared';
 import type { EntityId } from './entity/entity';
 
 export type Animation = 'idle' | 'breathing' | 'run' | 'attack' | 'hit' | 'death';
@@ -44,6 +44,16 @@ export type FXSystem = {
       framePercentage?: number;
     }
   ): Promise<void>;
+
+  playSfxOnEntity(
+    entityId: EntityId,
+    options: {
+      resourceName: string;
+      animationName: string;
+      offset?: Point;
+      delay?: number;
+    }
+  ): Promise<void>;
 };
 
 export const noopFXContext: FXSystem = {
@@ -76,6 +86,10 @@ export const noopFXContext: FXSystem = {
   },
 
   playAnimation() {
+    return Promise.resolve();
+  },
+
+  playSfxOnEntity() {
     return Promise.resolve();
   }
 };

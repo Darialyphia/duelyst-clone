@@ -1,5 +1,5 @@
 import { CARDS, type CardBlueprint } from './card-lookup';
-import { Interceptable, type inferInterceptor } from '../utils/helpers';
+import { Interceptable } from '../utils/helpers';
 import { Card } from './card';
 import type { Nullable, Point3D } from '@game/shared';
 import { ENTITY_EVENTS, type Entity } from '../entity/entity';
@@ -55,7 +55,13 @@ export class Unit extends Card<UnitCtx> {
       playerId: this.playerId,
       position: ctx.position
     });
-
+    const id = this.entity.id;
+    this.session.fxSystem.playSfxOnEntity(id, {
+      resourceName: 'fx_smoke2',
+      animationName: 'smokeground',
+      offset: { x: 0, y: 20 },
+      delay: 200
+    });
     await this.blueprint.onPlay(this.session, this as any);
     this.entity.emit(ENTITY_EVENTS.CREATED, this.entity);
 

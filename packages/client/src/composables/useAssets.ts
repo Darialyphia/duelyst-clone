@@ -71,6 +71,7 @@ export const useAssetsProvider = () => {
     // transform the manifest to add separate bundles for units and icons, as loading everything at once is way too expensive
     splitBundle(manifest, 'units');
     splitBundle(manifest, 'icons');
+    splitBundle(manifest, 'fx');
     splitBundle(manifest, 'normals');
     Assets.init({ manifest });
 

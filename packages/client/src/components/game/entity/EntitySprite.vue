@@ -56,9 +56,7 @@ const filters = computed(() => {
 });
 
 watch(sprite, newSprite => {
-  if (entity.value) {
-    fx.registerSprite(entity.value.id, newSprite);
-  }
+  fx.registerSprite(entityId, newSprite);
 });
 </script>
 
@@ -70,7 +68,9 @@ watch(sprite, newSprite => {
           (child: any) => child instanceof AnimatedSprite
         );
 
-        if (spriteInst) sprite = spriteInst;
+        if (spriteInst) {
+          sprite = spriteInst;
+        }
       }
     "
     :filters="filters"

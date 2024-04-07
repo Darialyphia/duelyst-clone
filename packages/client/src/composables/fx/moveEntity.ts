@@ -1,7 +1,7 @@
 import type { FxCommand } from '../useFx';
 
 export const moveEntity: FxCommand<'moveEntity'> = (
-  { camera, session, entityPositionsMap, done },
+  { entityPositionsMap, done },
   entityId,
   path
 ) => {

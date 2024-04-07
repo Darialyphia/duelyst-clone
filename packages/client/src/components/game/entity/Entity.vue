@@ -3,7 +3,6 @@ import type { EntityId } from '@game/sdk';
 import { randomInt } from '@game/shared';
 import { Container } from 'pixi.js';
 import { PTransition } from 'vue3-pixi';
-
 const { entityId } = defineProps<{ entityId: EntityId }>();
 
 const { camera, fx } = useGame();
@@ -90,7 +89,7 @@ const onShadowEnter = (container: Container) => {
         </PTransition>
       </container>
 
-      <!-- <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" /> -->
+      <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" />
     </container>
   </IsoPositioner>
 </template>
