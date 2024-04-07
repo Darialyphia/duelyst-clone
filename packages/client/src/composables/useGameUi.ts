@@ -7,6 +7,9 @@ import type { InjectionKey } from 'vue';
 export const DEFAULT_MOUSE_LIGHT_STRENGTH = 16;
 export const DEFAULT_MOUSE_LIGHT_COLOR = '#ffffff';
 
+export const DEFAULT_AMBIENT_LIGHT_STRENGTH = 0.8;
+export const DEFAULT_AMBIENT_LIGHT_COLOR = '#ffffff';
+
 export const TARGETING_MODES = {
   NONE: 'NONE',
   BASIC: 'BASIC',
@@ -25,6 +28,11 @@ export type GameUiContext = {
   setMouseLightColor(val: number | string): void;
   mouseLightStrength: Ref<number>;
   setMouseLightStrength(val: number): void;
+
+  ambientLightColor: Ref<number | string>;
+  setAmbientLightColor(val: number | string): void;
+  ambientLightStrength: Ref<number | string>;
+  setAmbientLightStrength(val: number | string): void;
 
   hoveredCell: ComputedRef<Nullable<Cell>>;
   hoveredEntity: ComputedRef<Nullable<Entity>>;
@@ -69,9 +77,28 @@ export const useGameUiProvider = (session: GameSession) => {
     summonTarget,
     followupTargets,
     selectedCardIndex,
+    ambientLightColor: ref(DEFAULT_AMBIENT_LIGHT_COLOR),
+    setAmbientLightColor(val) {
+      gsap.killTweensOf(api.ambientLightColor);
+      gsap.to(api.ambientLightColor, {
+        value: val,
+        duration: 0.5,
+        ease: Power2.easeOut
+      });
+    },
+    ambientLightStrength: ref(DEFAULT_AMBIENT_LIGHT_STRENGTH),
+    setAmbientLightStrength(val) {
+      gsap.killTweensOf(api.ambientLightStrength);
+      gsap.to(api.ambientLightStrength, {
+        value: val,
+        duration: 0.5,
+        ease: Power2.easeOut
+      });
+    },
     mousePosition: ref({ x: 0, y: 0 }),
     mouseLightColor: ref(DEFAULT_MOUSE_LIGHT_COLOR),
     setMouseLightColor(val) {
+      gsap.killTweensOf(api.mouseLightColor);
       gsap.to(api.mouseLightColor, {
         value: val,
         duration: 0.5,
@@ -80,6 +107,7 @@ export const useGameUiProvider = (session: GameSession) => {
     },
     mouseLightStrength: ref(DEFAULT_MOUSE_LIGHT_STRENGTH),
     setMouseLightStrength(val) {
+      gsap.killTweensOf(api.mouseLightStrength);
       gsap.to(api.mouseLightStrength, {
         value: val,
         duration: 0.5,

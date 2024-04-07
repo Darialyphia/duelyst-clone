@@ -61,6 +61,8 @@ export type FXSystem = {
     offset?: Point;
     delay?: number;
   }): Promise<void>;
+
+  changeAmbientLightUntil(color: string, strength: number): () => void;
 };
 
 export const noopFXContext: FXSystem = {
@@ -102,5 +104,9 @@ export const noopFXContext: FXSystem = {
 
   playSfxOnScreenCenter() {
     return Promise.resolve();
+  },
+
+  changeAmbientLightUntil() {
+    return () => void 0;
   }
 };

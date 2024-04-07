@@ -87,7 +87,7 @@ export const useAssetsProvider = () => {
     loaded.value = true;
   };
 
-  const bundlesLoaded = new Set<string>();
+  const bundlesPromises = new Map<string, Promise<any>>();
   const normalPromises = new Map<string, Promise<SpritesheetWithAnimations>>();
   const api: AssetsContext = {
     loaded,
@@ -115,19 +115,18 @@ export const useAssetsProvider = () => {
     },
     async loadSpritesheet(key) {
       // avoids pixi warning messages when wetry to load a bundle multiple times
-      if (!bundlesLoaded.has(key)) {
-        await Assets.loadBundle(key);
-        bundlesLoaded.add(key);
+      if (!bundlesPromises.has(key)) {
+        bundlesPromises.set(key, Assets.loadBundle(key));
       }
+      await bundlesPromises.get(key);
       return Assets.get<SpritesheetWithAnimations>(key);
     },
     async loadTexture(key) {
       // avoids pixi warning messages when wetry to load a bundle multiple times
-      if (!bundlesLoaded.has(key)) {
-        await Assets.loadBundle(key);
-
-        bundlesLoaded.add(key);
+      if (!bundlesPromises.has(key)) {
+        bundlesPromises.set(key, Assets.loadBundle(key));
       }
+      await bundlesPromises.get(key);
       return Assets.get<Texture>(key);
     },
     getSpritesheet(key: string) {

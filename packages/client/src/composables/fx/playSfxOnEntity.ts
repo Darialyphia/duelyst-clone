@@ -14,7 +14,7 @@ const waitUntil = <T>(cond: () => T) => {
 };
 
 export const playSfxOnEntity: FxCommand<'playSfxOnEntity'> = async (
-  { assets, session, entityRootMap, spriteMap, done },
+  { assets, session, entityRootMap, done },
   entityId,
   { resourceName, animationName, offset, delay }
 ) => {

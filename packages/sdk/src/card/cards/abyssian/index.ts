@@ -34,19 +34,20 @@ export const abyssian: CardBlueprint[] = [
     async onPlay(session, card) {
       const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
-
+      const revertLight = session.fxSystem.changeAmbientLightUntil('#440066', 1.5);
       await Promise.all([
         session.fxSystem.playSfxOnEntity(entity.id, {
           resourceName: 'fx_f4_voidpulse',
           animationName: 'default',
-          offset: { x: 0, y: -65 }
+          offset: { x: 0, y: -70 }
         }),
         session.fxSystem.playSfxOnEntity(session.playerSystem.activePlayer.general.id, {
           resourceName: 'fx_f4_voidpulse',
           animationName: 'default',
-          offset: { x: 0, y: -65 }
+          offset: { x: 0, y: -70 }
         })
       ]);
+      revertLight();
 
       await Promise.all([
         entity.takeDamage(1, card),

@@ -21,7 +21,10 @@ const entities = useGameSelector(session => session.entitySystem.getList());
     <Layer :group="normalGroup" />
     <Layer :group="lightGroup" />
 
-    <AmbientLight :color="0xffffff" :brightness="0.8" />
+    <AmbientLight
+      :color="ui.ambientLightColor.value"
+      :brightness="ui.ambientLightStrength.value"
+    />
 
     <Underground />
     <MapCell v-for="cell in cells" :key="cell.id" :cell-id="cell.id" />
