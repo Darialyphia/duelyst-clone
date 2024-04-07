@@ -234,6 +234,7 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     priority?: number
   ) {
     this.interceptors[key].add(interceptor as any, priority);
+    return () => this.removeInterceptor(key, interceptor);
   }
 
   removeInterceptor<T extends keyof EntityInterceptor>(

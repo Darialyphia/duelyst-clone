@@ -14,6 +14,7 @@ import { playAnimationUntil } from './fx/playAnimationUntil';
 import type { IsoCameraContext } from './useIsoCamera';
 import { playAnimation } from './fx/playAnimation';
 import { playSfxOnEntity } from './fx/playSfxOnEntity';
+import { playSfxOnScreenCenter } from './fx/playSfxOnScreenCenter';
 
 export type FxContext = {
   isPlaying: Ref<boolean>;
@@ -181,12 +182,17 @@ export const useFXProvider = () => {
     },
     playAnimation(...args) {
       return executeAsyncCommand(ctx => {
-        playAnimation(ctx, ...args);
+        return playAnimation(ctx, ...args);
       });
     },
     playSfxOnEntity(...args) {
       return executeAsyncCommand(ctx => {
-        playSfxOnEntity(ctx, ...args);
+        return playSfxOnEntity(ctx, ...args);
+      });
+    },
+    playSfxOnScreenCenter(...args) {
+      return executeAsyncCommand(ctx => {
+        return playSfxOnScreenCenter(ctx, ...args);
       });
     }
   };

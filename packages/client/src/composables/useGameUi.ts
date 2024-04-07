@@ -121,6 +121,7 @@ export const useGameUiProvider = (session: GameSession) => {
     selectEntity(entityId) {
       selectedEntityId.value = entityId;
       api.switchTargetingMode(TARGETING_MODES.BASIC);
+      selectedCardIndex.value = null;
     },
     unselectEntity() {
       selectedEntityId.value = null;
@@ -133,6 +134,7 @@ export const useGameUiProvider = (session: GameSession) => {
     selectCardAtIndex(index) {
       selectedCardIndex.value = index;
       api.switchTargetingMode(TARGETING_MODES.SUMMON);
+      selectedEntityId.value = null;
     },
     unselectCard() {
       selectedCardIndex.value = null;

@@ -3,6 +3,7 @@ import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.m
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { type CardBlueprint } from '../../card-lookup';
 import { CARD_KINDS, FACTIONS, RARITIES } from '../../card-utils';
+import { modifierStatModifierMixin } from '../../../modifier/mixins/stat-modifier.mixin';
 
 export const vetruvian: CardBlueprint[] = [
   {
@@ -37,30 +38,22 @@ export const vetruvian: CardBlueprint[] = [
     async onPlay(session, card) {
       const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
+      await session.fxSystem.playSfxOnEntity(entity.id, {
+        resourceName: 'fx_f3_scionsfirstwish',
+        animationName: 'default',
+        offset: { x: 0, y: -175 }
+      });
       entity.addModifier(
         createEntityModifier({
-          id: 'scions_first_wish',
           stackable: true,
           visible: true,
           name: "Scions's First wish",
           description: '+1 / +1',
           stacks: 1,
           mixins: [
-            modifierInterceptorMixin({
-              key: 'attack',
-              duration: Infinity,
-              keywords: [],
-              interceptor: modifier => atk => {
-                return atk + 1 * modifier.stacks!;
-              }
-            }),
-            modifierInterceptorMixin({
-              key: 'maxHp',
-              duration: Infinity,
-              keywords: [],
-              interceptor: modifier => hp => {
-                return hp + 1 * modifier.stacks!;
-              }
+            modifierStatModifierMixin({
+              attack: 1,
+              maxHp: 1
             })
           ]
         })

@@ -44,6 +44,7 @@ const parsePlist = (url: string, raw: string): ISpritesheetData => {
 
   Object.keys(json.frames).forEach(key => {
     const parts = key.replace(`${filename}_`, '').split('_');
+
     const name = parts.at(-2) ?? 'default'; // spells and artifacts dont have an animation name for their "default" state
     if (!animations[name]) {
       animations[name] = [];
