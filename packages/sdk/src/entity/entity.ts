@@ -333,6 +333,15 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       this.id,
       amount
     );
+
+    this.session.fxSystem.playSfxOnEntity(this.id, {
+      resourceName: 'fx_bloodground',
+      animationName: `bloodground${this.session.rngSystem.nextInt(4) + 1}`,
+      offset: {
+        x: 0,
+        y: 20
+      }
+    });
     await this.session.fxSystem.playAnimation(this.id, 'hit');
     this.hp = this.currentHp.value - amount;
     this.emit(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, payload);
