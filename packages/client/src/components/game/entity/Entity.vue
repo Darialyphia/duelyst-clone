@@ -90,7 +90,7 @@ const onShadowEnter = (container: Container) => {
         </PTransition>
       </container>
 
-      <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" />
+      <!-- <EntityStats v-if="isEnterAnimationDone" :entity-id="entityId" /> -->
     </container>
   </IsoPositioner>
 </template>

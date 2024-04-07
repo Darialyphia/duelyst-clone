@@ -7,7 +7,6 @@ import { Container } from 'pixi.js';
 import type { FederatedPointerEvent } from 'pixi.js';
 
 const app = useApplication();
-const screenViewport = shallowRef<Viewport>();
 
 const { fx, ui } = useGame();
 
@@ -55,10 +54,12 @@ const worldSize = computed(() => ({
     WORLD_PADDING.y
 }));
 
-const containerOffset = computed(() => ({
-  x: -minX.value + WORLD_PADDING.x / 2,
-  y: -minY.value + WORLD_PADDING.y / 2
-}));
+watchEffect(() => {
+  camera.offset.value = {
+    x: -minX.value + WORLD_PADDING.x / 2,
+    y: -minY.value + WORLD_PADDING.y / 2
+  };
+});
 
 const isoCenter = computed(() => {
   const i = pointToIndex(
@@ -72,10 +73,10 @@ const isoCenter = computed(() => {
   return isoCells.value[i];
 });
 
-until(screenViewport)
+until(camera.viewport)
   .not.toBe(undefined)
   .then(() => {
-    screenViewport.value
+    camera.viewport.value
       ?.drag({
         mouseButtons: 'right'
       })
@@ -88,15 +89,21 @@ until(screenViewport)
       .clampZoom({ minScale: 2, maxScale: 3 })
       .zoomPercent(0, false)
       .moveCenter(
-        isoCenter.value.isoX + containerOffset.value.x,
-        isoCenter.value.isoY + containerOffset.value.y - CELL_HEIGHT / 2
+        isoCenter.value.isoX + camera.offset.value.x,
+        isoCenter.value.isoY + camera.offset.value.y - CELL_HEIGHT / 2
       );
   });
 </script>
 
 <template>
   <viewport
-    ref="screenViewport"
+    :ref="
+      (el: any) => {
+        if (!el) return;
+
+        camera.viewport.value = el;
+      }
+    "
     :screen-width="app.view.width"
     :screen-height="app.view.height"
     :world-width="worldSize.width"
@@ -106,16 +113,16 @@ until(screenViewport)
     :sortable-children="true"
     @pointermove="
       (e: FederatedPointerEvent) => {
-        const pos = screenViewport!.toWorld(e.global);
+        const pos = camera.viewport.value!.toWorld(e.global);
         ui.mousePosition.value = {
-          x: pos.x - containerOffset.x,
-          y: pos.y - containerOffset.y
+          x: pos.x - camera.offset.value.x,
+          y: pos.y - camera.offset.value.y
         };
       }
     "
     @pointerup="
       (e: FederatedPointerEvent) => {
-        if (e.target === screenViewport) {
+        if (e.target === camera.viewport.value) {
           ui.unselectCard();
           ui.unselectEntity();
         }
@@ -123,7 +130,7 @@ until(screenViewport)
     "
   >
     <container
-      v-bind="containerOffset"
+      v-bind="camera.offset.value"
       :ref="
         (container: any) => {
           if (container instanceof Container) {

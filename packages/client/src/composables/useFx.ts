@@ -29,6 +29,7 @@ export type FxContext = {
   ) => void;
   registerEntityRootContainer: (entityId: EntityId, container: Container) => void;
   registerRoot: (container: Container) => void;
+  getEntityRoot(entityId: EntityId): Container | null;
 };
 
 const FX_INJECTION_KEY = Symbol('fx') as InjectionKey<FxContext>;
@@ -220,6 +221,9 @@ export const useFXProvider = () => {
     },
     registerRoot(container) {
       sceneRoot = container;
+    },
+    getEntityRoot(entityId) {
+      return entityRootMap.get(entityId) ?? null;
     }
   };
 
