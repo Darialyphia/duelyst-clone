@@ -23,6 +23,10 @@ export class ConvexClientWithSSR extends ConvexClient {
   constructor(address: string, options: ConvexClientOptions = {}) {
     super(address, options);
     this.httpClient = new ConvexHttpClient(address);
+    // @ts-expect-error
+    if (typeof window === 'undefined') {
+      this.close();
+    }
   }
 
   setAuth(fetchToken: AuthTokenFetcher, onChange?: (isAuthenticated: boolean) => void) {
