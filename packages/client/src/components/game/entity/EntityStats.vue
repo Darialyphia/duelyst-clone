@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EntityId } from '@game/sdk';
 import { TextStyle } from 'pixi.js';
+import { PTransition, EasePresets } from 'vue3-pixi';
 
 const { ui } = useGame();
 const { entityId } = defineProps<{ entityId: EntityId }>();
@@ -43,6 +44,30 @@ watchEffect(() => {
         ? 0x12c943
         : 'white';
 });
+
+const attackDiff = ref<string | null>(null);
+const maxHpDiff = ref<string | null>(null);
+
+watch(
+  () => entity.value.attack,
+  (newAttack, oldAttack) => {
+    const diff = newAttack - oldAttack;
+    attackDiff.value = `${diff > 0 ? '+' : ''}${diff}`;
+    setTimeout(() => {
+      attackDiff.value = null;
+    }, 1200);
+  }
+);
+watch(
+  () => entity.value.maxHp,
+  (newHp, oldHp) => {
+    const diff = newHp - oldHp;
+    maxHpDiff.value = `${diff > 0 ? '+' : ''}${diff}`;
+    setTimeout(() => {
+      maxHpDiff.value = null;
+    }, 1200);
+  }
+);
 </script>
 
 <template>
@@ -86,5 +111,69 @@ watchEffect(() => {
         {{ Math.max(0, entity.hp) }}
       </pixi-text>
     </graphics>
+  </container>
+
+  <container
+    :ref="(container: any) => ui.assignLayer(container, 'ui')"
+    :x="CELL_WIDTH * 0.15"
+    :y="CELL_HEIGHT * 0.25"
+    event-mode="none"
+  >
+    <PTransition
+      :duration="{ enter: 300, leave: 300 }"
+      :before-enter="{ scale: 0 }"
+      :enter="{ scale: 1, ease: EasePresets.easeOutSine }"
+      :leave="{ scale: 0, ease: EasePresets.easeOutSine }"
+    >
+      <graphics
+        v-if="attackDiff"
+        :x="maxHpDiff ? -CELL_WIDTH * 0.3 : -CELL_WIDTH * 0.15"
+        @render="
+          g => {
+            g.clear();
+            g.beginFill('black');
+            g.lineStyle({ color: 'yellow', width: 1 });
+            g.drawCircle(0, 0, 10);
+          }
+        "
+      >
+        <pixi-text
+          :style="{ fontSize: 34, align: 'center', fill: 'yellow' }"
+          :scale="0.25"
+          :x="0"
+          :anchor="0.5"
+        >
+          {{ attackDiff }}
+        </pixi-text>
+      </graphics>
+    </PTransition>
+
+    <PTransition
+      :duration="{ enter: 300, leave: 300 }"
+      :before-enter="{ scale: 0 }"
+      :enter="{ scale: 1, ease: EasePresets.easeOutSine }"
+      :leave="{ scale: 0, ease: EasePresets.easeOutSine }"
+    >
+      <graphics
+        v-if="maxHpDiff"
+        :x="attackDiff ? 0 : -CELL_WIDTH * 0.15"
+        @render="
+          g => {
+            g.clear();
+            g.beginFill('black');
+            g.lineStyle({ color: 'red', width: 1 });
+            g.drawCircle(0, 0, 10);
+          }
+        "
+      >
+        <pixi-text
+          :style="{ fontSize: 34, align: 'center', fill: 'red' }"
+          :scale="0.25"
+          :anchor="0.5"
+        >
+          {{ maxHpDiff }}
+        </pixi-text>
+      </graphics>
+    </PTransition>
   </container>
 </template>
