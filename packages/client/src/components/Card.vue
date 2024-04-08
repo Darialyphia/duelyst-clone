@@ -125,15 +125,20 @@ const rarityIcon = computed(
 .stat {
   position: absolute;
   top: 160px;
+
+  display: grid;
+
+  width: 2ch;
+
   font-size: var(--font-size-4);
   text-align: center;
 
   &.atk {
-    left: 46px;
+    left: calc(46px - 0.5ch);
   }
 
   &.hp {
-    left: 166px;
+    left: calc(166px - 0.5ch);
   }
 }
 

@@ -10,7 +10,7 @@ const hoveredIndex = ref<number | null>(null);
 </script>
 
 <template>
-  <UiTooltip :side-offset="30" :delay="250">
+  <UiTooltip :side-offset="30" :delay="100">
     <template #trigger>
       <button
         class="card-button"
@@ -48,7 +48,7 @@ const hoveredIndex = ref<number | null>(null);
         rarity: card.blueprint.rarity,
         attack: (card as Unit).blueprint.attack,
         hp: (card as Unit).blueprint.maxHp,
-        cost: card.blueprint.manaCost
+        cost: card.manaCost
       }"
     />
   </UiTooltip>
