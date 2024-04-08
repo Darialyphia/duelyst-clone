@@ -47,6 +47,31 @@ watchEffect(() => {
 
 const attackDiff = ref<string | null>(null);
 const maxHpDiff = ref<string | null>(null);
+const currentHpDiff = ref<string | null>(null);
+const currentHpDiffStyle = new TextStyle({
+  fontSize: 34,
+  align: 'center'
+});
+
+until(entity)
+  .toBeTruthy()
+  .then(() => {
+    entity.value.on('after_take_damage', e => {
+      currentHpDiff.value = `-${e.amount}`;
+      currentHpDiffStyle.fill = 'red';
+      setTimeout(() => {
+        currentHpDiff.value = null;
+      }, 1200);
+    });
+
+    entity.value.on('after_heal', e => {
+      currentHpDiff.value = `+${e.amount}`;
+      currentHpDiffStyle.fill = 'lime';
+      setTimeout(() => {
+        currentHpDiff.value = null;
+      }, 1200);
+    });
+  });
 
 watch(
   () => entity.value.attack,
@@ -120,7 +145,7 @@ watch(
     event-mode="none"
   >
     <PTransition
-      :duration="{ enter: 300, leave: 300 }"
+      :duration="{ enter: 200, leave: 200 }"
       :before-enter="{ scale: 0 }"
       :enter="{ scale: 1, ease: EasePresets.easeOutSine }"
       :leave="{ scale: 0, ease: EasePresets.easeOutSine }"
@@ -149,7 +174,7 @@ watch(
     </PTransition>
 
     <PTransition
-      :duration="{ enter: 300, leave: 300 }"
+      :duration="{ enter: 200, leave: 200 }"
       :before-enter="{ scale: 0 }"
       :enter="{ scale: 1, ease: EasePresets.easeOutSine }"
       :leave="{ scale: 0, ease: EasePresets.easeOutSine }"
@@ -172,6 +197,31 @@ watch(
           :anchor="0.5"
         >
           {{ maxHpDiff }}
+        </pixi-text>
+      </graphics>
+    </PTransition>
+
+    <PTransition
+      :duration="{ enter: 200, leave: 200 }"
+      :before-enter="{ scale: 0 }"
+      :enter="{ scale: 1, ease: EasePresets.easeOutSine }"
+      :leave="{ scale: 0, ease: EasePresets.easeOutSine }"
+    >
+      <graphics
+        v-if="currentHpDiff"
+        :x="-CELL_WIDTH * 0.15"
+        @render="
+          g => {
+            g.clear();
+            g.beginFill('black');
+            g.lineStyle({ color: currentHpDiffStyle.fill as any, width: 1 });
+            g.drawCircle(0, 0, 10);
+            g.endFill();
+          }
+        "
+      >
+        <pixi-text :style="currentHpDiffStyle" :scale="0.25" :anchor="0.5">
+          {{ currentHpDiff }}
         </pixi-text>
       </graphics>
     </PTransition>

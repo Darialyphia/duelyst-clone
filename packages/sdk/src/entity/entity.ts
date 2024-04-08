@@ -298,9 +298,10 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   getHealReceived(amount: number) {
-    return this.interceptors.healReceived.getValue(amount, {
+    const clamped = Math.min(amount, this.maxHp - this.hp);
+    return this.interceptors.healReceived.getValue(clamped, {
       entity: this,
-      amount
+      amount: clamped
     });
   }
 
@@ -332,12 +333,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     // @FIXME removing this lien causes a circular dependency issue...like wtf ??
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const entity = source instanceof Unit ? source.entity : null;
-
-    this.session.fxSystem.displayText(`${amount}`, this.id, {
-      color: 'red',
-      duration: 1,
-      path: [{ y: -100 }]
-    });
 
     this.session.fxSystem.playSfxOnEntity(this.id, {
       resourceName: 'fx_bloodground',
@@ -395,7 +390,8 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
   }
 
   async heal(baseAmount: number, source: AnyCard) {
-    const amount = this.getTakenDamage(baseAmount);
+    const amount = this.getHealReceived(baseAmount);
+
     const payload = {
       entity: this,
       amount,

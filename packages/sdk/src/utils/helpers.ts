@@ -42,8 +42,7 @@ export class Interceptable<
   TValue extends string | number | boolean,
   TContext extends AnyObject
 > {
-  private listeners: { interceptor: Interceptor<TValue, TContext>; priority: number }[] =
-    [];
+  listeners: { interceptor: Interceptor<TValue, TContext>; priority: number }[] = [];
 
   add(interceptor: Interceptor<TValue, TContext>, priority = 1) {
     this.listeners.push({ interceptor, priority });
