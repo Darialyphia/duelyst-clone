@@ -1,5 +1,5 @@
 import { CARDS, type CardBlueprint } from './card-lookup';
-import { Interceptable } from '../utils/helpers';
+import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { Card } from './card';
 import type { Nullable, Point3D } from '@game/shared';
 import { ENTITY_EVENTS, type Entity } from '../entity/entity';
@@ -77,5 +77,21 @@ export class Unit extends Card<UnitCtx> {
     const predicate = nearby.some(cell => cell.entity?.player.equals(this.player));
 
     return this.interceptors.canSummonAt.getValue(predicate, { unit: this, point });
+  }
+
+  addInterceptor<T extends keyof UnitInterceptor>(
+    key: T,
+    interceptor: inferInterceptor<UnitInterceptor[T]>,
+    priority?: number
+  ) {
+    this.interceptors[key].add(interceptor as any, priority);
+    return () => this.removeInterceptor(key, interceptor);
+  }
+
+  removeInterceptor<T extends keyof UnitInterceptor>(
+    key: T,
+    interceptor: inferInterceptor<UnitInterceptor[T]>
+  ) {
+    this.interceptors[key].remove(interceptor as any);
   }
 }

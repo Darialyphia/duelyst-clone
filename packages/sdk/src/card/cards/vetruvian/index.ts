@@ -38,10 +38,18 @@ export const vetruvian: CardBlueprint[] = [
     async onPlay(session, card) {
       const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
+      const removeLight = session.fxSystem.addLightOnEntityUntil(entity.id, {
+        color: 0x884400,
+        strength: 3,
+        offset: {
+          x: 0,
+          y: 30
+        }
+      });
       await session.fxSystem.playSfxOnEntity(entity.id, {
         resourceName: 'fx_f3_scionsfirstwish',
         animationName: 'default',
-        offset: { x: 0, y: -175 }
+        offset: { x: 0, y: -125 }
       });
       entity.addModifier(
         createEntityModifier({
@@ -58,6 +66,7 @@ export const vetruvian: CardBlueprint[] = [
           ]
         })
       );
+      removeLight();
       session.playerSystem.activePlayer.draw(1);
     }
   }

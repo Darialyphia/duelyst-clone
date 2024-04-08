@@ -34,25 +34,40 @@ export const abyssian: CardBlueprint[] = [
     async onPlay(session, card) {
       const entity = session.entitySystem.getEntityAt(card.castPoint);
       if (!entity) return;
-      const revertLight = session.fxSystem.changeAmbientLightUntil('#440066', 1.5);
+
+      const pointLightOptions = {
+        color: 0xff0000,
+        strength: 2
+      };
+      const lights = [
+        session.fxSystem.addLightOnEntityUntil(entity.id, pointLightOptions),
+        session.fxSystem.addLightOnEntityUntil(
+          session.playerSystem.activePlayer.general.id,
+          pointLightOptions
+        ),
+        session.fxSystem.changeAmbientLightUntil('#250050', 3)
+      ];
+
+      const fxOptions = {
+        resourceName: 'fx_f4_voidpulse',
+        animationName: 'default',
+        offset: { x: 0, y: -75 }
+      };
+
       await Promise.all([
-        session.fxSystem.playSfxOnEntity(entity.id, {
-          resourceName: 'fx_f4_voidpulse',
-          animationName: 'default',
-          offset: { x: 0, y: -70 }
-        }),
-        session.fxSystem.playSfxOnEntity(session.playerSystem.activePlayer.general.id, {
-          resourceName: 'fx_f4_voidpulse',
-          animationName: 'default',
-          offset: { x: 0, y: -70 }
-        })
+        session.fxSystem.playSfxOnEntity(entity.id, fxOptions),
+        session.fxSystem.playSfxOnEntity(
+          session.playerSystem.activePlayer.general.id,
+          fxOptions
+        )
       ]);
-      revertLight();
 
       await Promise.all([
         entity.takeDamage(1, card),
         session.playerSystem.activePlayer.general.heal(2, card)
       ]);
+
+      lights.forEach(cleanup => cleanup());
     }
   }
 ];

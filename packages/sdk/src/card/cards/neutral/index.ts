@@ -72,10 +72,7 @@ export const neutral: CardBlueprint[] = [
     maxHp: 1,
     onPlay(session, card) {
       openingGambit(card, (session, attachedTo) => {
-        const [point] = attachedTo.card.followupTargets;
-        if (!point) return;
-
-        const entity = session.entitySystem.getEntityAt(point);
+        const [entity] = getFollowupEntities(session, card);
         if (entity) {
           entity.takeDamage(1, attachedTo.card);
         }

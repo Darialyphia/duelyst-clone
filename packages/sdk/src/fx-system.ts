@@ -63,6 +63,11 @@ export type FXSystem = {
   }): Promise<void>;
 
   changeAmbientLightUntil(color: string, strength: number): () => void;
+
+  addLightOnEntityUntil(
+    entityId: EntityId,
+    options: { color: number; strength: number; offset?: Point }
+  ): () => void;
 };
 
 export const noopFXContext: FXSystem = {
@@ -107,6 +112,10 @@ export const noopFXContext: FXSystem = {
   },
 
   changeAmbientLightUntil() {
+    return () => void 0;
+  },
+
+  addLightOnEntityUntil() {
     return () => void 0;
   }
 };

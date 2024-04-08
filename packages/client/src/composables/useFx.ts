@@ -16,6 +16,7 @@ import { playAnimation } from './fx/playAnimation';
 import { playSfxOnEntity } from './fx/playSfxOnEntity';
 import { playSfxOnScreenCenter } from './fx/playSfxOnScreenCenter';
 import { changeAmbientLightUntil } from './fx/changeAmbientLightUntil';
+import { addLightOnEntityUntil } from './fx/addLightOnentityUntil';
 
 export type FxContext = {
   isPlaying: Ref<boolean>;
@@ -199,6 +200,11 @@ export const useFXProvider = () => {
     changeAmbientLightUntil(...args) {
       return executeCommand(ctx => {
         return changeAmbientLightUntil(ctx, ...args);
+      });
+    },
+    addLightOnEntityUntil(...args) {
+      return executeCommand(ctx => {
+        return addLightOnEntityUntil(ctx, ...args);
       });
     }
   };

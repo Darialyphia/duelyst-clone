@@ -328,12 +328,16 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
       source
     };
     this.emit(ENTITY_EVENTS.BEFORE_TAKE_DAMAGE, payload);
+
+    // @FIXME removing this lien causes a circular dependency issue...like wtf ??
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const entity = source instanceof Unit ? source.entity : null;
-    this.session.fxSystem.displayDamageIndicator(
-      entity?.id ?? this.player.opponent.general.id,
-      this.id,
-      amount
-    );
+
+    this.session.fxSystem.displayText(`${amount}`, this.id, {
+      color: 'red',
+      duration: 1,
+      path: [{ y: -100 }]
+    });
 
     this.session.fxSystem.playSfxOnEntity(this.id, {
       resourceName: 'fx_bloodground',
