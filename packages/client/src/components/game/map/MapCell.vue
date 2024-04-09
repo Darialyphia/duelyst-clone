@@ -118,18 +118,17 @@ const isHovered = computed(() => ui.hoveredCell.value?.equals(cell.value));
                 }
               })
               .with(TARGETING_MODES.SUMMON, () => {
-                if (ui.selectedCard.value?.canPlayAt(cell.position)) {
-                  if (ui.selectedCard.value.blueprint.followup) {
-                    ui.summonTarget.value = cell.position;
-                    ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);
-                  } else {
-                    dispatch('playCard', {
-                      cardIndex: ui.selectedCardIndex.value!,
-                      position: cell.position,
-                      targets: []
-                    });
-                    ui.unselectCard();
-                  }
+                if (!ui.selectedCard.value?.canPlayAt(cell.position)) return;
+                if (ui.selectedCard.value.blueprint.followup) {
+                  ui.summonTarget.value = cell.position;
+                  ui.switchTargetingMode(TARGETING_MODES.FOLLOWUP);
+                } else {
+                  dispatch('playCard', {
+                    cardIndex: ui.selectedCardIndex.value!,
+                    position: cell.position,
+                    targets: []
+                  });
+                  ui.unselectCard();
                 }
               })
               .with(TARGETING_MODES.FOLLOWUP, () => {

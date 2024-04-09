@@ -9,14 +9,15 @@ const boardDimensions = useGameSelector(session => ({
   height: session.boardSystem.height
 }));
 
+const OFFSET = 0;
 const edgeCells = computed(() =>
   cells.value.filter(
     cell =>
       cell.z === 0 &&
-      (cell.x === 3 ||
-        cell.y === 3 ||
-        cell.x === boardDimensions.value.width - 1 + 3 ||
-        cell.y === boardDimensions.value.height - 1 + 3)
+      (cell.x === OFFSET ||
+        cell.y === OFFSET ||
+        cell.x === boardDimensions.value.width - 1 + OFFSET ||
+        cell.y === boardDimensions.value.height - 1 + OFFSET)
   )
 );
 
@@ -30,9 +31,9 @@ const water = Array.from({ length: session.boardSystem.height + 7 }, (_, y) =>
   .flat()
   .filter(
     cell =>
-      cell.x < 3 ||
+      cell.x < OFFSET ||
       cell.x >= session.boardSystem.width ||
-      cell.y < 3 ||
+      cell.y < OFFSET ||
       cell.y >= session.boardSystem.height
   );
 

@@ -3,7 +3,7 @@ import { GameSession, type SerializedGameState } from '@game/sdk';
 
 const WIDTH = 9;
 const HEIGHT = 5;
-const OFFSET = 3;
+const OFFSET = 0;
 const state: SerializedGameState = {
   activeEntityId: null,
   history: [],
