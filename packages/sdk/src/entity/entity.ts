@@ -242,8 +242,6 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     interceptor: inferInterceptor<EntityInterceptor[T]>
   ) {
     this.interceptors[key].remove(interceptor as any);
-
-    return () => this.removeInterceptor(key, interceptor);
   }
 
   clearAllInterceptors() {
