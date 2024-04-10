@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { EntityId } from '@game/sdk';
-import { AnimatedSprite, BlurFilter } from 'pixi.js';
+import { AnimatedSprite, BlurFilter, AlphaFilter } from 'pixi.js';
 import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 import IlluminatedSprite from '../IlluminatedSprite.vue';
-import { AdjustmentFilter } from '@pixi/filter-adjustment';
 import { clamp, dist, mapRange } from '@game/shared';
 import { useScreen } from 'vue3-pixi';
 
@@ -89,9 +88,14 @@ const blur = computed(() =>
   )
 );
 
+const colorOverlayFilter = new ColorOverlayFilter(0x000000);
+const alphaFilter = new AlphaFilter(alpha.value);
+watchEffect(() => {
+  alphaFilter.alpha = alpha.value;
+});
 const shadowFilters = computed(() => [
-  new ColorOverlayFilter(0x000000),
-  new AdjustmentFilter({ alpha: alpha.value }),
+  colorOverlayFilter,
+  alphaFilter,
   new BlurFilter(blur.value)
 ]);
 </script>
@@ -108,6 +112,7 @@ const shadowFilters = computed(() => [
       }
     "
     :z-index="1"
+    :alpha="0.8"
   >
     <IlluminatedSprite
       v-if="diffuseTextures?.length && normalTextures?.length"

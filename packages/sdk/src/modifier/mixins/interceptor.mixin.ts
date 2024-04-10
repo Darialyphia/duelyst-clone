@@ -9,11 +9,13 @@ export const modifierInterceptorMixin = <T extends keyof EntityInterceptor>({
   duration,
   interceptor,
   tickOn,
-  keywords
+  keywords,
+  priority
 }: {
   key: T;
   keywords: Keyword[];
   duration: number;
+  priority?: number;
   tickOn?: Parameters<typeof modifierDurationMixin>[0]['tickOn'];
   interceptor: (modifier: EntityModifier) => inferInterceptor<EntityInterceptor[T]>;
 }) => {
@@ -24,7 +26,7 @@ export const modifierInterceptorMixin = <T extends keyof EntityInterceptor>({
     tickOn,
     onApplied(session, attachedTo, modifier) {
       _interceptor = interceptor(modifier);
-      attachedTo.addInterceptor(key, _interceptor);
+      attachedTo.addInterceptor(key, _interceptor, priority);
     },
     onRemoved(session, attachedTo) {
       attachedTo.removeInterceptor(key, _interceptor);

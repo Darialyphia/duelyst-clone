@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Texture, FrameObject } from 'pixi.js';
 import { diffuseGroup, normalGroup } from '@pixi/lights';
+import { ColorOverlayFilter } from '@pixi/filter-color-overlay';
 
 defineOptions({
   inheritAttrs: false

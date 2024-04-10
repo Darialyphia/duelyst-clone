@@ -1,9 +1,17 @@
 import { config } from '../../../config';
-import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { type CardBlueprint } from '../../card-lookup';
-import { CARD_KINDS, FACTIONS, RARITIES } from '../../card-utils';
+import {
+  CARD_KINDS,
+  FACTIONS,
+  gateway,
+  RARITIES,
+  rush,
+  structure,
+  TRIBES
+} from '../../card-utils';
 import { modifierStatModifierMixin } from '../../../modifier/mixins/stat-modifier.mixin';
+import { PLAYER_EVENTS } from '../../../player/player';
 
 export const vetruvian: CardBlueprint[] = [
   {
@@ -20,6 +28,46 @@ export const vetruvian: CardBlueprint[] = [
     description: '',
     attack: config.GENERAL_DEFAULT_ATTACK,
     maxHp: config.GENERAL_DEFAULT_HP
+  },
+  {
+    id: 'wind_dervish',
+    name: 'Wind Dervish',
+    description: 'Rush.\nAt the end of your turn, this disappears.',
+    faction: FACTIONS.VETRUVIAN,
+    rarity: RARITIES.TOKEN,
+    spriteId: 'f3_dervish',
+    kind: CARD_KINDS.MINION,
+    tribe: TRIBES.DERVISH,
+    manaCost: 1,
+    attack: 2,
+    maxHp: 2,
+    onPlay(session, card) {
+      session.fxSystem.playSfxOnEntity(card.entity.id, {
+        resourceName: 'fx_firetornado',
+        animationName: 'default'
+      });
+      rush(card);
+      card.entity.player.once(PLAYER_EVENTS.TURN_END, () => {
+        card.entity.destroy();
+      });
+    }
+  },
+  {
+    id: 'ethereal_obelysk',
+    name: 'Ethereal Obelysk',
+    description: 'Gateway',
+    faction: FACTIONS.VETRUVIAN,
+    rarity: RARITIES.COMMON,
+    spriteId: 'f3_obelyskredsand',
+    kind: CARD_KINDS.MINION,
+    tribe: TRIBES.STRUCTURE,
+    manaCost: 2,
+    attack: 0,
+    maxHp: 6,
+    onPlay(session, card) {
+      gateway(card);
+      structure(card);
+    }
   },
   {
     id: 'scions_first_wish',

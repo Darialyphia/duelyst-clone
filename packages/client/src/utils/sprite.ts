@@ -29,7 +29,8 @@ export const SPRITE_ZINDEX_OFFSETS = {
 // some sprites animations needs to be played at half speed, but it's not indicated in the plist filename
 // so we have to manually do the bookkeeping here as we'll add the sprites :pepehands:
 export const HALF_SPEED_SPRITES: [string, string][] = [
-  ['icon_f4_voidpulse.png', 'default']
+  ['icon_f4_voidpulse.png', 'default'],
+  ['icon_f4_d2_daemoniclure.png', 'default']
 ];
 
 export const isHalfSpeed = (sheet: Spritesheet, animation: string) => {

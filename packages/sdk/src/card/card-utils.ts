@@ -6,12 +6,14 @@ import { modifierOpeningGambitMixin } from '../modifier/mixins/opening-gambit.mi
 import { modifierDyingWishMixin } from '../modifier/mixins/dying-wish.mixin';
 import { modifierRushMixin } from '../modifier/mixins/rush.mixin';
 import { modifierGameEventMixin } from '../modifier/mixins/game-event.mixin';
+import { modifierGatewayMixin } from '../modifier/mixins/gateway.mixin';
 import { KEYWORDS } from '../utils/keywords';
 import type { GameEvent, GameEventMap, GameSession } from '../game-session';
 import { CARD_EVENTS, type AnyCard } from './card';
 import { PLAYER_EVENTS } from '../player/player';
 import { modifierRangedMixin } from '../modifier/mixins/ranged.mixin';
 import type { Spell } from './spell';
+import { modifierInterceptorMixin } from '../modifier/mixins/interceptor.mixin';
 
 export const CARD_KINDS = {
   MINION: 'MINION',
@@ -39,10 +41,22 @@ export const RARITIES = {
   COMMON: 'common',
   RARE: 'rare',
   EPIC: 'epic',
-  LEGENDARY: 'legendary'
+  LEGENDARY: 'legendary',
+  TOKEN: 'token'
 } as const;
 
 export type Rarity = Values<typeof RARITIES>;
+
+export const TRIBES = {
+  DERVISH: 'Dervish',
+  STRUCTURE: 'Structure'
+} as const;
+
+export type Tribe = Values<typeof TRIBES>;
+
+export const INTERCEPTOR_PRIORITIES = {
+  FINAL: 999
+};
 
 export const openingGambit = (
   card: Unit & { entity: Entity },
@@ -90,6 +104,50 @@ export const rush = (card: Unit & { entity: Entity }) => {
       description: KEYWORDS.RUSH.description,
       stackable: false,
       mixins: [modifierRushMixin()]
+    })
+  );
+};
+
+export const gateway = (card: Unit & { entity: Entity }) => {
+  card.entity.addModifier(
+    createEntityModifier({
+      visible: true,
+      name: KEYWORDS.GATEWAY.name,
+      description: KEYWORDS.GATEWAY.description,
+      stackable: false,
+      mixins: [modifierGatewayMixin()]
+    })
+  );
+};
+
+export const structure = (card: Unit & { entity: Entity }) => {
+  card.entity.addModifier(
+    createEntityModifier({
+      visible: false,
+      stackable: false,
+      mixins: [
+        modifierInterceptorMixin({
+          key: 'attack',
+          priority: INTERCEPTOR_PRIORITIES.FINAL,
+          duration: Infinity,
+          interceptor: () => () => 0,
+          keywords: []
+        }),
+        modifierInterceptorMixin({
+          key: 'canMove',
+          priority: INTERCEPTOR_PRIORITIES.FINAL,
+          duration: Infinity,
+          interceptor: () => () => false,
+          keywords: []
+        }),
+        modifierInterceptorMixin({
+          key: 'canAttack',
+          priority: INTERCEPTOR_PRIORITIES.FINAL,
+          duration: Infinity,
+          interceptor: () => () => false,
+          keywords: []
+        })
+      ]
     })
   );
 };

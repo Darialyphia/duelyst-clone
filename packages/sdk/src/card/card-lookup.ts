@@ -10,7 +10,7 @@ import { abyssian } from './cards/abyssian';
 import { magmar } from './cards/magmar';
 import { vanar } from './cards/vanar';
 import { neutral } from './cards/neutral';
-import type { CardKind, Faction, Rarity } from './card-utils';
+import type { CardKind, Faction, Rarity, Tribe } from './card-utils';
 import type { Unit } from './unit';
 import type { Spell } from './spell';
 import type { CardModifier } from '../modifier/card-modifier';
@@ -30,6 +30,7 @@ type CardBlueprintUnit = {
   attack: number;
   maxHp: number;
   modifiers?: CardModifier<Unit>[];
+  tribe?: Tribe;
   onPlay(session: GameSession, card: Unit & { entity: Entity }): MaybePromise<void>;
   followup?: {
     minTargetCount: number;

@@ -334,9 +334,10 @@ export class Entity extends EventEmitter<EntityEventMap> implements Serializable
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const entity = source instanceof Unit ? source.entity : null;
 
+    const bloodFx = this.session.rngSystem.nextInt(4);
     this.session.fxSystem.playSfxOnEntity(this.id, {
       resourceName: 'fx_bloodground',
-      animationName: `bloodground${this.session.rngSystem.nextInt(4) + 1}`,
+      animationName: `bloodground${bloodFx ? bloodFx : ''}`,
       offset: {
         x: 0,
         y: 20

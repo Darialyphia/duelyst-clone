@@ -132,13 +132,13 @@ const isHovered = computed(() => ui.hoveredCell.value?.equals(cell.value));
                 }
               })
               .with(TARGETING_MODES.FOLLOWUP, () => {
+                if (!ui.selectedCard.value) return;
                 if (
-                  ui.selectedCard.value instanceof Unit &&
                   ui.selectedCard.value.blueprint.followup?.isTargetable(
                     session,
                     cell,
                     ui.summonTarget.value!,
-                    ui.selectedCard.value
+                    ui.selectedCard.value as any
                   )
                 ) {
                   ui.followupTargets.value.push(cell.position);

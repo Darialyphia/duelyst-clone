@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type CardKind, CARD_KINDS } from '@game/sdk';
-import type { Rarity } from '@game/sdk/src/card/card-utils';
+import { RARITIES, type Rarity } from '@game/sdk/src/card/card-utils';
 
 type ICard = {
   kind: CardKind;
@@ -15,7 +15,7 @@ type ICard = {
 const { card } = defineProps<{ card: ICard }>();
 
 const rarityIcon = computed(() =>
-  card.rarity === 'basic'
+  [RARITIES.BASIC, RARITIES.TOKEN].includes(card.rarity)
     ? ''
     : `url('/assets/ui/collection_card_rarity_${card.rarity}.png')`
 );

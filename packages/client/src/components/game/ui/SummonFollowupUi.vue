@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Unit } from '@game/sdk';
+import { Artifact, Unit } from '@game/sdk';
 
 const { ui, dispatch } = useGame();
 
@@ -26,7 +26,7 @@ watchEffect(() => {
   if (ui.targetingMode.value !== TARGETING_MODES.FOLLOWUP) return;
   const card = ui.selectedCard.value;
   if (!card) return false;
-  if (!(card instanceof Unit)) return false;
+  if (card instanceof Artifact) return false;
 
   if (ui.followupTargets.value.length === card.blueprint.followup!.maxTargetCount) {
     commit();

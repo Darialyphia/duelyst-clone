@@ -31,6 +31,16 @@ export const KEYWORDS = {
     id: 'ranged',
     name: 'Ranged',
     description: 'Can attack any enemy, regardeless of distance.'
+  },
+  EPHEMERAL: {
+    id: 'ephemeral',
+    name: 'Ephemeral',
+    description: 'Disappears at the end of the turn it is summoned.'
+  },
+  GATEWAY: {
+    id: 'gateway',
+    name: 'Gateway',
+    description: 'At the start of your turn, summon a Wind Dervish on a nearby space.'
   }
 } as const satisfies Record<string, Keyword>;
 

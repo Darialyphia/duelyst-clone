@@ -117,6 +117,9 @@ export const useGameUiProvider = (session: GameSession) => {
     switchTargetingMode(mode) {
       targetingMode.value = mode;
       api.mouseLightColor.value = DEFAULT_MOUSE_LIGHT_COLOR;
+      api.setAmbientLightStrength(
+        mode === TARGETING_MODES.FOLLOWUP ? 0.6 : DEFAULT_AMBIENT_LIGHT_STRENGTH
+      );
     },
     registerLayer(layer, name) {
       if (!layer) return;

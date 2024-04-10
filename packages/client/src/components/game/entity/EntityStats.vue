@@ -97,9 +97,11 @@ watch(
 const diffProps = {
   duration: { enter: 200, leave: 200 },
   beforeEnter: { scale: 0 },
-  enter: { scale: 1, ease: EasePresets.easeOutSine },
-  leave: { scale: 0, ease: EasePresets.easeOutSine }
+  enter: { scale: 1, ease: EasePresets.easeOutCubic },
+  leave: { scale: 0, ease: EasePresets.easeOutCubic }
 };
+
+const { autoDestroyRef } = useAutoDestroy();
 </script>
 
 <template>
@@ -151,6 +153,7 @@ const diffProps = {
     <PTransition v-bind="diffProps">
       <graphics
         v-if="attackDiff"
+        :ref="(el: any) => autoDestroyRef(el)"
         :x="maxHpDiff ? -CELL_WIDTH * 0.3 : -CELL_WIDTH * 0.15"
         @render="
           g => {
@@ -175,6 +178,7 @@ const diffProps = {
     <PTransition v-bind="diffProps">
       <graphics
         v-if="maxHpDiff"
+        :ref="(el: any) => autoDestroyRef(el)"
         :x="attackDiff ? 0 : -CELL_WIDTH * 0.15"
         @render="
           g => {
@@ -198,6 +202,7 @@ const diffProps = {
     <PTransition v-bind="diffProps">
       <graphics
         v-if="currentHpDiff"
+        :ref="(el: any) => autoDestroyRef(el)"
         :x="-CELL_WIDTH * 0.15"
         @render="
           g => {

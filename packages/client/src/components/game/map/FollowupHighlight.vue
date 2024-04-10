@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Unit, type Cell } from '@game/sdk';
+import { Artifact, Unit, type Cell } from '@game/sdk';
 import { match } from 'ts-pattern';
 
 const { cell } = defineProps<{ cell: Cell }>();
@@ -19,14 +19,14 @@ const isMatch = (cellToTest: Cell) => {
     )
     .with(TARGETING_MODES.FOLLOWUP, () => {
       if (!ui.selectedCard.value) return false;
-      if (!(ui.selectedCard.value instanceof Unit)) return false;
+      if (ui.selectedCard.value instanceof Artifact) return false;
 
       return (
         ui.selectedCard.value.blueprint.followup?.isTargetable(
           session,
           cellToTest,
           ui.summonTarget.value!,
-          ui.selectedCard.value
+          ui.selectedCard.value as any
         ) ?? false
       );
     })

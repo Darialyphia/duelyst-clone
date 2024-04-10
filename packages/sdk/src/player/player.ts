@@ -158,12 +158,7 @@ export class Player extends EventEmitter<PlayerEventMap> implements Serializable
   }
 
   generateCard(blueprintId: CardBlueprintId) {
-    const card = createCard(
-      this.session,
-      { blueprintId: 'mini_jax' },
-      this.cards.length,
-      this.id
-    );
+    const card = createCard(this.session, { blueprintId }, this.cards.length, this.id);
     this.cards.push(card);
 
     return card;
