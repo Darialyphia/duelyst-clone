@@ -1,5 +1,8 @@
-import type { Point, Size } from '../types/geometry';
-import type { AnyFunction, AnyObject, Entries, Matrix } from '../types/utils';
+import type { Point } from '../types/geometry';
+import type { AnyObject, Entries } from '../types/utils';
+
+export const camelToSnakeCase = (str: string) =>
+  str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 
 export const clamp = (num: number, min: number, max: number) =>
   Math.min(Math.max(num, min), max);

@@ -71,7 +71,7 @@ onMounted(async () => {
   const app = createApp(GameView);
   app.provide(appInjectKey, pixiApp);
   app.provide(GAME_INJECTION_KEY, game);
-
+  app.provide(ASSETS_INJECTION_KEY, game.assets);
   const { appContext } = getCurrentInstance()!;
 
   const parent = appContext?.app;

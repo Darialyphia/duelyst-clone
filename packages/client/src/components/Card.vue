@@ -15,7 +15,7 @@ type ICard = {
 const { card } = defineProps<{ card: ICard }>();
 
 const rarityIcon = computed(() =>
-  [RARITIES.BASIC, RARITIES.TOKEN].includes(card.rarity)
+  [RARITIES.BASIC, RARITIES.TOKEN].includes(card.rarity as any)
     ? ''
     : `url('/assets/ui/collection_card_rarity_${card.rarity}.png')`
 );
@@ -49,9 +49,12 @@ const rarityIcon = computed(() =>
 
 <style scoped lang="postcss">
 .card {
+  position: relative;
+
   width: 226px;
   height: 297px;
   padding: 0.8rem 0.6rem;
+
   border-radius: var(--radius-2);
 
   &:is(.general, .minion) {

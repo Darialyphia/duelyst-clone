@@ -116,6 +116,7 @@ export const useAssetsProvider = () => {
     async loadSpritesheet(key) {
       // avoids pixi warning messages when wetry to load a bundle multiple times
       if (!bundlesPromises.has(key)) {
+        console.log('load bundle', key);
         bundlesPromises.set(key, Assets.loadBundle(key));
       }
       await bundlesPromises.get(key);

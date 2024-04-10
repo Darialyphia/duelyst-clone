@@ -1,33 +1,29 @@
 <script setup lang="ts" generic="T extends string | number">
-import {
-  ComboboxAnchor,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxRoot,
-  ComboboxTrigger,
-  ComboboxViewport
-} from 'radix-vue';
-
 const { options } = defineProps<{
   options: Array<{ label: string; value: T }>;
+  displayValue?: (val: T) => string;
 }>();
 
 const selected = defineModel<T>({ required: true });
 const search = ref('');
-const searchDebounced = refDebounced(search, 200);
+const filteredOptions = computed(() =>
+  options.filter(option =>
+    option.label.toLowerCase().includes(search.value.toLowerCase())
+  )
+);
 
-// const searchOptions = computed(() =>
-//   searchDebounced.value
-//     ? options.filter(option => {
-//         return option.label.toLowerCase().includes(searchDebounced.value.toLowerCase());
-//       })
-//     : []
-// );
+const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
+  itemHeight: 32
+});
 </script>
 
 <template>
-  <ComboboxRoot v-model="selected" class="ui-combobox-root">
+  <ComboboxRoot
+    v-model="selected"
+    v-model:search-term="search"
+    class="ui-combobox-root"
+    :display-value="displayValue"
+  >
     <ComboboxAnchor class="anchor">
       <ComboboxInput />
       <ComboboxTrigger>
@@ -37,14 +33,18 @@ const searchDebounced = refDebounced(search, 200);
 
     <ComboboxContent class="content">
       <ComboboxViewport class="viewport">
-        <ComboboxItem
-          v-for="option in options"
-          :key="option.value"
-          :value="option.value"
-          class="item"
-        >
-          {{ option.label }}
-        </ComboboxItem>
+        <div v-bind="containerProps" style="height: 300px">
+          <div v-bind="wrapperProps">
+            <ComboboxItem
+              v-for="option in list"
+              :key="option.index"
+              :value="option.data.value"
+              class="item"
+            >
+              {{ option.data.label }}
+            </ComboboxItem>
+          </div>
+        </div>
       </ComboboxViewport>
     </ComboboxContent>
   </ComboboxRoot>
@@ -89,18 +89,12 @@ const searchDebounced = refDebounced(search, 200);
   }
 }
 
-.viewport {
-  overflow-y: auto;
-  max-height: 300px;
-}
-
 .content {
   position: absolute;
   z-index: 10;
 
-  overflow: hidden;
-
   width: 100%;
+  max-height: 200px;
   margin-top: 8px;
   padding-block: var(--size-2);
 

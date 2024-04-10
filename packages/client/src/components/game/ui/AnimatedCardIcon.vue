@@ -7,9 +7,15 @@ const { spriteId, kind, isActive, isHovered } = defineProps<{
   isActive?: boolean;
   isHovered?: boolean;
 }>();
-const { assets } = useGame();
+const assets = useAssets();
 
-const sheet = assets.getSpritesheet(spriteId);
+const sheet = ref<SpritesheetWithAnimations>();
+
+const getSheet = async () => {
+  sheet.value = await assets.loadSpritesheet(spriteId);
+};
+
+watchEffect(getSheet);
 
 const animationName = computed(() =>
   match(kind)
@@ -21,13 +27,19 @@ const animationName = computed(() =>
     )
     .exhaustive()
 );
-const animation = computed(() => sheet.animations[animationName.value]);
-const frame = ref(0);
-const frameDuration = computed(() =>
-  isHalfSpeed(sheet, animationName.value) ? 160 : 80
+const animation = computed(() =>
+  sheet.value ? sheet.value.animations[animationName.value] : null
 );
 
+const frame = ref(0);
+
+const frameDuration = computed(() => {
+  if (!sheet.value) return 100;
+  return isHalfSpeed(sheet.value, animationName.value) ? 160 : 80;
+});
+
 useIntervalFn(() => {
+  if (!animation.value) return;
   frame.value = (frame.value + 1) % (animation.value.length - 1);
 }, frameDuration);
 
@@ -36,7 +48,9 @@ watch([() => isHovered, () => isActive], () => {
 });
 
 const style = computed(() => {
-  const bg = sheet.baseTexture.resource.src;
+  if (!sheet.value || !animation.value) return {};
+
+  const bg = sheet.value.baseTexture.resource.src;
   const texture = animation.value[frame.value];
   return {
     '--width': texture.orig.width,
