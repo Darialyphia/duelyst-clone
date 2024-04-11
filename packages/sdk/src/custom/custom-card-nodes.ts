@@ -8,52 +8,60 @@ import {
   attackModifierInput,
   hpModifierInput,
   targetInput,
-  type CustomCardInput
+  type CustomCardInput,
+  type inferProcessedInput
 } from './custom-card-inputs';
 
-export type CustomCardNode<TInputs extends any[], TReturn = void> = {
-  label: string;
-  inputs?: CustomCardInput[];
-  process(session: GameSession, card: AnyCard, ...inputs: TInputs): TReturn;
+type inferInputs<T extends CustomCardInput[]> = {
+  [P in keyof T]: inferProcessedInput<T[P]>;
 };
 
-export const dealDamageNode: CustomCardNode<[Entity[], number]> = {
+export type CustomCardNode<T extends CustomCardInput[]> = {
+  label: string;
+  inputs?: [...T];
+  process(session: GameSession, card: AnyCard, ...inputs: inferInputs<T>): Promise<any>;
+};
+
+export type inferProcessedNode<T extends CustomCardNode<any>> = Awaited<
+  ReturnType<T['process']>
+>;
+
+const defineNode = <T extends CustomCardInput[]>(node: CustomCardNode<T>) => node;
+
+export const dealDamageNode = defineNode({
   label: 'Deal damage',
   inputs: [targetInput, amountInput],
-  process(session, card, targets, amount) {
-    targets.forEach(target => {
-      target.takeDamage(amount, card);
-    });
+  async process(session, card, targets, amount) {
+    await Promise.all(targets.map(target => target.takeDamage(amount, card)));
   }
-};
+});
 
-export const healNode: CustomCardNode<[Entity[], number]> = {
+export const healNode = defineNode({
   label: 'Heal',
   inputs: [targetInput, amountInput],
-  process(session, card, targets, amount) {
-    targets.forEach(target => {
-      target.heal(amount, card);
-    });
+  async process(session, card, targets, amount) {
+    await Promise.all(targets.map(target => target.heal(amount, card)));
   }
-};
+});
 
-export const statChangeNode: CustomCardNode<[number, number, Entity[]], (() => void)[]> =
-  {
-    label: 'Give +X / +X',
-    inputs: [attackModifierInput, hpModifierInput, targetInput],
-    process(session, card, attack, hp, targets) {
-      return targets
+export const statChangeNode = defineNode({
+  label: 'Give +X / +X',
+  inputs: [attackModifierInput, hpModifierInput, targetInput],
+  process(session, card, attack, hp, targets) {
+    return Promise.resolve(
+      targets
         .map(target => {
           return [
             target.addInterceptor('attack', val => val + attack),
             target.addInterceptor('maxHp', val => val + hp)
           ];
         })
-        .flat();
-    }
-  };
+        .flat()
+    );
+  }
+});
 
-export const openingGambitNode: CustomCardNode<[CustomCardNode]> = {
+export const openingGambitNode = defineNode({
   label: 'Opening Gambit',
   inputs: [{ type: 'node', choices: [dealDamageNode, healNode, statChangeNode] }],
   process(session, card, action) {
@@ -61,7 +69,7 @@ export const openingGambitNode: CustomCardNode<[CustomCardNode]> = {
     //   action.
     // });
   }
-};
+});
 
 export const dyingWishNode: CustomCardNode = {
   label: 'Dying Wish',
