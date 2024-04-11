@@ -1,5 +1,5 @@
 import type { AnyCard } from '../card/card';
-import { dyingWish, openingGambit } from '../card/card-utils';
+import { dyingWish, openingGambit, rush } from '../card/card-utils';
 import type { GameSession } from '../game-session';
 import { createEntityModifier } from '../modifier/entity-modifier';
 import {
@@ -126,6 +126,20 @@ export const healNode = defineNode({
   }
 });
 
+export const drawNode = defineNode({
+  label: 'Draw X',
+  inputs: [amountInput] as const,
+  process(session, card, config, node) {
+    const [amount] = getInputs(session, card, config, node);
+
+    return () => card.player.draw(amount);
+  },
+  getDescription(config, node) {
+    const [amount] = getInputDescriptions(config, node);
+    return `Draw ${amount} cards.`;
+  }
+});
+
 export const statChangeNode = defineNode({
   label: 'Give +X / +X',
   inputs: [attackModifierInput, hpModifierInput, targetInput] as const,
@@ -165,7 +179,7 @@ export const openingGambitNode = defineNode({
     {
       type: 'node',
       label: 'Action',
-      choices: [dealDamageNode, healNode, statChangeNode] as const
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode] as const
     }
   ],
   process(session, card, config, node) {
@@ -185,7 +199,11 @@ export const openingGambitNode = defineNode({
 export const dyingWishNode = defineNode({
   label: 'Dying Wish',
   inputs: [
-    { type: 'node', label: 'Action', choices: [dealDamageNode, healNode, statChangeNode] }
+    {
+      type: 'node',
+      label: 'Action',
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode]
+    }
   ],
   process(session, card, config, node) {
     const [action] = getInputs(session, card, config, node);
@@ -201,10 +219,25 @@ export const dyingWishNode = defineNode({
   }
 });
 
+export const rushNode = defineNode({
+  label: 'Rush',
+  inputs: [],
+  process(session, card, config, node) {
+    return () => rush(card as any);
+  },
+  getDescription(config, node) {
+    return `Rush`;
+  }
+});
+
 export const rootNode = defineNode({
   label: 'Choose an Action',
   inputs: [
-    { type: 'node', label: 'Effect type', choices: [openingGambitNode, dyingWishNode] }
+    {
+      type: 'node',
+      label: 'Effect type',
+      choices: [openingGambitNode, dyingWishNode, rushNode]
+    }
   ] as const,
   process(session, card, config, node) {
     const [action] = getInputs(session, card, config, node);
