@@ -1,9 +1,10 @@
 import type { Point3D } from '@game/shared';
 import type { CustomCardNode, inferProcessedNode } from './custom-card-nodes';
+
 import type { GameSession } from '../game-session';
 import type { Entity } from '../entity/entity';
 
-type EnumCardInput<T> = {
+export type EnumCardInput<T> = {
   type: 'choices';
   label: string;
   choices: Array<{
@@ -12,29 +13,26 @@ type EnumCardInput<T> = {
   }>;
 };
 
-type NumberCardInput = { type: 'number'; label: string; allowNegative: boolean };
+export type NumberCardInput = { type: 'number'; label: string; allowNegative: boolean };
 
-type NodeCardInput<T extends CustomCardInput[]> = {
+export type NodeCardInput<T extends CustomCardInput[], U> = {
   type: 'node';
-  choices: CustomCardNode<T>[];
+  label: string;
+  choices: CustomCardNode<T, U>[];
 };
 
-export type CustomCardInput<T = any> = T extends CustomCardInput[]
-  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T>
+export type CustomCardInput<T = any, U = any> = T extends CustomCardInput[]
+  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T, U>
   : EnumCardInput<T> | NumberCardInput;
 
 export type inferProcessedInput<T> =
-  T extends CustomCardInput<infer U>
-    ? T extends EnumCardInput<U>
-      ? U
-      : T extends NumberCardInput
-        ? number
-        : U extends CustomCardInput[]
-          ? T extends NodeCardInput<U>
-            ? inferProcessedNode<T['choices'][number]>
-            : 'Unknown CustomCardInput type'
-          : 'Wrong generic type for NodeCardInput'
-    : 'Not a CustomCardInput';
+  T extends EnumCardInput<infer U>
+    ? U
+    : T extends NumberCardInput
+      ? number
+      : T extends NodeCardInput<infer Input, infer Return>
+        ? Return
+        : 'Unknown CustomCardInput type';
 
 export const attackModifierInput = {
   type: 'number',
@@ -42,7 +40,7 @@ export const attackModifierInput = {
   allowNegative: true
 } satisfies CustomCardInput;
 
-export const hpModifierInput: CustomCardInput = {
+export const hpModifierInput = {
   type: 'number',
   label: 'Health',
   allowNegative: true
