@@ -17,3 +17,11 @@ export { Unit } from './card/unit';
 export { Spell } from './card/spell';
 export { Artifact } from './card/artifact';
 export { type Faction, FACTIONS } from './card/card-utils';
+
+export type { CustomCardBlueprint } from './custom/custom-card-blueprint';
+export {
+  type CustomCardNode,
+  type AnyCardNode,
+  rootNode
+} from './custom/custom-card-nodes';
+export type { CustomCardInput } from './custom/custom-card-inputs';

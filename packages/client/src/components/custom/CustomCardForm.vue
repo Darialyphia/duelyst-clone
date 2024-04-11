@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { rootNode, type CustomCardBlueprint } from '@game/sdk';
+
 const plists = import.meta.glob('@/assets/units{m}/*.plist', {
   eager: true,
   query: '?url',
@@ -15,19 +17,20 @@ const spriteOptions = computed(() => {
     .map(k => ({ label: k, value: k }));
 });
 
-const form = reactive({
+const form = reactive<CustomCardBlueprint>({
   spriteId: null as any,
-  cost: 2,
+  manaCost: 2,
   name: 'My Cool Card',
   description: 'My Cool description',
   attack: 2,
-  hp: 3
+  maxHp: 3,
+  nodes: []
 });
 </script>
 
 <template>
   <p v-if="!assets.loaded">Loading card data...</p>
-  <div v-else class="fancy-surface grid grid-cols-2 gap-8">
+  <div v-else class="fancy-surface custom-card-form">
     <form>
       <Label>Sprite</Label>
       <UiCombobox v-model="form.spriteId" :options="spriteOptions" />
@@ -44,7 +47,12 @@ const form = reactive({
 
       <Label>
         Mana Cost
-        <UiTextInput id="card-cost" v-model.number="form.cost" step="1" type="number" />
+        <UiTextInput
+          id="card-cost"
+          v-model.number="form.manaCost"
+          step="1"
+          type="number"
+        />
       </Label>
 
       <Label>
@@ -59,21 +67,35 @@ const form = reactive({
 
       <Label>
         Health
-        <UiTextInput id="card-hp" v-model.number="form.hp" step="1" type="number" />
+        <UiTextInput id="card-hp" v-model.number="form.maxHp" step="1" type="number" />
       </Label>
+
+      <Label>Effects</Label>
+      <ul>
+        <li v-for="(node, index) in form.nodes" :key="index">
+          <CustomCardNode v-model:config="form.nodes[index]" :node="rootNode" />
+        </li>
+      </ul>
+      <UiButton
+        class="primary-button"
+        type="button"
+        @click="form.nodes.push([{ value: undefined as any, next: [] }])"
+      >
+        Add new effect
+      </UiButton>
     </form>
-    <div>
+    <div class="sticky top-0" style="height: 75dvh">
       <UiCenter v-if="form.spriteId">
         <Card
           :card="{
-            cost: form.cost,
+            cost: form.manaCost,
             name: form.name,
             description: form.description,
             kind: 'MINION',
             spriteId: form.spriteId,
             rarity: 'legendary',
             attack: form.attack,
-            hp: form.hp
+            hp: form.maxHp
           }"
         />
       </UiCenter>
@@ -83,6 +105,14 @@ const form = reactive({
 </template>
 
 <style scoped lang="postcss">
+.custom-card-form {
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--size-8);
+
+  height: 75dvh;
+}
 .form {
   transform: scale(1);
 }

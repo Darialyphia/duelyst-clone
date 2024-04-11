@@ -31,22 +31,24 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
       </ComboboxTrigger>
     </ComboboxAnchor>
 
-    <ComboboxContent class="content">
-      <ComboboxViewport class="viewport">
-        <div v-bind="containerProps" style="height: 300px">
-          <div v-bind="wrapperProps">
-            <ComboboxItem
-              v-for="option in list"
-              :key="option.index"
-              :value="option.data.value"
-              class="item"
-            >
-              {{ option.data.label }}
-            </ComboboxItem>
+    <ComboboxPortal>
+      <ComboboxContent class="ui-comboox-content" position="popper">
+        <ComboboxViewport class="viewport">
+          <div v-bind="containerProps" style="height: 300px">
+            <div v-bind="wrapperProps">
+              <ComboboxItem
+                v-for="option in list"
+                :key="option.index"
+                :value="option.data.value"
+                class="item"
+              >
+                {{ option.data.label }}
+              </ComboboxItem>
+            </div>
           </div>
-        </div>
-      </ComboboxViewport>
-    </ComboboxContent>
+        </ComboboxViewport>
+      </ComboboxContent>
+    </ComboboxPortal>
   </ComboboxRoot>
 </template>
 
@@ -89,11 +91,10 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
   }
 }
 
-.content {
-  position: absolute;
+:global(.ui-comboox-content) {
   z-index: 10;
 
-  width: 100%;
+  width: 15rem;
   max-height: 200px;
   margin-top: 8px;
   padding-block: var(--size-2);
@@ -124,16 +125,5 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
     background-color: var(--primary-dark);
     outline: none;
   }
-}
-
-.ComboboxItemIndicator {
-  position: absolute;
-  left: 0;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 25px;
 }
 </style>

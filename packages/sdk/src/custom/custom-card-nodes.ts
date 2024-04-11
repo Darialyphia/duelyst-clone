@@ -14,33 +14,36 @@ import {
 } from './custom-card-inputs';
 import { modifierStatModifierMixin } from '../modifier/mixins/stat-modifier.mixin';
 import { match } from 'ts-pattern';
+import type { MaybePromise } from '@game/shared';
 
 type inferInputs<T extends CustomCardInput[]> = {
   [P in keyof T]: inferProcessedInput<T[P]>;
 };
 
-export type CustomCardNode<T extends CustomCardInput[], TReturn> = {
+export type CustomCardNode<T extends CustomCardInput[]> = {
   label: string;
   inputs: [...T];
   process(
     session: GameSession,
     card: AnyCard,
     config: NodeConfig[],
-    node: CustomCardNode<T, TReturn>
-  ): TReturn;
+    node: CustomCardNode<T>
+  ): () => MaybePromise<any>;
 };
 
-type GenericNode = CustomCardNode<any, any>;
-export type inferProcessedNode<T extends GenericNode> = Awaited<ReturnType<T['process']>>;
+export type AnyCardNode = CustomCardNode<CustomCardInput[]>;
+export type inferProcessedNode<T extends AnyCardNode> = Awaited<ReturnType<T['process']>>;
 
-type NodeConfig = {
-  value: number;
-  next?: NodeConfig[];
+export type NodeConfig = {
+  value: number | string;
+  next: NodeConfig[];
 };
 
-const defineNode = <T extends CustomCardInput[], U = any>(node: CustomCardNode<T, U>) =>
-  node;
-const getInputs = <TNode extends GenericNode>(
+const defineNode = <T extends CustomCardInput[]>(node: CustomCardNode<T>) => node;
+
+const getInputs = <TNode extends AnyCardNode>(
+  session: GameSession,
+  card: AnyCard,
   nodeConfig: NodeConfig[],
   node: TNode
 ): inferInputs<TNode['inputs']> => {
@@ -49,9 +52,16 @@ const getInputs = <TNode extends GenericNode>(
     if (!input) throw new Error('invalid node config');
 
     return match(input.type)
-      .with('number', () => conf.value)
-      .with('choices', () => (input as EnumCardInput<any>).choices[conf.value])
-      .with('node', () => (input as NodeCardInput<any, any>).choices[conf.value]);
+      .with('number', () => Number(conf.value))
+      .with('choices', () => (input as EnumCardInput<any>).choices[Number(conf.value)])
+      .with('node', () =>
+        (input as NodeCardInput<any>).choices[Number(conf.value)].process(
+          session,
+          card,
+          conf.next,
+          node
+        )
+      );
   }) as inferInputs<TNode['inputs']>;
 };
 
@@ -59,7 +69,7 @@ export const dealDamageNode = defineNode({
   label: 'Deal damage',
   inputs: [targetInput, amountInput] as const,
   process(session, card, config, node) {
-    const [targets, amount] = getInputs(config, node);
+    const [targets, amount] = getInputs(session, card, config, node);
 
     return () => Promise.all(targets.map(target => target.takeDamage(amount, card)));
   }
@@ -69,7 +79,7 @@ export const healNode = defineNode({
   label: 'Heal',
   inputs: [targetInput, amountInput] as const,
   process(session, card, config, node) {
-    const [targets, amount] = getInputs(config, node);
+    const [targets, amount] = getInputs(session, card, config, node);
 
     return () => Promise.all(targets.map(target => target.heal(amount, card)));
   }
@@ -79,7 +89,7 @@ export const statChangeNode = defineNode({
   label: 'Give +X / +X',
   inputs: [attackModifierInput, hpModifierInput, targetInput] as const,
   process(session, card, config, node) {
-    const [attack, hp, targets] = getInputs(config, node);
+    const [attack, hp, targets] = getInputs(session, card, config, node);
 
     return () =>
       targets
@@ -114,7 +124,7 @@ export const openingGambitNode = defineNode({
     }
   ],
   process(session, card, config, node) {
-    const [action] = getInputs(config, node);
+    const [action] = getInputs(session, card, config, node);
 
     return () =>
       openingGambit(card as any, () => {
@@ -129,7 +139,7 @@ export const dyingWishNode = defineNode({
     { type: 'node', label: 'Action', choices: [dealDamageNode, healNode, statChangeNode] }
   ],
   process(session, card, config, node) {
-    const [action] = getInputs(config, node);
+    const [action] = getInputs(session, card, config, node);
 
     return () =>
       dyingWish(card as any, () => {
@@ -138,12 +148,14 @@ export const dyingWishNode = defineNode({
   }
 });
 
-// export const rootNode = defineNode({
-//   label: 'Choose an effect',
-//   inputs: [
-//     { type: 'node', label: 'Action', choices: [openingGambitNode, dyingWishNode] }
-//   ] as const,
-//   async process(session, card, action) {
-//     await action();
-//   }
-// });
+export const rootNode = defineNode({
+  label: 'Choose an Action',
+  inputs: [
+    { type: 'node', label: 'Effect type', choices: [openingGambitNode, dyingWishNode] }
+  ] as const,
+  process(session, card, config, node) {
+    const [action] = getInputs(session, card, config, node);
+
+    return () => action();
+  }
+});

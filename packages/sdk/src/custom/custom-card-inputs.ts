@@ -1,4 +1,4 @@
-import type { Point3D } from '@game/shared';
+import type { MaybePromise, Point3D } from '@game/shared';
 import type { CustomCardNode, inferProcessedNode } from './custom-card-nodes';
 
 import type { GameSession } from '../game-session';
@@ -15,14 +15,14 @@ export type EnumCardInput<T> = {
 
 export type NumberCardInput = { type: 'number'; label: string; allowNegative: boolean };
 
-export type NodeCardInput<T extends CustomCardInput[], U> = {
+export type NodeCardInput<T extends CustomCardInput[]> = {
   type: 'node';
   label: string;
-  choices: CustomCardNode<T, U>[];
+  choices: CustomCardNode<T>[];
 };
 
-export type CustomCardInput<T = any, U = any> = T extends CustomCardInput[]
-  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T, U>
+export type CustomCardInput<T = any> = T extends CustomCardInput[]
+  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T>
   : EnumCardInput<T> | NumberCardInput;
 
 export type inferProcessedInput<T> =
@@ -30,8 +30,8 @@ export type inferProcessedInput<T> =
     ? U
     : T extends NumberCardInput
       ? number
-      : T extends NodeCardInput<infer Input, infer Return>
-        ? Return
+      : T extends NodeCardInput<any>
+        ? () => MaybePromise<any>
         : 'Unknown CustomCardInput type';
 
 export const attackModifierInput = {
@@ -48,7 +48,7 @@ export const hpModifierInput = {
 
 export const amountInput = {
   type: 'number',
-  label: 'string',
+  label: 'Amount',
   allowNegative: false
 } satisfies CustomCardInput;
 
