@@ -19,6 +19,9 @@ import type { MaybePromise } from '@game/shared';
 type inferInputs<T extends CustomCardInput[]> = {
   [P in keyof T]: inferProcessedInput<T[P]>;
 };
+type inferDescriptions<T extends CustomCardInput[]> = {
+  [P in keyof T]: string;
+};
 
 export type CustomCardNode<T extends CustomCardInput[]> = {
   label: string;
@@ -29,6 +32,7 @@ export type CustomCardNode<T extends CustomCardInput[]> = {
     config: NodeConfig[],
     node: CustomCardNode<T>
   ): () => MaybePromise<any>;
+  getDescription(config: NodeConfig[], node: CustomCardNode<T>): string;
 };
 
 export type AnyCardNode = CustomCardNode<CustomCardInput[]>;
@@ -54,15 +58,44 @@ const getInputs = <TNode extends AnyCardNode>(
     return match(input.type)
       .with('number', () => Number(conf.value))
       .with('choices', () => (input as EnumCardInput<any>).choices[Number(conf.value)])
-      .with('node', () =>
-        (input as NodeCardInput<any>).choices[Number(conf.value)].process(
+      .with('node', () => {
+        const childNode = (input as NodeCardInput<any>).choices[Number(conf.value)];
+        return (input as NodeCardInput<any>).choices[Number(conf.value)].process(
           session,
           card,
           conf.next,
-          node
-        )
-      );
+          childNode
+        );
+      })
+      .run();
   }) as inferInputs<TNode['inputs']>;
+};
+
+const getInputDescriptions = <TNode extends AnyCardNode>(
+  nodeConfig: NodeConfig[],
+  node: TNode
+): inferDescriptions<TNode['inputs']> => {
+  const ret = nodeConfig.map((conf, index) => {
+    const input = node.inputs?.[index];
+    if (!input) throw new Error('invalid node config');
+
+    return match(input.type)
+      .with('number', () => String(conf.value))
+      .with(
+        'choices',
+        () => (input as EnumCardInput<any>).choices[Number(conf.value)].description
+      )
+      .with('node', () => {
+        const childNode = (input as NodeCardInput<any>).choices[Number(conf.value)];
+        return (input as NodeCardInput<any>).choices[Number(conf.value)].getDescription(
+          conf.next,
+          childNode
+        );
+      })
+      .run();
+  }) as inferDescriptions<TNode['inputs']>;
+  console.log(ret);
+  return ret;
 };
 
 export const dealDamageNode = defineNode({
@@ -72,6 +105,10 @@ export const dealDamageNode = defineNode({
     const [targets, amount] = getInputs(session, card, config, node);
 
     return () => Promise.all(targets.map(target => target.takeDamage(amount, card)));
+  },
+  getDescription(config, node) {
+    const [targets, amount] = getInputDescriptions(config, node);
+    return `Deal ${amount} damage to ${targets}`;
   }
 });
 
@@ -82,6 +119,10 @@ export const healNode = defineNode({
     const [targets, amount] = getInputs(session, card, config, node);
 
     return () => Promise.all(targets.map(target => target.heal(amount, card)));
+  },
+  getDescription(config, node) {
+    const [targets, amount] = getInputDescriptions(config, node);
+    return `Restore ${amount} health to ${targets}`;
   }
 });
 
@@ -111,6 +152,10 @@ export const statChangeNode = defineNode({
           );
         })
         .flat();
+  },
+  getDescription(config, node) {
+    const [attack, hp, targets] = getInputDescriptions(config, node);
+    return `Give ${Number(attack) > 0 ? '+' : ''}${attack} / ${Number(hp) > 0 ? '+' : ''}${hp} to ${targets}`;
   }
 });
 
@@ -130,6 +175,10 @@ export const openingGambitNode = defineNode({
       openingGambit(card as any, () => {
         action();
       });
+  },
+  getDescription(config, node) {
+    const [action] = getInputDescriptions(config, node);
+    return `Opening Gambit: ${action}`;
   }
 });
 
@@ -145,6 +194,10 @@ export const dyingWishNode = defineNode({
       dyingWish(card as any, () => {
         action();
       });
+  },
+  getDescription(config, node) {
+    const [action] = getInputDescriptions(config, node);
+    return `Opening Gambit: ${action}`;
   }
 });
 
@@ -157,5 +210,9 @@ export const rootNode = defineNode({
     const [action] = getInputs(session, card, config, node);
 
     return () => action();
+  },
+  getDescription(config, node) {
+    const [action] = getInputDescriptions(config, node);
+    return action;
   }
 });

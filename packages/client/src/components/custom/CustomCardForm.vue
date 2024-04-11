@@ -17,14 +17,23 @@ const spriteOptions = computed(() => {
     .map(k => ({ label: k, value: k }));
 });
 
-const form = reactive<CustomCardBlueprint>({
+const form = reactive<Omit<CustomCardBlueprint, 'description'>>({
   spriteId: null as any,
   manaCost: 2,
   name: 'My Cool Card',
-  description: 'My Cool description',
   attack: 2,
   maxHp: 3,
   nodes: []
+});
+
+const description = computed(() => {
+  try {
+    const res = form.nodes.map(node => rootNode.getDescription([node[0]], rootNode));
+
+    return res.join('\n');
+  } catch (err) {
+    return '';
+  }
 });
 </script>
 
@@ -38,11 +47,6 @@ const form = reactive<CustomCardBlueprint>({
       <Label>
         Name
         <UiTextInput id="card-name" v-model="form.name" />
-      </Label>
-
-      <Label>
-        Description
-        <UiTextInput id="card-description" v-model="form.description" />
       </Label>
 
       <Label>
@@ -90,7 +94,7 @@ const form = reactive<CustomCardBlueprint>({
           :card="{
             cost: form.manaCost,
             name: form.name,
-            description: form.description,
+            description: description,
             kind: 'MINION',
             spriteId: form.spriteId,
             rarity: 'legendary',

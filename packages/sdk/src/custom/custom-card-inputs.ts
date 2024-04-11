@@ -9,6 +9,7 @@ export type EnumCardInput<T> = {
   label: string;
   choices: Array<{
     label: string;
+    description: string;
     value: (session: GameSession, castPoint: Point3D) => T;
   }>;
 };
@@ -57,25 +58,29 @@ export const targetInput = {
   label: 'Target',
   choices: [
     {
-      label: 'An enemy unit',
+      label: 'An enemy',
+      description: 'an enemy',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'An ally unit',
+      label: 'An ally',
+      description: 'an ally',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'An enemy minion',
+      description: 'an enemy minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'An ally minion',
+      description: 'an allied minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
@@ -83,94 +88,123 @@ export const targetInput = {
 
     {
       label: 'The enemy general',
+      description: 'the enemy general',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'Your general',
+      description: 'your general',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'A nearby enemy unit',
+      label: 'A nearby enemy',
+      description: 'a nearby enemy',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'A nearby enemy minion',
+      description: 'a nearby enemy minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'A nearby ally unit',
+      label: 'A nearby ally',
+      description: 'a nearby ally',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'A nearby ally minion',
+      description: 'a nearby allied minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All enemy units',
+      label: 'All enemies',
+      description: 'all enemies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All enemy minions',
+      description: 'all enemy minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'All ally units',
+      label: 'All allies',
+      description: 'all allies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All ally minions',
+      description: 'all allied minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All nearby enemy units',
+      label: 'All nearby enemy',
+      description: 'all nearby enemies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All nearby enemy minions',
+      description: 'all  nearby enemy minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'All nearby ally units',
+      label: 'All nearby allies',
+      description: 'all nearby allies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All nearby ally minions',
+      description: 'all nearby ally minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All units',
+      label: 'All minions',
+      description: 'all minions',
+      value(session, castPoint) {
+        return [] as Entity[];
+      }
+    },
+    {
+      label: 'Any unit',
+      description: 'a unit',
+      value(session, castPoint) {
+        return [] as Entity[];
+      }
+    },
+    {
+      label: 'everyone',
+      description: 'everyone',
       value(session, castPoint) {
         return [] as Entity[];
       }
