@@ -13,7 +13,7 @@ export class AttackAction extends GameAction<typeof schema> {
 
   protected payloadSchema = schema;
 
-  get entity() {
+  get attacker() {
     const entity = this.session.entitySystem.getEntityById(this.payload.entityId);
     if (!entity) throw new Error(`Entity not found: ${this.payload.entityId}`);
     return entity;
@@ -26,6 +26,9 @@ export class AttackAction extends GameAction<typeof schema> {
   }
 
   async impl() {
-    await this.entity.performAttack(this.target);
+    if (!this.target.canBeAttacked(this.attacker)) return;
+    if (!this.attacker.canAttack(this.target)) return;
+
+    await this.attacker.performAttack(this.target);
   }
 }
