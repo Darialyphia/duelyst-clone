@@ -1,4 +1,3 @@
-import { Vec3 } from '@game/shared';
 import { config } from '../../../config';
 import { isEmpty } from '../../../entity/entity-utils';
 import { isWithinCells } from '../../../utils/targeting';

@@ -28,6 +28,8 @@ export const SPRITE_ZINDEX_OFFSETS = {
 
 // some sprites animations needs to be played at half speed, but it's not indicated in the plist filename
 // so we have to manually do the bookkeeping here as we'll add the sprites :pepehands:
+// maybe I should make an fx.ts file like CPG, after all it was only EIGHTEEN THOUSAND LINES
+// also cannot wait to find out there are other speeds somewhere in this file
 export const HALF_SPEED_SPRITES: [string, string][] = [
   ['icon_f4_voidpulse.png', 'default'],
   ['icon_f4_d2_daemoniclure.png', 'default']

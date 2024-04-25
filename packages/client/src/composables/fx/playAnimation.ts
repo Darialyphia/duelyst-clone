@@ -24,9 +24,7 @@ export const playAnimation: FxCommand<'playAnimation'> = (
     console.warn(
       `FXContext: animation not found on sprite : ${animationName}. Available animations are ${Object.keys(sheet.animations).join(', ')}`
     );
-    return () => {
-      done();
-    };
+    return done();
   }
   const current = entityAnimationsMap.value.get(entityId)!;
 

@@ -187,9 +187,27 @@ export const neutral: CardBlueprint[] = [
     attack: 2,
     maxHp: 3,
     onPlay(session, card) {
+      const modifier = createEntityModifier({
+        id: 'primus_fist_headhunter_buff',
+        visible: true,
+        name: 'Fist of the Primus',
+        description: '+1 Attack.',
+        stackable: true,
+        stacks: 1,
+        mixins: [
+          modifierInterceptorMixin({
+            key: 'attack',
+            duration: Infinity,
+            keywords: [],
+            interceptor: modifier => atk => {
+              return atk + 1 * modifier.stacks!;
+            }
+          })
+        ]
+      });
       openingGambit(card, (session, attachedTo) => {
         session.entitySystem.getNearbyAllyMinions(attachedTo).forEach(entity => {
-          entity.addInterceptor('attack', atk => atk + 1);
+          entity.addModifier(modifier);
         });
       });
     }
@@ -286,18 +304,13 @@ export const neutral: CardBlueprint[] = [
           {
             onApplied(session, card) {
               const handler = () => {
-                const onTakeDamage = () => {
+                card.player.opponent.general.once(ENTITY_EVENTS.AFTER_TAKE_DAMAGE, () => {
                   const remove = card.addInterceptor(
                     'manaCost',
                     (val: number) => val - 1
                   );
                   card.player.once(PLAYER_EVENTS.TURN_END, remove);
-                };
-
-                card.player.opponent.general.once(
-                  ENTITY_EVENTS.AFTER_TAKE_DAMAGE,
-                  onTakeDamage
-                );
+                });
               };
 
               const { activate, deactivate } = onlyDuringOwnerTurn(card, handler);
