@@ -159,5 +159,6 @@ const rarityIcon = computed(() =>
   line-height: 1.2;
   color: #bbf7f7;
   text-align: center;
+  white-space: pre-wrap;
 }
 </style>

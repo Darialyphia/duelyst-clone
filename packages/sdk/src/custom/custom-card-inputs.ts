@@ -1,4 +1,4 @@
-import type { Point3D } from '@game/shared';
+import type { MaybePromise, Point3D } from '@game/shared';
 import type { CustomCardNode, inferProcessedNode } from './custom-card-nodes';
 
 import type { GameSession } from '../game-session';
@@ -9,20 +9,21 @@ export type EnumCardInput<T> = {
   label: string;
   choices: Array<{
     label: string;
+    description: string;
     value: (session: GameSession, castPoint: Point3D) => T;
   }>;
 };
 
 export type NumberCardInput = { type: 'number'; label: string; allowNegative: boolean };
 
-export type NodeCardInput<T extends CustomCardInput[], U> = {
+export type NodeCardInput<T extends CustomCardInput[]> = {
   type: 'node';
   label: string;
-  choices: CustomCardNode<T, U>[];
+  choices: CustomCardNode<T>[];
 };
 
-export type CustomCardInput<T = any, U = any> = T extends CustomCardInput[]
-  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T, U>
+export type CustomCardInput<T = any> = T extends CustomCardInput[]
+  ? EnumCardInput<T> | NumberCardInput | NodeCardInput<T>
   : EnumCardInput<T> | NumberCardInput;
 
 export type inferProcessedInput<T> =
@@ -30,8 +31,8 @@ export type inferProcessedInput<T> =
     ? U
     : T extends NumberCardInput
       ? number
-      : T extends NodeCardInput<infer Input, infer Return>
-        ? Return
+      : T extends NodeCardInput<any>
+        ? () => MaybePromise<any>
         : 'Unknown CustomCardInput type';
 
 export const attackModifierInput = {
@@ -48,7 +49,7 @@ export const hpModifierInput = {
 
 export const amountInput = {
   type: 'number',
-  label: 'string',
+  label: 'Amount',
   allowNegative: false
 } satisfies CustomCardInput;
 
@@ -57,25 +58,29 @@ export const targetInput = {
   label: 'Target',
   choices: [
     {
-      label: 'An enemy unit',
+      label: 'An enemy',
+      description: 'an enemy',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'An ally unit',
+      label: 'An ally',
+      description: 'an ally',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'An enemy minion',
+      description: 'an enemy minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'An ally minion',
+      description: 'an allied minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
@@ -83,94 +88,123 @@ export const targetInput = {
 
     {
       label: 'The enemy general',
+      description: 'the enemy general',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'Your general',
+      description: 'your general',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'A nearby enemy unit',
+      label: 'A nearby enemy',
+      description: 'a nearby enemy',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'A nearby enemy minion',
+      description: 'a nearby enemy minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'A nearby ally unit',
+      label: 'A nearby ally',
+      description: 'a nearby ally',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'A nearby ally minion',
+      description: 'a nearby allied minion',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All enemy units',
+      label: 'All enemies',
+      description: 'all enemies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All enemy minions',
+      description: 'all enemy minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'All ally units',
+      label: 'All allies',
+      description: 'all allies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All ally minions',
+      description: 'all allied minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All nearby enemy units',
+      label: 'All nearby enemy',
+      description: 'all nearby enemies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All nearby enemy minions',
+      description: 'all  nearby enemy minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
-      label: 'All nearby ally units',
+      label: 'All nearby allies',
+      description: 'all nearby allies',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
     {
       label: 'All nearby ally minions',
+      description: 'all nearby ally minions',
       value(session, castPoint) {
         return [] as Entity[];
       }
     },
 
     {
-      label: 'All units',
+      label: 'All minions',
+      description: 'all minions',
+      value(session, castPoint) {
+        return [] as Entity[];
+      }
+    },
+    {
+      label: 'Any unit',
+      description: 'a unit',
+      value(session, castPoint) {
+        return [] as Entity[];
+      }
+    },
+    {
+      label: 'everyone',
+      description: 'everyone',
       value(session, castPoint) {
         return [] as Entity[];
       }
