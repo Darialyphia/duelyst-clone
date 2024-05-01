@@ -1,18 +1,5 @@
-import { AnimatedSprite, Graphics } from 'pixi.js';
+import { AnimatedSprite } from 'pixi.js';
 import type { FxCommand } from '../useFx';
-import { Viewport } from 'pixi-viewport';
-
-const waitUntil = <T>(cond: () => T) => {
-  return new Promise<T>(resolve => {
-    const interval = setInterval(() => {
-      const val = cond();
-      if (val) {
-        clearInterval(interval);
-        resolve(val);
-      }
-    }, 50);
-  });
-};
 
 export const playSfxOnScreenCenter: FxCommand<'playSfxOnScreenCenter'> = async (
   { assets, camera, done },

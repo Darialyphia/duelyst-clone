@@ -1,12 +1,6 @@
 import { GameAction, type DefaultSchema, type SerializedAction } from './action';
 import { GameSession } from '../game-session';
-import type {
-  AnyAsyncFunction,
-  AnyFunction,
-  Constructor,
-  MaybePromise,
-  Serializable
-} from '@game/shared';
+import type { Constructor, MaybePromise, Serializable } from '@game/shared';
 import { AttackAction } from './attack.action';
 import { EndTurnAction } from './end-turn.action';
 import { MoveAction } from './move.action';

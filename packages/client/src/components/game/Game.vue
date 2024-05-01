@@ -46,6 +46,8 @@ onMounted(async () => {
   // We create the pixi app manually instead of using vue3-pixi's <Application /> component
   // because we want to be able to provide a bunch of stuff so we need access to the underlying vue-pixi app
   // and we can forward the providers to it
+  // We also want to use the Stage from @pixi/layers and this is the easiest way to set it up before the pixi app starts
+
   const pixiApp = new Application({
     view: canvas.value,
     width: window.innerWidth,

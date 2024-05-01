@@ -38,8 +38,12 @@ watchEffect(() => {
 });
 
 const filters = computed(() => {
-  const result: Filter[] = [outlineFilter];
+  const result: Filter[] = [];
 
+  // we dont always apply the outline filter, even if we can set its width to 0, because otherwise FPS goes bye bye when there are many units
+  if (isSelected.value || isHovered.value) {
+    result.push(outlineFilter);
+  }
   if (entity.value.hasKeyword(KEYWORDS.EXHAUSTED)) {
     result.push(exhaustedFilter);
   }
@@ -62,7 +66,7 @@ const lightColor = computed(() => {
     .with(FACTIONS.NEUTRAL, () => 0xffffff)
     .exhaustive();
 });
-const MIN_LIGHTNESS = 0.1;
+const MIN_LIGHTNESS = 0;
 const MAX_LIGHTNESS = 1.7;
 const lightBrightness = ref(MIN_LIGHTNESS);
 watchEffect(() => {
@@ -90,7 +94,13 @@ watchEffect(() => {
       }
     "
   >
-    <PointLight :color="lightColor" :brightness="lightBrightness" :x="0" :y="50" />
+    <PointLight
+      v-if="lightBrightness > 0"
+      :color="lightColor"
+      :brightness="lightBrightness"
+      :x="0"
+      :y="50"
+    />
 
     <IlluminatedSprite
       v-if="diffuseTextures && normalTextures"
