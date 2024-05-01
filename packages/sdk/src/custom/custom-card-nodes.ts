@@ -1,10 +1,12 @@
 import type { AnyCard } from '../card/card';
-import { dyingWish, openingGambit, rush } from '../card/card-utils';
+import { dyingWish, onGameEvent, openingGambit, rush } from '../card/card-utils';
 import type { GameSession } from '../game-session';
 import { createEntityModifier } from '../modifier/entity-modifier';
 import {
   amountInput,
   attackModifierInput,
+  entityEventInput,
+  entityEventSourceInput,
   hpModifierInput,
   targetInput,
   type CustomCardInput,
@@ -15,6 +17,8 @@ import {
 import { modifierStatModifierMixin } from '../modifier/mixins/stat-modifier.mixin';
 import { match } from 'ts-pattern';
 import type { MaybePromise } from '@game/shared';
+import type { Unit } from '../card/unit';
+import type { Entity } from '../entity/entity';
 
 type inferInputs<T extends CustomCardInput[]> = {
   [P in keyof T]: inferProcessedInput<T[P]>;
@@ -75,7 +79,7 @@ const getInputDescriptions = <TNode extends AnyCardNode>(
   nodeConfig: NodeConfig[],
   node: TNode
 ): inferDescriptions<TNode['inputs']> => {
-  const ret = nodeConfig.map((conf, index) => {
+  return nodeConfig.map((conf, index) => {
     const input = node.inputs?.[index];
     if (!input) throw new Error('invalid node config');
 
@@ -94,8 +98,6 @@ const getInputDescriptions = <TNode extends AnyCardNode>(
       })
       .run();
   }) as inferDescriptions<TNode['inputs']>;
-  console.log(ret);
-  return ret;
 };
 
 export const dealDamageNode = defineNode({
@@ -230,13 +232,66 @@ export const rushNode = defineNode({
   }
 });
 
+export const eventNode = defineNode({
+  label: 'Whenever',
+  inputs: [
+    entityEventSourceInput,
+    entityEventInput,
+    {
+      type: 'node',
+      label: 'Action',
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode]
+    }
+  ],
+  process(session, card, config, node) {
+    return () => {
+      const [source, event, action] = getInputs(session, card, config, node);
+      const unit = card as Unit & { entity: Entity };
+
+      onGameEvent(unit, `entity:${event}`, ([event]) => {
+        match(source)
+          .with('self', () => {
+            const entity = 'entity' in event ? event.entity : event;
+            if (unit.entity.equals(entity)) action();
+          })
+          .with('ally', () => {
+            const entity = 'entity' in event ? event.entity : event;
+            if (unit.entity.isAlly(entity.id)) action();
+          })
+          .with('enemy', () => {
+            const entity = 'entity' in event ? event.entity : event;
+            if (unit.entity.isEnemy(entity.id)) action();
+          })
+          .with('ally_general', () => {
+            const entity = 'entity' in event ? event.entity : event;
+            if (!entity.isGeneral) return;
+            if (unit.entity.isAlly(entity.id)) action();
+          })
+          .with('enemy_general', () => {
+            const entity = 'entity' in event ? event.entity : event;
+            if (!entity.isGeneral) return;
+            if (unit.entity.isEnemy(entity.id)) action();
+          })
+          .with('any', () => {
+            action();
+          })
+          .exhaustive();
+      });
+    };
+  },
+  getDescription(config, node) {
+    const [source, event, action] = getInputDescriptions(config, node);
+    return `Whenever ${source} ${event}, ${action}`;
+  }
+});
+
 export const rootNode = defineNode({
   label: 'Choose an Action',
   inputs: [
     {
       type: 'node',
       label: 'Effect type',
-      choices: [openingGambitNode, dyingWishNode, rushNode]
+      choices: [openingGambitNode, dyingWishNode, rushNode, eventNode]
     }
   ] as const,
   process(session, card, config, node) {

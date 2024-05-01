@@ -95,7 +95,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
   z-index: 10;
 
   width: 15rem;
-  max-height: 200px;
+  max-height: 300px;
   margin-top: 8px;
   padding-block: var(--size-2);
 

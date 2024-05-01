@@ -20,7 +20,7 @@ const config = defineModel<NodeConfig[]>('config', { required: true });
 </script>
 
 <template>
-  <div v-if="node" style="margin-block: 1rem; padding-left: 1rem">
+  <div v-if="node" style="margin-block-end: 1rem; padding-left: 1rem">
     <div v-for="(input, inputIndex) in node.inputs" :key="input.label">
       <Label>{{ input.label }}</Label>
 

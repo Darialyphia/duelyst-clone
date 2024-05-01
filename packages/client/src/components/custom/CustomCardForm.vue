@@ -76,7 +76,8 @@ const description = computed(() => {
 
       <Label>Effects</Label>
       <ul>
-        <li v-for="(node, index) in form.nodes" :key="index">
+        <li v-for="(node, index) in form.nodes" :key="index" class="flex gap-2">
+          <UiIconButton name="mdi:close" class="error-button self-start" />
           <CustomCardNode v-model:config="form.nodes[index]" :node="rootNode" />
         </li>
       </ul>
@@ -85,7 +86,7 @@ const description = computed(() => {
         type="button"
         @click="form.nodes.push([{ value: undefined as any, next: [] }])"
       >
-        Add new effect
+        Add effect
       </UiButton>
     </form>
     <div class="sticky top-0" style="height: 75dvh">

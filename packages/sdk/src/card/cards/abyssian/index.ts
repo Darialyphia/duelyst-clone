@@ -1,6 +1,6 @@
 import { Vec3 } from '@game/shared';
 import { config } from '../../../config';
-import { isEmpty } from '../../../entity/entity-utils';
+import { isEmpty, isEnemy } from '../../../entity/entity-utils';
 import { isWithinCells } from '../../../utils/targeting';
 import { type CardBlueprint } from '../../card-lookup';
 import {
@@ -93,6 +93,7 @@ export const abyssian: CardBlueprint[] = [
       openingGambit(card, async session => {
         const [entity] = getFollowupEntities(session, card);
         if (!entity) return;
+
         await session.fxSystem.playSfxOnEntity(entity.id, {
           resourceName: 'fx_impactred',
           animationName: 'impactredmedium'
@@ -112,6 +113,7 @@ export const abyssian: CardBlueprint[] = [
         if (entity.isGeneral) return false;
 
         return entity.hp < entity.maxHp;
+        // return entity.attack <= 3;
       }
     }
   },
@@ -128,7 +130,8 @@ export const abyssian: CardBlueprint[] = [
       const entity = session.entitySystem.getEntityAt(point);
       if (!entity) return false;
       if (entity.isGeneral) return false;
-      return !entity.player.equals(session.playerSystem.activePlayer);
+
+      return isEnemy(session, entity.id, session.playerSystem.activePlayer.id);
     },
     followup: {
       minTargetCount: 1,
@@ -144,7 +147,7 @@ export const abyssian: CardBlueprint[] = [
       if (entity.hp <= 0) return;
 
       // we delay the movement to let the client side damage indicator play out
-      // Should the SDK be responsible to display the indicators to avoid doing this ?
+      // Maybe the SDK should be responsible of displaying the indicators to avoid doing this pepega shit ?
       setTimeout(() => {
         entity.move([card.followupTargets[0]]);
       }, 1000);
