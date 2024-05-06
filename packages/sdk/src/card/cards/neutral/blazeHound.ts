@@ -1,7 +1,7 @@
 import { ENTITY_EVENTS } from '../../../entity/entity';
 import { createCardModifier } from '../../../modifier/card-modifier';
 import { PLAYER_EVENTS } from '../../../player/player';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import {
   FACTIONS,
   RARITIES,

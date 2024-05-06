@@ -1,8 +1,9 @@
-import { CARDS, type CardBlueprint } from './card-lookup';
+import { CARDS } from './card-lookup';
 import { Interceptable, type inferInterceptor } from '../utils/helpers';
 import { Card } from './card';
 import type { Nullable, Point3D } from '@game/shared';
 import { ENTITY_EVENTS, type Entity } from '../entity/entity';
+import type { CardBlueprint } from './card-blueprint';
 
 export type UnitInterceptor = Unit['interceptors'];
 

@@ -1,4 +1,4 @@
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { FACTIONS, RARITIES, CARD_KINDS, openingGambit } from '../../card-utils';
 
 export default defineBlueprint({

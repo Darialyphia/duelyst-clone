@@ -1,4 +1,4 @@
-import { type CardBlueprint } from '../../card-lookup';
+import { type CardBlueprint } from '../../card-blueprint';
 import healingMystic from './healingMystic';
 import bloodTearAlchemist from './bloodTearAlchemist';
 import arakiHeadhunter from './arakiHeadhunter';

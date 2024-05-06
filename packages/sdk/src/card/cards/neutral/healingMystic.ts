@@ -1,6 +1,5 @@
-import { head } from 'lodash-es';
 import { isEmpty } from '../../../entity/entity-utils';
-import { defineBlueprint, type CardBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import {
   CARD_KINDS,
   FACTIONS,

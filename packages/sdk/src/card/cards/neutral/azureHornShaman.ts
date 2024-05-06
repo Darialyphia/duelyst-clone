@@ -1,6 +1,6 @@
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { FACTIONS, RARITIES, CARD_KINDS, dyingWish } from '../../card-utils';
 
 export default defineBlueprint({

@@ -1,6 +1,6 @@
 import { getNearest } from '../../../entity/entity-utils';
 import { airdrop } from '../../../modifier/modifier-utils';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { CARD_KINDS, FACTIONS, RARITIES, openingGambit } from '../../card-utils';
 
 export default defineBlueprint({

@@ -1,5 +1,5 @@
 import type { AnyCard } from '../../card';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { CARD_KINDS, FACTIONS, RARITIES, whileOnBoard } from '../../card-utils';
 
 export default defineBlueprint({

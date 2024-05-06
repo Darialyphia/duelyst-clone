@@ -1,3 +1,3 @@
-import { type CardBlueprint } from '../../card-lookup';
+import { type CardBlueprint } from '../../card-blueprint';
 
 export const magmar: CardBlueprint[] = [];

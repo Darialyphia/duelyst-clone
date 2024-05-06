@@ -1,7 +1,7 @@
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { modifierInterceptorMixin } from '../../../modifier/mixins/interceptor.mixin';
 import { KEYWORDS } from '../../../utils/keywords';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { FACTIONS, RARITIES, CARD_KINDS, onGameEvent } from '../../card-utils';
 
 export default defineBlueprint({

@@ -1,5 +1,5 @@
 import { PLAYER_EVENTS } from '../../../player/player';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { FACTIONS, RARITIES, CARD_KINDS, TRIBES, rush } from '../../card-utils';
 
 export default defineBlueprint({

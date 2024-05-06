@@ -1,4 +1,4 @@
-import { type CardBlueprint } from '../../card-lookup';
+import { type CardBlueprint } from '../../card-blueprint';
 import daemonicLure from './daemonicLure';
 import { maev } from './generals';
 import nightSorrowAssasin from './nightSorrowAssasin';

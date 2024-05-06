@@ -1,5 +1,5 @@
 import { isEmpty, isEnemy } from '../../../entity/entity-utils';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { CARD_KINDS, FACTIONS, RARITIES } from '../../card-utils';
 
 export default defineBlueprint({

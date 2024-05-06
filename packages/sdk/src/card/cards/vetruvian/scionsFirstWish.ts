@@ -1,6 +1,6 @@
 import { createEntityModifier } from '../../../modifier/entity-modifier';
 import { modifierStatModifierMixin } from '../../../modifier/mixins/stat-modifier.mixin';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { CARD_KINDS, FACTIONS, RARITIES } from '../../card-utils';
 
 export default defineBlueprint({

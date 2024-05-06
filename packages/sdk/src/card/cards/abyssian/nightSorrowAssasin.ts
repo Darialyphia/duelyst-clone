@@ -1,5 +1,5 @@
 import { isWithinCells } from '../../../utils/targeting';
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import {
   CARD_KINDS,
   FACTIONS,

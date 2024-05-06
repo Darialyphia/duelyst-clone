@@ -1,6 +1,7 @@
-import { CARDS, type CardBlueprint } from './card-lookup';
+import { CARDS } from './card-lookup';
 import { Card } from './card';
 import type { Point3D } from '@game/shared';
+import type { CardBlueprint } from './card-blueprint';
 
 export type SpellInterceptor = Spell['interceptors'];
 

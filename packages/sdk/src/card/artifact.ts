@@ -1,6 +1,7 @@
-import { CARDS, type CardBlueprint } from './card-lookup';
+import { CARDS } from './card-lookup';
 import { Card } from './card';
 import type { Entity } from '../entity/entity';
+import type { CardBlueprint } from './card-blueprint';
 
 export type ArtifactInterceptor = Artifact['interceptors'];
 

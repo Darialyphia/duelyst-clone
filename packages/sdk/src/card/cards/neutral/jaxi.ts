@@ -1,4 +1,4 @@
-import { defineBlueprint } from '../../card-lookup';
+import { defineBlueprint } from '../../card-blueprint';
 import { CARD_KINDS, FACTIONS, RARITIES, dyingWish, ranged } from '../../card-utils';
 import type { Unit } from '../../unit';
 
