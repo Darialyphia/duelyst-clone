@@ -26,6 +26,7 @@ export type NodeCardInput<T extends CustomCardInput[]> = {
   type: 'node';
   label: string;
   choices: CustomCardNode<T>[];
+  multiple: boolean;
 };
 
 export type CustomCardInput<T = any> = T extends CustomCardInput[]

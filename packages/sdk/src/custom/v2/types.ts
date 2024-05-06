@@ -1,6 +1,7 @@
 import type { Faction, Rarity } from '../../card/card-utils';
 
 export type SerializedBlueprintUnit = {
+  id: string;
   name: string;
   faction: Faction;
   rarity: Rarity;
@@ -29,6 +30,5 @@ export type SerializedBlueprintEffect = {
 
 type Node<TId extends string, TInputs extends any[]> = {
   id: TId;
-  inputs: TInputs;
-  serialize(): SerializedNode<TId, TInputs>;
+  serialize(...inputs: TInputs): SerializedNode<TId, TInputs>;
 };

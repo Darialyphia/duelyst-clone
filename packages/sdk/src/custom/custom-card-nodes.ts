@@ -181,7 +181,8 @@ export const openingGambitNode = defineNode({
     {
       type: 'node',
       label: 'Action',
-      choices: [dealDamageNode, healNode, statChangeNode, drawNode] as const
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode] as const,
+      multiple: true
     }
   ],
   process(session, card, config, node) {
@@ -204,7 +205,8 @@ export const dyingWishNode = defineNode({
     {
       type: 'node',
       label: 'Action',
-      choices: [dealDamageNode, healNode, statChangeNode, drawNode]
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode],
+      multiple: true
     }
   ],
   process(session, card, config, node) {
@@ -240,7 +242,8 @@ export const eventNode = defineNode({
     {
       type: 'node',
       label: 'Action',
-      choices: [dealDamageNode, healNode, statChangeNode, drawNode]
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode],
+      multiple: true
     }
   ],
   process(session, card, config, node) {
@@ -291,7 +294,8 @@ export const rootNode = defineNode({
     {
       type: 'node',
       label: 'Effect type',
-      choices: [openingGambitNode, dyingWishNode, rushNode, eventNode]
+      choices: [openingGambitNode, dyingWishNode, rushNode, eventNode],
+      multiple: true
     }
   ] as const,
   process(session, card, config, node) {
