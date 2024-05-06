@@ -26,6 +26,6 @@ export class Artifact extends Card<ArtifactCtx> {
   }
 
   async onPlay(ctx: ArtifactCtx) {
-    return this.blueprint.onEquiped(this.session, ctx.equipedOn);
+    return this.blueprint.onEquiped(this.session, ctx.equipedOn, this.blueprint.meta);
   }
 }

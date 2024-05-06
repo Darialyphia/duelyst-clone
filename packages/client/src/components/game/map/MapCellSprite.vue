@@ -6,7 +6,7 @@ import { Hitbox } from '~/utils/hitbox';
 
 const { cellId } = defineProps<{ cellId: CellId }>();
 
-const { assets, ui, pathfinding, fx, session } = useGame();
+const { assets, ui, fx } = useGame();
 const cell = useGameSelector(session => session.boardSystem.getCellAt(cellId)!);
 
 const diffuseTextures = computed(() => {
@@ -33,35 +33,11 @@ const normalTextures = computed(() => {
 const shape = assets.getHitbox('tile');
 const hitArea = Hitbox.from(shape.shapes[0].points, shape.shapes[0].source, 0.5);
 
-const pathFilter = new ColorOverlayFilter(0x4455bb, 0.5);
 const attackFilter = new ColorOverlayFilter(0xff0000, 0.5);
-const isMovePathHighlighted = computed(() => {
-  if (!ui.hoveredCell.value) return false;
-  if (ui.targetingMode.value !== TARGETING_MODES.BASIC) return false;
-
-  const entityOnCell = session.entitySystem.getEntityAt(cell.value);
-  if (!ui.selectedEntity.value) return false;
-
-  const canMoveTo = pathfinding.canMoveTo(ui.selectedEntity.value, cell.value);
-  if (!canMoveTo) return false;
-
-  const path = pathfinding.getPath(
-    ui.selectedEntity.value,
-    ui.hoveredCell.value,
-    ui.selectedEntity.value.reach
-  );
-
-  if (!path) return false;
-
-  const isInPath = path.some(vec => vec.equals(cell.value.position));
-
-  return isInPath || entityOnCell?.equals(ui.selectedEntity.value);
-});
 
 const filters = computed(() => {
   const result: Filter[] = [];
   if (fx.isPlaying.value) return result;
-  if (isMovePathHighlighted.value) result.push(pathFilter);
   if (
     ui.selectedEntity.value &&
     ui.hoveredCell.value?.equals(cell.value) &&

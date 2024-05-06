@@ -9,4 +9,5 @@ const { cell } = defineProps<{ cell: Cell }>();
   <DangerHighlight :cell="cell" />
   <SummonHighlight :cell="cell" />
   <FollowupHighlight :cell="cell" />
+  <PathHighlight :cell-id="cell.id" />
 </template>

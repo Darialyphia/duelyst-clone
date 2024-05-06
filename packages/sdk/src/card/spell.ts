@@ -29,6 +29,6 @@ export class Spell extends Card<SpellCtx> {
   async onPlay(ctx: SpellCtx) {
     this.castPoint = ctx.position;
     this.followupTargets = ctx.targets;
-    this.blueprint.onPlay(this.session, this);
+    this.blueprint.onPlay(this.session, this, this.blueprint.meta);
   }
 }

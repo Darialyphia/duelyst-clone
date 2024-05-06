@@ -224,10 +224,10 @@ export const dyingWishNode = defineNode({
 export const rushNode = defineNode({
   label: 'Rush',
   inputs: [],
-  process(session, card, config, node) {
+  process(session, card) {
     return () => rush(card as any);
   },
-  getDescription(config, node) {
+  getDescription() {
     return `Rush`;
   }
 });

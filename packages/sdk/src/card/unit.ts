@@ -62,7 +62,7 @@ export class Unit extends Card<UnitCtx> {
       offset: { x: 0, y: 20 },
       delay: 200
     });
-    await this.blueprint.onPlay(this.session, this as any);
+    await this.blueprint.onPlay(this.session, this as any, this.blueprint.meta);
     this.entity.emit(ENTITY_EVENTS.CREATED, this.entity);
 
     if (this.shouldExhaustOnPlay) {

@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash-es';
 import type { CardBlueprintId } from './card';
-import type { MaybePromise, Point3D, Prettify, Values } from '@game/shared';
+import type { AnyObject, MaybePromise, Point3D, Prettify, Values } from '@game/shared';
 import type { GameSession } from '../game-session';
 import type { Entity } from '../entity/entity';
 import { lyonar } from './cards/lyonar';
@@ -16,7 +16,7 @@ import type { Spell } from './spell';
 import type { CardModifier } from '../modifier/card-modifier';
 import type { Artifact } from './artifact';
 
-type CardBlueprintBase = {
+type CardBlueprintBase<T extends AnyObject> = {
   id: CardBlueprintId;
   name: string;
   description: string;
@@ -24,14 +24,19 @@ type CardBlueprintBase = {
   rarity: Rarity;
   manaCost: number;
   spriteId: string;
+  meta: T;
 };
 
-type CardBlueprintUnit = {
+type CardBlueprintUnit<T extends AnyObject> = {
   attack: number;
   maxHp: number;
   modifiers?: CardModifier<Unit>[];
   tribe?: Tribe;
-  onPlay(session: GameSession, card: Unit & { entity: Entity }): MaybePromise<void>;
+  onPlay(
+    session: GameSession,
+    card: Unit & { entity: Entity },
+    meta: T
+  ): MaybePromise<void>;
   followup?: {
     minTargetCount: number;
     maxTargetCount: number;
@@ -44,8 +49,8 @@ type CardBlueprintUnit = {
   };
 };
 
-type CardBlueprintSpell = {
-  onPlay(session: GameSession, card: Spell): Promise<void>;
+type CardBlueprintSpell<T extends AnyObject> = {
+  onPlay(session: GameSession, card: Spell, meta: T): Promise<void>;
   modifiers?: CardModifier<Spell>[];
   isTargetable(session: GameSession, point: Point3D): boolean;
   followup?: {
@@ -60,9 +65,9 @@ type CardBlueprintSpell = {
   };
 };
 
-type CardBlueprintArtifact = {
-  onEquiped(session: GameSession, equipedOn: Entity): Promise<void>;
-  onRemoved(session: GameSession, equipedOn: Entity): Promise<void>;
+type CardBlueprintArtifact<T extends AnyObject> = {
+  onEquiped(session: GameSession, equipedOn: Entity, meta: T): Promise<void>;
+  onRemoved(session: GameSession, equipedOn: Entity, meta: T): Promise<void>;
   modifiers?: CardModifier<Artifact>[];
   followup?: {
     minTargetCount: number;
@@ -76,22 +81,25 @@ type CardBlueprintArtifact = {
   };
 };
 
-export type CardBlueprint = Prettify<
-  | (CardBlueprintBase &
-      CardBlueprintArtifact & {
+export type CardBlueprint<T extends AnyObject = AnyObject> = Prettify<
+  | (CardBlueprintBase<T> &
+      CardBlueprintArtifact<T> & {
         kind: Extract<CardKind, 'ARTIFACT'>;
       })
-  | (CardBlueprintBase &
-      CardBlueprintUnit & {
+  | (CardBlueprintBase<T> &
+      CardBlueprintUnit<T> & {
         kind: Extract<CardKind, 'MINION' | 'GENERAL'>;
       })
-  | (CardBlueprintBase &
-      CardBlueprintSpell & {
+  | (CardBlueprintBase<T> &
+      CardBlueprintSpell<T> & {
         kind: Extract<CardKind, 'SPELL'>;
       })
 >;
 
-const allCards: CardBlueprint[] = [
+export const defineBlueprint = <T extends AnyObject>(blueprint: CardBlueprint<T>) =>
+  blueprint;
+
+const allCards: CardBlueprint<AnyObject>[] = [
   ...lyonar,
   ...songhai,
   ...vetruvian,
