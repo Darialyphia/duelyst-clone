@@ -28,6 +28,7 @@ type inferDescriptions<T extends CustomCardInput[]> = {
 };
 
 export type CustomCardNode<T extends CustomCardInput[]> = {
+  id: string;
   label: string;
   inputs: [...T];
   process(
@@ -118,6 +119,7 @@ const getInputDescriptions = <TNode extends AnyCardNode>(
 };
 
 export const dealDamageNode = defineNode({
+  id: 'deal_damage',
   label: 'Deal damage',
   inputs: [targetInput, amountInput] as const,
   process(session, card, config, node) {
@@ -132,6 +134,7 @@ export const dealDamageNode = defineNode({
 });
 
 export const healNode = defineNode({
+  id: 'heal',
   label: 'Heal',
   inputs: [targetInput, amountInput] as const,
   process(session, card, config, node) {
@@ -146,6 +149,7 @@ export const healNode = defineNode({
 });
 
 export const drawNode = defineNode({
+  id: 'draw_cards',
   label: 'Draw X',
   inputs: [amountInput] as const,
   process(session, card, config, node) {
@@ -160,6 +164,7 @@ export const drawNode = defineNode({
 });
 
 export const statChangeNode = defineNode({
+  id: 'stat_change',
   label: 'Give +X / +X',
   inputs: [attackModifierInput, hpModifierInput, targetInput] as const,
   process(session, card, config, node) {
@@ -193,6 +198,7 @@ export const statChangeNode = defineNode({
 });
 
 export const openingGambitNode = defineNode({
+  id: 'opening_gambit',
   label: 'Opening Gambit',
   inputs: [
     {
@@ -217,6 +223,7 @@ export const openingGambitNode = defineNode({
 });
 
 export const dyingWishNode = defineNode({
+  id: 'dying_wish',
   label: 'Dying Wish',
   inputs: [
     {
@@ -241,6 +248,7 @@ export const dyingWishNode = defineNode({
 });
 
 export const rushNode = defineNode({
+  id: 'rush',
   label: 'Rush',
   inputs: [],
   process(session, card) {
@@ -252,6 +260,7 @@ export const rushNode = defineNode({
 });
 
 export const eventNode = defineNode({
+  id: 'event',
   label: 'Whenever',
   inputs: [
     entityEventSourceInput,
@@ -308,6 +317,7 @@ export const eventNode = defineNode({
 });
 
 export const rootNode = defineNode({
+  id: 'root',
   label: 'Choose an Action',
   inputs: [
     {
