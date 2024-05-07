@@ -5,25 +5,10 @@ const { options } = defineProps<{
 }>();
 
 const selected = defineModel<T>({ required: true });
-const search = ref('');
-const filteredOptions = computed(() =>
-  options.filter(option =>
-    option.label.toLowerCase().includes(search.value.toLowerCase())
-  )
-);
-
-const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
-  itemHeight: 32
-});
 </script>
 
 <template>
-  <ComboboxRoot
-    v-model="selected"
-    v-model:search-term="search"
-    class="ui-combobox-root"
-    :display-value="displayValue"
-  >
+  <ComboboxRoot v-model="selected" class="ui-combobox-root" :display-value="displayValue">
     <ComboboxAnchor class="anchor">
       <ComboboxInput />
       <ComboboxTrigger>
@@ -34,18 +19,14 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
     <ComboboxPortal>
       <ComboboxContent class="ui-comboox-content" position="popper">
         <ComboboxViewport class="viewport">
-          <div v-bind="containerProps" style="height: 300px">
-            <div v-bind="wrapperProps">
-              <ComboboxItem
-                v-for="option in list"
-                :key="option.index"
-                :value="option.data.value"
-                class="item"
-              >
-                {{ option.data.label }}
-              </ComboboxItem>
-            </div>
-          </div>
+          <ComboboxItem
+            v-for="(option, index) in options"
+            :key="index"
+            :value="option.value"
+            class="item"
+          >
+            {{ option.label }}
+          </ComboboxItem>
         </ComboboxViewport>
       </ComboboxContent>
     </ComboboxPortal>
@@ -94,7 +75,6 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
 :global(.ui-comboox-content) {
   z-index: 10;
 
-  width: 15rem;
   max-height: 300px;
   margin-top: 8px;
   padding-block: var(--size-2);
@@ -111,6 +91,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredOptions, {
   display: flex;
   align-items: center;
   padding: var(--size-1) var(--size-3);
+
   &[data-disabled] {
     pointer-events: none;
     opacity: 0.5;

@@ -25,35 +25,38 @@ const config = defineModel<NodeConfig[]>('config', { required: true });
       <Label>{{ input.label }}</Label>
 
       <div v-if="input.type === 'node'">
-        <UiCombobox
-          :model-value="config[inputIndex].value"
-          :options="
-            input.choices.map((choice, choiceIndex) => ({
-              label: choice.label,
-              value: String(choiceIndex)
-            }))
-          "
-          :display-value="val => input.choices[Number(val)].label"
-          @update:model-value="
-            (newValue: any) => {
-              config[inputIndex].value = newValue;
-              if (!isDefined(newValue)) return;
-              // @ts-expect-error
-              config[inputIndex].next = Array.from(
-                { length: input.choices[newValue].inputs.length },
-                () => ({
-                  value: undefined,
-                  next: []
-                })
-              );
-            }
-          "
-        />
-        <CustomCardNode
-          v-if="isDefined(config[inputIndex]?.next)"
-          :node="input.choices[Number(config[inputIndex]?.value)]"
-          :config="config[inputIndex].next"
-        />
+        <template v-if="Array.isArray(config[inputIndex].value)"></template>
+        <template v-else>
+          <UiCombobox
+            :model-value="config[inputIndex].value"
+            :options="
+              input.choices.map((choice, choiceIndex) => ({
+                label: choice.label,
+                value: String(choiceIndex)
+              }))
+            "
+            :display-value="val => input.choices[Number(val)].label"
+            @update:model-value="
+              (newValue: any) => {
+                config[inputIndex].value = newValue;
+                if (!isDefined(newValue)) return;
+                // @ts-expect-error
+                config[inputIndex].next = Array.from(
+                  { length: input.choices[newValue].inputs.length },
+                  () => ({
+                    value: undefined,
+                    next: []
+                  })
+                );
+              }
+            "
+          />
+          <CustomCardNode
+            v-if="isDefined(config[inputIndex]?.next)"
+            :node="input.choices[Number(config[inputIndex]?.value)]"
+            :config="config[inputIndex].next"
+          />
+        </template>
       </div>
 
       <div v-else-if="input.type === 'choices'">
@@ -75,7 +78,16 @@ const config = defineModel<NodeConfig[]>('config', { required: true });
       </div>
 
       <div v-else-if="input.type === 'number'">
-        <UiTextInput id="foo" v-model="config[inputIndex].value" type="number" step="1" />
+        <p v-if="Array.isArray(config[inputIndex].value)" class="color-red-500">
+          The card configuration is invalid and cannot be displayed
+        </p>
+        <UiTextInput
+          v-else
+          id="foo"
+          v-model="config[inputIndex].value as number"
+          type="number"
+          step="1"
+        />
       </div>
     </div>
   </div>

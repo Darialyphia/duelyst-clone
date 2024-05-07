@@ -1,5 +1,5 @@
 import type { Point } from '../types/geometry';
-import type { AnyObject, Entries } from '../types/utils';
+import type { AnyObject, Entries, MaybePromise } from '../types/utils';
 
 export const camelToSnakeCase = (str: string) =>
   str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
@@ -46,4 +46,12 @@ export const objectKeys = <T extends AnyObject>(obj: T) =>
 
 export const padArray = <T>(arr: T[], len: number, fill: T) => {
   return arr.concat(Array(len).fill(fill)).slice(0, len);
+};
+
+export const runPromisesSequentially = async (
+  fns: Array<() => MaybePromise<any>>
+) => {
+  for (const fn of fns) {
+    await fn();
+  }
 };

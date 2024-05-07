@@ -8,6 +8,7 @@ import type { Unit } from '../card/unit';
 export type EnumCardInput<T> = {
   type: 'choices';
   label: string;
+  multiple: boolean;
   choices: Array<{
     label: string;
     description: string;
@@ -26,6 +27,7 @@ export type NodeCardInput<T extends CustomCardInput[]> = {
   type: 'node';
   label: string;
   choices: CustomCardNode<T>[];
+  multiple: boolean;
 };
 
 export type CustomCardInput<T = any> = T extends CustomCardInput[]
@@ -34,7 +36,9 @@ export type CustomCardInput<T = any> = T extends CustomCardInput[]
 
 export type inferProcessedInput<T> =
   T extends EnumCardInput<infer U>
-    ? U
+    ? T['multiple'] extends true
+      ? Array<U>
+      : U
     : T extends NumberCardInput
       ? number
       : T extends NodeCardInput<any>
@@ -62,6 +66,7 @@ export const amountInput = {
 export const targetInput = {
   type: 'choices',
   label: 'Target',
+  multiple: false,
   choices: [
     {
       label: 'An enemy',
@@ -301,6 +306,7 @@ export const targetInput = {
 export const entityEventSourceInput = {
   type: 'choices',
   label: 'Event target',
+  multiple: false,
   choices: [
     {
       label: 'This unit',
@@ -352,6 +358,7 @@ export const entityEventSourceInput = {
 export const entityEventInput = {
   type: 'choices',
   label: 'Event',
+  multiple: true,
   choices: [
     {
       label: 'Is summoned',
@@ -386,6 +393,13 @@ export const entityEventInput = {
       description: 'takes damage',
       value() {
         return ENTITY_EVENTS.AFTER_TAKE_DAMAGE;
+      }
+    },
+    {
+      label: 'Deals damage',
+      description: 'deals damage',
+      value() {
+        return ENTITY_EVENTS.AFTER_DEAL_DAMAGE;
       }
     },
     {

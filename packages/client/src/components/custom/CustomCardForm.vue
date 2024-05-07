@@ -23,7 +23,7 @@ const form = reactive<Omit<CustomCardBlueprint, 'description'>>({
   name: 'My Cool Card',
   attack: 2,
   maxHp: 3,
-  nodes: []
+  nodes: [[{ value: undefined as any, next: [] }]]
 });
 
 const description = computed(() => {
@@ -77,26 +77,10 @@ const description = computed(() => {
       <Label>Effects</Label>
       <ul>
         <li v-for="(node, index) in form.nodes" :key="index" class="flex gap-2">
-          <UiIconButton
-            name="mdi:close"
-            class="error-button self-start"
-            type="button"
-            @click="
-              () => {
-                form.nodes.splice(index, 1);
-              }
-            "
-          />
           <CustomCardNode v-model:config="form.nodes[index]" :node="rootNode" />
         </li>
       </ul>
-      <UiButton
-        class="primary-button"
-        type="button"
-        @click="form.nodes.push([{ value: undefined as any, next: [] }])"
-      >
-        Add effect
-      </UiButton>
+
       <UiButton type="button" @click="() => console.log(form)">Debug</UiButton>
     </form>
     <div class="sticky top-0" style="height: 75dvh">

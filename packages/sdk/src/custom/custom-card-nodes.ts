@@ -16,7 +16,7 @@ import {
 } from './custom-card-inputs';
 import { modifierStatModifierMixin } from '../modifier/mixins/stat-modifier.mixin';
 import { match } from 'ts-pattern';
-import type { MaybePromise } from '@game/shared';
+import { runPromisesSequentially, type MaybePromise } from '@game/shared';
 import type { Unit } from '../card/unit';
 import type { Entity } from '../entity/entity';
 
@@ -43,7 +43,7 @@ export type AnyCardNode = CustomCardNode<CustomCardInput[]>;
 export type inferProcessedNode<T extends AnyCardNode> = Awaited<ReturnType<T['process']>>;
 
 export type NodeConfig = {
-  value: number | string;
+  value: number | string | number[] | string[];
   next: NodeConfig[];
 };
 
@@ -59,17 +59,34 @@ const getInputs = <TNode extends AnyCardNode>(
     const input = node.inputs?.[index];
     if (!input) throw new Error('invalid node config');
 
-    return match(input.type)
-      .with('number', () => Number(conf.value))
-      .with('choices', () => (input as EnumCardInput<any>).choices[Number(conf.value)])
-      .with('node', () => {
-        const childNode = (input as NodeCardInput<any>).choices[Number(conf.value)];
-        return (input as NodeCardInput<any>).choices[Number(conf.value)].process(
-          session,
-          card,
-          conf.next,
-          childNode
-        );
+    return match(input)
+      .with({ type: 'number' }, () => Number(conf.value))
+      .with({ type: 'choices' }, input => {
+        if (input.multiple) {
+          if (!Array.isArray(conf.value)) {
+            throw new Error('Input value needs to be an array');
+          }
+          return conf.value.map(val => {
+            return input.choices[Number(val)];
+          });
+        }
+
+        return input.choices[Number(conf.value)];
+      })
+      .with({ type: 'node' }, input => {
+        if (input.multiple) {
+          if (!Array.isArray(conf.value)) {
+            throw new Error('Input value needs to be an array');
+          }
+          return runPromisesSequentially(
+            conf.value.map(val => {
+              const childNode = input.choices[Number(val)];
+              return () => childNode.process(session, card, conf.next, childNode);
+            })
+          );
+        }
+        const childNode = input.choices[Number(conf.value)];
+        return childNode.process(session, card, conf.next, childNode);
       })
       .run();
   }) as inferInputs<TNode['inputs']>;
@@ -181,6 +198,7 @@ export const openingGambitNode = defineNode({
     {
       type: 'node',
       label: 'Action',
+      multiple: true,
       choices: [dealDamageNode, healNode, statChangeNode, drawNode] as const
     }
   ],
@@ -204,6 +222,7 @@ export const dyingWishNode = defineNode({
     {
       type: 'node',
       label: 'Action',
+      multiple: true,
       choices: [dealDamageNode, healNode, statChangeNode, drawNode]
     }
   ],
@@ -240,42 +259,45 @@ export const eventNode = defineNode({
     {
       type: 'node',
       label: 'Action',
+      multiple: true,
       choices: [dealDamageNode, healNode, statChangeNode, drawNode]
     }
   ],
   process(session, card, config, node) {
     return () => {
-      const [source, event, action] = getInputs(session, card, config, node);
+      const [source, events, action] = getInputs(session, card, config, node);
       const unit = card as Unit & { entity: Entity };
 
-      onGameEvent(unit, `entity:${event}`, ([event]) => {
-        match(source)
-          .with('self', () => {
-            const entity = 'entity' in event ? event.entity : event;
-            if (unit.entity.equals(entity)) action();
-          })
-          .with('ally', () => {
-            const entity = 'entity' in event ? event.entity : event;
-            if (unit.entity.isAlly(entity.id)) action();
-          })
-          .with('enemy', () => {
-            const entity = 'entity' in event ? event.entity : event;
-            if (unit.entity.isEnemy(entity.id)) action();
-          })
-          .with('ally_general', () => {
-            const entity = 'entity' in event ? event.entity : event;
-            if (!entity.isGeneral) return;
-            if (unit.entity.isAlly(entity.id)) action();
-          })
-          .with('enemy_general', () => {
-            const entity = 'entity' in event ? event.entity : event;
-            if (!entity.isGeneral) return;
-            if (unit.entity.isEnemy(entity.id)) action();
-          })
-          .with('any', () => {
-            action();
-          })
-          .exhaustive();
+      events.forEach(event => {
+        onGameEvent(unit, `entity:${event}`, ([event]) => {
+          match(source)
+            .with('self', () => {
+              const entity = 'entity' in event ? event.entity : event;
+              if (unit.entity.equals(entity)) action();
+            })
+            .with('ally', () => {
+              const entity = 'entity' in event ? event.entity : event;
+              if (unit.entity.isAlly(entity.id)) action();
+            })
+            .with('enemy', () => {
+              const entity = 'entity' in event ? event.entity : event;
+              if (unit.entity.isEnemy(entity.id)) action();
+            })
+            .with('ally_general', () => {
+              const entity = 'entity' in event ? event.entity : event;
+              if (!entity.isGeneral) return;
+              if (unit.entity.isAlly(entity.id)) action();
+            })
+            .with('enemy_general', () => {
+              const entity = 'entity' in event ? event.entity : event;
+              if (!entity.isGeneral) return;
+              if (unit.entity.isEnemy(entity.id)) action();
+            })
+            .with('any', () => {
+              action();
+            })
+            .exhaustive();
+        });
       });
     };
   },
@@ -291,6 +313,7 @@ export const rootNode = defineNode({
     {
       type: 'node',
       label: 'Effect type',
+      multiple: true,
       choices: [openingGambitNode, dyingWishNode, rushNode, eventNode]
     }
   ] as const,

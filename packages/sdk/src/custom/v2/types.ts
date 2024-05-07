@@ -9,7 +9,7 @@ export type SerializedBlueprintUnit = {
   manaCost: number;
   attack: number;
   maxHp: number;
-  effects: any[];
+  effects: Array<SerializedBlueprintEffect>;
 };
 
 export type SerializedNode<TId extends string, TInputs extends any[]> = Readonly<
