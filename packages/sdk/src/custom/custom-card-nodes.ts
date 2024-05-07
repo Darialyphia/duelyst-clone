@@ -259,8 +259,8 @@ export const eventNode = defineNode({
     {
       type: 'node',
       label: 'Action',
-      multiple: true,
-      choices: [dealDamageNode, healNode, statChangeNode, drawNode]
+      choices: [dealDamageNode, healNode, statChangeNode, drawNode],
+      multiple: true
     }
   ],
   process(session, card, config, node) {
